@@ -24,6 +24,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.Utils;
@@ -87,7 +88,11 @@ public class SeemView extends ActionBarActivity implements ReplyFragmentSelected
                             .setText(mAppSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }*/
-        depthRepliesIds.add(-1);
+        Reply baseReply = new Reply();
+        baseReply.setId(AppSingleton.getInstance().getNewImageId());
+        AppSingleton.getInstance().saveReply(baseReply);
+
+        depthRepliesIds.add(baseReply.getId());
         mAppSectionsPagerAdapter.notifyDataSetChanged();
     }
 
@@ -123,11 +128,27 @@ public class SeemView extends ActionBarActivity implements ReplyFragmentSelected
 
     @Override
     public void replySelected(int id, int depth) {
+        boolean add = false;
         Utils.debug("Hey "+id);
-        depthRepliesIds.add(id);
-        mAppSectionsPagerAdapter.notifyDataSetChanged();
-        mViewPager.setCurrentItem(depthRepliesIds.size()-1);
+        if(depth < depthRepliesIds.size()){
+            int lastId = depthRepliesIds.get(depth);
+            if(lastId == id){
+                //Already exist, just navigate
+            } else {
+                for(int i = depthRepliesIds.size()-1;depth < depthRepliesIds.size();i--){
+                    depthRepliesIds.remove(i);
+                }
+                add = true;
+            }
+        } else {
+            add = true;
+        }
+        if(add){
+            depthRepliesIds.add(id);
+            mAppSectionsPagerAdapter.notifyDataSetChanged();
+        }
 
+        mViewPager.setCurrentItem(depth);
         /*ReplyFragment replyFragment = (ReplyFragment)
                 getSupportFragmentManager().findFragmentById(R.id.reply_fragment);
 
@@ -196,6 +217,7 @@ public class SeemView extends ActionBarActivity implements ReplyFragmentSelected
         }
 
         public Fragment getItem(int position) {
+            Utils.debug("ItemPosition:"+position+" ID:"+depthRepliesIds.get(position));
             ReplyFragment newFragment = ReplyFragment.newInstance(depthRepliesIds.get(position),position);
             return newFragment;
         }

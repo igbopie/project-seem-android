@@ -99,7 +99,7 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
             reply = AppSingleton.getInstance().findReplyById(getReplyId());
         }
 
-        if(reply == null) {
+        if(reply == null || reply.getImageUri() == null) {
             currentImage.setOnClickListener(new TakeAPictureClickHandler());
         }else{
             currentImage.setImageBitmap(reply.getImageBitmap());
@@ -164,14 +164,20 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
 
         @Override
         public void onClick(View view) {
-            replyInProgress = new Reply();
-            replyInProgress.setId(AppSingleton.getInstance().getNewImageId());
+            if(reply.getImageUri() != null) {
+                replyInProgress = new Reply();
+                replyInProgress.setId(AppSingleton.getInstance().getNewImageId());
+            }else {
+                replyInProgress = reply;
+            }
             replyInProgress.setImageUri(Utils.getNewFileUri(replyInProgress.getId()));
 
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, replyInProgress.getImageUri());
 
             startActivityForResult(cameraIntent, GlobalVars.TAKE_PHOTO_CODE);
+
+
         }
     }
 
@@ -187,7 +193,7 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
             //Controller Logic
 
             replyInProgress.setImageBitmap(Utils.shrinkBitmap(replyInProgress.getImageUri().getPath()));
-            if(reply != null){
+            if(reply != null && reply != replyInProgress){
                 reply.getReplyList().add(replyInProgress);
             }
             images.put(currentImage,replyInProgress);
