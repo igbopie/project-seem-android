@@ -3,6 +3,10 @@ package com.seem.android.mockup1.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,11 +29,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by igbopie on 13/03/14.
  */
-public class ReplyFragment extends android.support.v4.app.Fragment {
+public class ReplyFragment extends android.support.v4.app.Fragment implements Observer{
 
     private ReplyFragmentSelectedListener mCallback;
     /**
@@ -95,24 +101,47 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
 
         currentImage = image;
 
-        if(getReplyId() >=  0){
+        paintReply();
+
+        for(Reply replyReply:reply.getReplyList()) {
+            replyReply.addObserver(this);
+        }
+
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    public void paintReply(){
+        gridLayout.removeAllViews();
+
+        if(reply == null){
             reply = AppSingleton.getInstance().findReplyById(getReplyId());
         }
 
-        if(reply == null || reply.getImageUri() == null) {
+        if(reply.getImageUri() == null) {
             currentImage.setOnClickListener(new TakeAPictureClickHandler());
         }else{
             currentImage.setImageBitmap(reply.getImageBitmap());
             for(Reply replyReply:reply.getReplyList()){
+
                 currentImage = new ImageView(getView().getContext());
 
-                currentImage.setImageBitmap(replyReply.getImageBitmap());
+                if(replyReply.getReplyList().size()>0) {
+                    Resources r = getResources();
+                    Drawable[] layers = new Drawable[2];
+                    Drawable d = new BitmapDrawable(getResources(), replyReply.getImageBitmap());
+                    layers[1] = r.getDrawable(R.drawable.withreplies);
+                    layers[0] = d;
+                    LayerDrawable layerDrawable = new LayerDrawable(layers);
+                    currentImage.setImageDrawable(layerDrawable);
+                }else {
+                    currentImage.setImageBitmap(replyReply.getImageBitmap());
+                }
                 currentImage.setOnClickListener(new GoToReplyClickHandler());
                 currentImage.setLayoutParams(layoutParamsForSmallReplies);
-                Utils.debug("Adding image to grid:"+replyReply.getId());
-                gridLayout.addView(currentImage,0);
+                Utils.debug("Adding image to grid:" + replyReply.getId());
+                gridLayout.addView(currentImage, 0);
 
-                images.put(currentImage,replyReply);
+                images.put(currentImage, replyReply);
             }
 
             currentImage = new ImageView(getView().getContext());
@@ -121,8 +150,6 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
             currentImage.setLayoutParams(layoutParamsForSmallReplies);
             gridLayout.addView(currentImage,0);
         }
-
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -145,6 +172,17 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        for(Reply replyReply:reply.getReplyList()) {
+            replyReply.deleteObserver(this);
+        }
+
+        super.onDestroy();
+        Utils.debug("Destroing:"+getReplyId());
+
+    }
+
     public int getReplyId() {
         int defaultValue = -1;
         if(getArguments() == null){
@@ -158,6 +196,12 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
             return defaultValue;
         }
         return getArguments().getInt(GlobalVars.EXTRA_DEPTH, defaultValue);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        Utils.debug("I am notified! I have to refresh:"+reply.getId());
+        paintReply();
     }
 
     class TakeAPictureClickHandler implements View.OnClickListener{
@@ -191,10 +235,10 @@ public class ReplyFragment extends android.support.v4.app.Fragment {
             Utils.debug("Pic taken");
 
             //Controller Logic
-
             replyInProgress.setImageBitmap(Utils.shrinkBitmap(replyInProgress.getImageUri().getPath()));
             if(reply != null && reply != replyInProgress){
-                reply.getReplyList().add(replyInProgress);
+                replyInProgress.addObserver(this);
+                reply.addReply(replyInProgress);
             }
             images.put(currentImage,replyInProgress);
             AppSingleton.getInstance().saveReply(replyInProgress);

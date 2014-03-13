@@ -7,15 +7,19 @@ import com.seem.android.mockup1.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by igbopie on 12/03/14.
  */
-public class Reply {
+public class Reply extends Observable {
     private int id;
     private Uri imageUri;
     private Bitmap imageBitmap;
     private List<Reply> replyList = new ArrayList<Reply>();
+
+
 
     public int getId() {
         return id;
@@ -48,4 +52,14 @@ public class Reply {
     public void setReplyList(List<Reply> replyList) {
         this.replyList = replyList;
     }
+
+    public void addReply(Reply reply){
+        Utils.debug("Should notify observers from:"+reply.getId());
+        this.getReplyList().add(reply);
+        this.setChanged();
+        this.notifyObservers();
+    }
+
+
+
 }
