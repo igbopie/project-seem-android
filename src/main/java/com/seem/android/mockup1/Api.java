@@ -73,6 +73,7 @@ public class Api {
     public static final String JSON_TAG_ITEM_MEDIA_ID = "mediaId";
     public static final String JSON_TAG_ITEM_CREATED = "created";
     public static final String JSON_TAG_ITEM_REPLY_COUNT = "replyCount";
+    public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
 
     public static List<Seem> getSeems(){
         try {
@@ -142,7 +143,7 @@ public class Api {
     public static String createMedia(Bitmap image){
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+            image.compress(Bitmap.CompressFormat.JPEG, 90, stream);
             String fileName = String.format("file_%d.png", new Date().getTime());
 
             ByteArrayBody bab = new ByteArrayBody(stream.toByteArray(),"image/jpeg", fileName);
@@ -184,7 +185,7 @@ public class Api {
         }
     }
 
-    public static void reply(String caption,String mediaId,String itemId){
+    public static Item reply(String caption,String mediaId,String itemId){
         try {
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("itemId", itemId);
@@ -201,13 +202,15 @@ public class Api {
                 String output = os.toString( "UTF-8" );
                 Utils.debug("Output:"+output);
 
-                return;
+                Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
+
+                return item;
             }
+            return null;
         } catch (Exception e) {
             Utils.debug("API error:",e);
-            return;
+            return null;
         }
-
     }
 
     public static List<Item> getReplies(String itemId){
@@ -277,6 +280,9 @@ public class Api {
         item.setMediaId(itemJson.getString(JSON_TAG_ITEM_MEDIA_ID));
         item.setCreated(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_CREATED)).getTime());
         item.setReplyCount(itemJson.getInt(JSON_TAG_ITEM_REPLY_COUNT));
+        if(itemJson.has(JSON_TAG_ITEM_REPLY_TO)) {
+            item.setReplyTo(itemJson.getString(JSON_TAG_ITEM_REPLY_TO));
+        }
         return item;
     }
 

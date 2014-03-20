@@ -49,7 +49,7 @@ public class SeemsListView extends ListActivity {
                     int parentWidth = getListView().getWidth();
                     Utils.debug("Width:"+parentWidth);
 
-                    GlobalVars.layoutParamsForSmallReplies = new LinearLayout.LayoutParams(parentWidth / 4, parentWidth / 4);
+                    GlobalVars.layoutParamsForSmallReplies = new LinearLayout.LayoutParams(parentWidth / GlobalVars.GRID_NUMBER_OF_PHOTOS, parentWidth / GlobalVars.GRID_NUMBER_OF_PHOTOS);
                 }
             }
         });
@@ -109,7 +109,11 @@ public class SeemsListView extends ListActivity {
 
         @Override
         protected Item doInBackground(String... id) {
-            Item item = Api.getItem(id[0]);
+            Item item = AppSingleton.getInstance().findItemById(id[0]);
+            if(item == null) {
+                item = Api.getItem(id[0]);
+                AppSingleton.getInstance().saveItem(item);
+            }
             Utils.debug("This is the item:" + item);
 
             return item;

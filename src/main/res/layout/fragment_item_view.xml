@@ -18,7 +18,7 @@
         <GridLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:columnCount="4"
+            android:columnCount="2"
             android:orientation="horizontal"
             android:id="@+id/gridLayout">
         </GridLayout>

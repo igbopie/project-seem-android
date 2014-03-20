@@ -18,6 +18,7 @@ public class Item {
     private String caption;
     private String mediaId;
     private Date created;
+    private String replyTo;
 
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
@@ -68,6 +69,13 @@ public class Item {
         this.replyCount = replyCount;
     }
 
+    public String getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(String replyTo) {
+        this.replyTo = replyTo;
+    }
 
     public Drawable getImageLarge() {
         return imageLarge;

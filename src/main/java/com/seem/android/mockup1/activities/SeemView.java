@@ -20,6 +20,7 @@ import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.fragments.ItemFragment;
+import com.seem.android.mockup1.fragments.ItemFullScreenFragment;
 import com.seem.android.mockup1.model.Seem;
 import com.seem.android.mockup1.util.Utils;
 import com.seem.android.mockup1.fragments.ItemFragmentSelectedListener;
@@ -71,23 +72,21 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
     public void itemSelected(String id, int depth) {
         boolean add = false;
         Utils.debug("Hey " + id);
-       /*
-        ItemFragment replyFragment = (ItemFragment)
-                getSupportFragmentManager().findFragmentById(R.id.reply_fragment);
+
 
 
         // Create fragment and give it an argument for the selected article
-        ItemFragment newFragment = ItemFragment.newInstance(id,depth);
+        ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(id);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.linear_layout, newFragment);
+        transaction.replace(R.id.linearLayout, newFragment);
         transaction.addToBackStack("Back");
 
         // Commit the transaction
-        transaction.commit();*/
+        transaction.commit();
 
     }
 

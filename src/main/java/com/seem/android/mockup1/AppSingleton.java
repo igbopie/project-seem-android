@@ -3,7 +3,9 @@ package com.seem.android.mockup1;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,11 +30,28 @@ public class AppSingleton {
 
     }
 
+    public List<Item> findItemReplies(String parentItemId){
+        List<Item> replies = new ArrayList<Item>();
+        for(Item item:itemsDB.values()){
+            if(item.getReplyTo() != null && item.getReplyTo().equals(parentItemId)){
+                replies.add(item);
+            }
+        }
+        return replies;
+    }
+
     public Item findItemById(String id){
         return itemsDB.get(id);
     }
 
     public void saveItem(Item item){
+        Item cached = itemsDB.get(item.getId());
+        if(cached != null && cached.getImageLarge() != null){
+            item.setImageLarge(cached.getImageLarge());
+        }
+        if(cached != null && cached.getImageLarge() != null){
+            item.setImageThumb(cached.getImageThumb());
+        }
         itemsDB.put(item.getId(),item);
     }
 

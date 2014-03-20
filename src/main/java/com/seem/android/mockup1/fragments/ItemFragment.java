@@ -1,15 +1,15 @@
 package com.seem.android.mockup1.fragments;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,9 +23,9 @@ import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
-import com.seem.android.mockup1.model.Seem;
 import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ import java.util.Observer;
 /**
  * Created by igbopie on 13/03/14.
  */
-public class ItemFragment extends android.support.v4.app.Fragment implements Observer{
+public class ItemFragment extends Fragment implements Observer{
 
 
 
@@ -61,7 +61,7 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
     }
 
     private ImageView image;
-    private Map<ImageView,Item> images = new HashMap<ImageView,Item>();
+    private Map<SpinnerImageView,Item> images = new HashMap<SpinnerImageView,Item>();
 
     private GridLayout gridLayout;
 
@@ -82,9 +82,8 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
 
         Utils.debug("onCreateView");
 
-
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.reply_fragment_view, container, false);
+        return inflater.inflate(R.layout.fragment_item_view, container, false);
     }
 
     @Override
@@ -111,15 +110,11 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
         item = AppSingleton.getInstance().findItemById(getReplyId());
         //FIND replies
         if(item.getReplyCount() > 0 ){
-            new GetRepliesTask(item.getId()).execute();
+            new GetRepliesTask(item).execute();
         }
 
         image.setImageDrawable(item.getImageLarge());
-        /*if(item.getImageLarge() == null) {
-            currentImage.setOnClickListener(new TakeAPictureClickHandler());
-        }else{*/
 
-        //}
     }
 
     @Override
@@ -183,24 +178,24 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
             //Controller Logic
             itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
 
-            SquareImageView iv = addToGrid(itemInProgress);
-            iv.setImageBitmap(itemInProgress.getTempLocalBitmap());
+            SpinnerImageView iv = addToGrid(itemInProgress);
+            iv.getImageView().setImageBitmap(itemInProgress.getTempLocalBitmap());
 
-            //TODO api save item
             new UploadMedia().execute(itemInProgress);
-
 
             itemInProgress = null;
         }
 
     }
 
-    private SquareImageView addToGrid(Item item){
-        SquareImageView thumb = new SquareImageView(getView().getContext());
+    private SpinnerImageView addToGrid(Item item){
+        SpinnerImageView thumb = new SpinnerImageView(getView().getContext(),null);
 
-        thumb.setOnClickListener(new GoToReplyClickHandler());
+        thumb.setText(item.getCaption());
+        thumb.setOnClickListener(new GoToItemClickHandler());
         thumb.setLayoutParams(GlobalVars.layoutParamsForSmallReplies);
         Utils.debug("Adding image to grid:" + item.getId());
+
         gridLayout.addView(thumb, 0);
 
         images.put(thumb, item);
@@ -209,17 +204,14 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
 
     }
 
-    class GoToReplyClickHandler implements View.OnClickListener{
+    class GoToItemClickHandler implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            /*
-            if(view instanceof ImageView) {
-                ImageView imageView = (ImageView)view;
-                Reply reply = images.get(imageView);
-
-                mCallback.itemSelected(reply.getId(), getDepth() + 1);
+            if(view instanceof SpinnerImageView) {
+                SpinnerImageView imageView = (SpinnerImageView)view;
+                Item item = images.get(imageView);
+                mCallback.itemSelected(item.getId(), 0);
             }
-            */
 
         }
 
@@ -227,10 +219,10 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
 
     private class GetRepliesTask extends AsyncTask<Void,Void,List<Item>> {
 
-        private String itemId;
+        private Item item;
 
-        public GetRepliesTask(String itemId){
-            this.itemId = itemId;
+        public GetRepliesTask(Item item){
+            this.item = item;
         }
 
         @Override
@@ -240,7 +232,15 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
 
         @Override
         protected List<Item> doInBackground(Void... voids) {
-            List<Item> items = Api.getReplies(itemId);
+            List<Item> items = AppSingleton.getInstance().findItemReplies(item.getId());
+            if(items.size() != item.getReplyCount()){
+                //DIRTY! We need to load more
+                items = Api.getReplies(item.getId());
+                for(Item item:items){
+                    AppSingleton.getInstance().saveItem(item);
+                }
+            }
+
             return items;
         }
 
@@ -251,7 +251,7 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
             replies = result;
 
             for(Item item:replies) {
-                SquareImageView thumb = addToGrid(item);
+                SpinnerImageView thumb = addToGrid(item);
                 new FetchThumbs(thumb).execute(item);
             }
         }
@@ -265,8 +265,10 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
                 String mediaId = Api.createMedia(items[0].getTempLocalBitmap());
                 if(mediaId != null){
                     items[0].setMediaId(mediaId);
-                    Api.reply("Hardcoded caption",items[0].getMediaId(),item.getId());
+                    Item reply = Api.reply("Hardcoded caption",items[0].getMediaId(),item.getId());
+                    AppSingleton.getInstance().saveItem(reply);
 
+                    item.setReplyCount(item.getReplyCount() + 1);
                 }else {
                     Utils.debug("Error uploading");
                 }
@@ -278,9 +280,9 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
 
     }
     private class FetchThumbs extends AsyncTask<Item,Void,Item> {
-        private ImageView imageView;
+        private SpinnerImageView imageView;
 
-        public FetchThumbs(ImageView imageView){
+        public FetchThumbs(SpinnerImageView imageView){
             this.imageView = imageView;
 
         }
@@ -289,7 +291,9 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
         protected Item doInBackground(Item... items) {
 
             try {
-                Api.downloadThumbImage(items[0]);
+                if(items[0].getImageThumb() == null) {
+                    Api.downloadThumbImage(items[0]);
+                }
                 return items[0];
             } catch (IOException e) {
                 Utils.debug("Pete al bajar la imagen",e);
@@ -306,10 +310,11 @@ public class ItemFragment extends android.support.v4.app.Fragment implements Obs
                     layers[1] = r.getDrawable(R.drawable.withreplies);
                     layers[0] =  item.getImageThumb();
                     LayerDrawable layerDrawable = new LayerDrawable(layers);
-                    imageView.setImageDrawable(layerDrawable);
+                    imageView.getImageView().setImageDrawable(layerDrawable);
                 }else {
-                    imageView.setImageDrawable(item.getImageThumb());
+                    imageView.getImageView().setImageDrawable(item.getImageThumb());
                 }
+                imageView.setLoading(false);
 
             }
         }
