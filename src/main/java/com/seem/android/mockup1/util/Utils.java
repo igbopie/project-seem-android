@@ -1,4 +1,4 @@
-package com.seem.android.mockup1;
+package com.seem.android.mockup1.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,8 +6,11 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.util.Log;
 
+import com.seem.android.mockup1.GlobalVars;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * Created by igbopie on 13/03/14.
@@ -69,10 +72,11 @@ public class Utils {
         }
     }
 
-    public static Uri getNewFileUri(int id){
+    public static Uri getNewFileUri(){
         createBaseDirs();
 
-        String file = GlobalVars.DIRECTORY_PICTURES+id+".jpg";
+        String randomId = Calendar.getInstance().getTimeInMillis()+"";
+        String file = GlobalVars.DIRECTORY_PICTURES+randomId+".jpg";
 
         File newfile = new File(file);
         try {
@@ -83,4 +87,7 @@ public class Utils {
         return Uri.fromFile(newfile);
 
     }
+
+
+
 }

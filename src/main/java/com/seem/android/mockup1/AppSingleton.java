@@ -1,10 +1,9 @@
 package com.seem.android.mockup1;
 
-import com.seem.android.mockup1.model.Reply;
+import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.model.Seem;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,27 +20,28 @@ public class AppSingleton {
     }
 
 
+    private Map<String,Item> itemsDB = new HashMap<String, Item>();
 
-    private int count=0;
-    private Map<Integer,Reply> repliesDB = new HashMap<Integer, Reply>();
+    private Map<String,Seem> seemsDB = new HashMap<String, Seem>();
 
     private AppSingleton(){
 
     }
 
-    public int getNewImageId(){
-        int countAux = count;
-        count++;
-        return count;
+    public Item findItemById(String id){
+        return itemsDB.get(id);
     }
 
-
-    public Reply findReplyById(int id){
-        return repliesDB.get(id);
+    public void saveItem(Item item){
+        itemsDB.put(item.getId(),item);
     }
 
-    public void saveReply(Reply reply){
-        repliesDB.put(reply.getId(),reply);
+    public Seem findSeemById(String id){
+        return seemsDB.get(id);
+    }
+
+    public void saveSeem(Seem seem){
+        seemsDB.put(seem.getId(),seem);
     }
 
 }
