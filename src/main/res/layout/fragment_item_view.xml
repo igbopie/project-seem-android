@@ -1,26 +1,32 @@
-<ScrollView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-        <com.seem.android.mockup1.customviews.SquareImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView"
-            android:src="@drawable/boton"
-            android:scaleType="centerCrop"
-            android:padding="0dp" />
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
 
-        <GridLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:columnCount="2"
-            android:orientation="horizontal"
-            android:id="@+id/gridLayout">
-        </GridLayout>
-    </LinearLayout>
-</ScrollView>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:id="@+id/linearLayout"
+                >
+
+            </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <com.seem.android.mockup1.customviews.SquareImageView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="@drawable/boton"
+        android:scaleType="centerCrop"
+        android:padding="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
+
+</RelativeLayout>

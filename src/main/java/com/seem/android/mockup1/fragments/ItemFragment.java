@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
@@ -63,10 +65,12 @@ public class ItemFragment extends Fragment implements Observer{
     private ImageView image;
     private Map<SpinnerImageView,Item> images = new HashMap<SpinnerImageView,Item>();
 
-    private GridLayout gridLayout;
 
     private Item item;
     private Item itemInProgress;
+
+    private LinearLayout horizonalGrid;
+    private LinearLayout currentVerticalGrid;
     private List<Item> replies = new ArrayList<Item>();
 
 
@@ -91,9 +95,9 @@ public class ItemFragment extends Fragment implements Observer{
 
         Utils.debug("OnActivityCreated");
 
-        gridLayout = (GridLayout) getView().findViewById(R.id.gridLayout);
+        horizonalGrid = (LinearLayout) getView().findViewById(R.id.linearLayout);
         image = (ImageView) getView().findViewById(R.id.imageView);
-
+        image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
         paintReply();
 
         /*
@@ -105,7 +109,7 @@ public class ItemFragment extends Fragment implements Observer{
     }
 
     public void paintReply(){
-        gridLayout.removeAllViews();
+        horizonalGrid.removeAllViews();
 
         item = AppSingleton.getInstance().findItemById(getReplyId());
         //FIND replies
@@ -181,7 +185,7 @@ public class ItemFragment extends Fragment implements Observer{
             SpinnerImageView iv = addToGrid(itemInProgress);
             iv.getImageView().setImageBitmap(itemInProgress.getTempLocalBitmap());
 
-            new UploadMedia().execute(itemInProgress);
+            new UploadMedia(iv).execute(itemInProgress);
 
             itemInProgress = null;
         }
@@ -193,10 +197,30 @@ public class ItemFragment extends Fragment implements Observer{
 
         thumb.setText(item.getCaption());
         thumb.setOnClickListener(new GoToItemClickHandler());
-        thumb.setLayoutParams(GlobalVars.layoutParamsForSmallReplies);
+        thumb.setLayoutParams(new LinearLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
         Utils.debug("Adding image to grid:" + item.getId());
 
-        gridLayout.addView(thumb, 0);
+        int childCount = horizonalGrid.getChildCount();
+        if(childCount == 0){
+            //first time
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            currentVerticalGrid = new LinearLayout(getActivity());
+            currentVerticalGrid.setLayoutParams(params);
+            currentVerticalGrid.setOrientation(LinearLayout.VERTICAL);
+            horizonalGrid.addView(currentVerticalGrid);
+            //On The first time we add a fake main image that is going to be behind
+            SpinnerImageView fake = new SpinnerImageView(getView().getContext(),null);
+            fake.setLayoutParams(new LinearLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
+
+            currentVerticalGrid.addView(fake);
+        }else if(currentVerticalGrid.getChildCount() >= GlobalVars.GRID_NUMBER_OF_PHOTOS){
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            currentVerticalGrid = new LinearLayout(getActivity());
+            currentVerticalGrid.setLayoutParams(params);
+            currentVerticalGrid.setOrientation(LinearLayout.VERTICAL);
+            horizonalGrid.addView(currentVerticalGrid);
+        }
+        currentVerticalGrid.addView(thumb);
 
         images.put(thumb, item);
 
@@ -258,6 +282,12 @@ public class ItemFragment extends Fragment implements Observer{
     }
 
     private class UploadMedia extends AsyncTask<Item,Void,Item> {
+        private final SpinnerImageView iv;
+
+        public UploadMedia(SpinnerImageView iv) {
+            this.iv = iv;
+        }
+
         @Override
         protected Item doInBackground(Item... items) {
 
@@ -269,6 +299,8 @@ public class ItemFragment extends Fragment implements Observer{
                     AppSingleton.getInstance().saveItem(reply);
 
                     item.setReplyCount(item.getReplyCount() + 1);
+
+                    return item;
                 }else {
                     Utils.debug("Error uploading");
                 }
@@ -278,6 +310,13 @@ public class ItemFragment extends Fragment implements Observer{
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Item item) {
+            super.onPostExecute(item);
+
+            images.put(iv,item);
+            iv.setLoading(false);
+        }
     }
     private class FetchThumbs extends AsyncTask<Item,Void,Item> {
         private SpinnerImageView imageView;

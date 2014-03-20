@@ -11,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
@@ -45,12 +47,9 @@ public class SeemsListView extends ListActivity {
         getListView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(GlobalVars.layoutParamsForSmallReplies == null) {
-                    int parentWidth = getListView().getWidth();
-                    Utils.debug("Width:"+parentWidth);
-
-                    GlobalVars.layoutParamsForSmallReplies = new LinearLayout.LayoutParams(parentWidth / GlobalVars.GRID_NUMBER_OF_PHOTOS, parentWidth / GlobalVars.GRID_NUMBER_OF_PHOTOS);
-                }
+                int parentWidth = getListView().getWidth();
+                int parentHeight = getListView().getHeight();
+                GlobalVars.GRID_SIZE = parentHeight / GlobalVars.GRID_NUMBER_OF_PHOTOS;
             }
         });
     }

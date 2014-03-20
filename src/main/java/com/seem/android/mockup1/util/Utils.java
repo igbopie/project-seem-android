@@ -3,6 +3,7 @@ package com.seem.android.mockup1.util;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.util.Log;
 
@@ -18,37 +19,57 @@ import java.util.Calendar;
 public class Utils {
 
     public static Bitmap shrinkBitmap(String file){
+        try {
+            ExifInterface exif  = new ExifInterface(file);;
+            int rotate = 0;
 
-        //500x500
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
 
-        BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
 
-        bmpFactoryOptions.inJustDecodeBounds = true;
+            //500x500
+            BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+            bmpFactoryOptions.inJustDecodeBounds = true;
 
-        Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
+            Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
 
-        boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
+            boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
+
+            int ratio = 0;
+            if(width) {
+                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 500);
+            } else {
+                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 500);
+            }
+            bmpFactoryOptions.inSampleSize = ratio;
 
 
-        int ratio = 0;
-        if(width) {
-            ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 500);
-        } else {
-            ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 500);
+            bmpFactoryOptions.inJustDecodeBounds = false;
+            bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
+
+            //int squareSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotate);
+            Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+
+            return croppedBmp;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        bmpFactoryOptions.inSampleSize = ratio;
-
-
-        bmpFactoryOptions.inJustDecodeBounds = false;
-        bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
-
-        int squareSize = Math.min(bitmap.getHeight(), bitmap.getHeight());
-
-        Matrix matrix = new Matrix();
-        matrix.postRotate(-90);
-        Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,squareSize,squareSize,matrix,true);
-
-        return croppedBmp;
+        return null;
     }
 
     public static void initApp(){
