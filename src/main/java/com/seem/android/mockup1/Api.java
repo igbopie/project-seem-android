@@ -124,7 +124,7 @@ public class Api {
                 Utils.debug("Now fetching images...");
 
                 //fetch IMAGEs
-                downloadLargeImage(item);
+                //downloadLargeImage(item);
                 downloadThumbImage(item);
 
                 Utils.debug("Images fetched");

@@ -34,7 +34,7 @@ public class SpinnerImageView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.square_image_component, this, true);
-        imageView = (SquareImageView) findViewById(R.id.imageView);
+        imageView = (SquareImageView) findViewById(R.id.componentImageView);
         imageView.setBackgroundColor(Color.BLACK);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         textView = (TextView) findViewById(R.id.textView);

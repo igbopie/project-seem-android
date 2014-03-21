@@ -3,13 +3,17 @@ package com.seem.android.mockup1.fragments;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
@@ -21,11 +25,14 @@ import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by igbopie on 20/03/14.
  */
 public class ItemFullScreenFragment extends Fragment {
+    Handler h=new Handler();
 
     public static ItemFullScreenFragment newInstance(String itemId) {
         ItemFullScreenFragment f = new ItemFullScreenFragment();
@@ -37,6 +44,7 @@ public class ItemFullScreenFragment extends Fragment {
 
     ImageView image;
     ProgressBar progressBar;
+    TextView captionTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,11 +64,14 @@ public class ItemFullScreenFragment extends Fragment {
         Utils.debug("OnActivityCreated");
         image = (ImageView) getView().findViewById(R.id.imageView);
         progressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
+        captionTextView = (TextView) getView().findViewById(R.id.captionTextView);
 
         String itemId = getItemId();
 
         new GetItem(itemId).execute();
 
+        Timer myTimer = new Timer();
+        myTimer.schedule(new HideActionBar(), 3000);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -105,6 +116,22 @@ public class ItemFullScreenFragment extends Fragment {
             super.onPostExecute(result);
             image.setImageDrawable(result.getImageLarge());
             progressBar.setVisibility(View.INVISIBLE);
+            captionTextView.setText(result.getCaption());
+        }
+    }
+
+    class HideActionBar extends TimerTask {
+        public void run() {
+            h.post(new Runnable() {
+
+                public void run() {
+
+                    if (getActivity().getActionBar().isShowing()){
+                        getActivity().getActionBar().hide();
+                    }
+                }
+            });
+
         }
     }
 }

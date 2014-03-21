@@ -1,6 +1,7 @@
 package com.seem.android.mockup1.fragments;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -25,6 +26,7 @@ import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.activities.SeemView;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
@@ -62,7 +64,7 @@ public class ItemFragment extends Fragment implements Observer{
         return f;
     }
 
-    private ImageView image;
+    private SpinnerImageView image;
     private Map<SpinnerImageView,Item> images = new HashMap<SpinnerImageView,Item>();
 
 
@@ -96,9 +98,13 @@ public class ItemFragment extends Fragment implements Observer{
         Utils.debug("OnActivityCreated");
 
         horizonalGrid = (LinearLayout) getView().findViewById(R.id.linearLayout);
-        image = (ImageView) getView().findViewById(R.id.imageView);
+        image = (SpinnerImageView) getView().findViewById(R.id.itemMainImage);
         image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
-        paintReply();
+        if (!getActivity().getActionBar().isShowing()){
+            getActivity().getActionBar().show();
+        }
+        new GetItemTask().execute(getReplyId());
+
 
         /*
         for(Reply replyReply:reply.getReplyList()) {
@@ -110,14 +116,20 @@ public class ItemFragment extends Fragment implements Observer{
 
     public void paintReply(){
         horizonalGrid.removeAllViews();
+        images.clear();
 
         item = AppSingleton.getInstance().findItemById(getReplyId());
         //FIND replies
         if(item.getReplyCount() > 0 ){
             new GetRepliesTask(item).execute();
+        } else {
+            image.setLoading(false);
         }
 
-        image.setImageDrawable(item.getImageLarge());
+        image.getImageView().setImageDrawable(item.getImageThumb());
+        image.setOnClickListener(new GoToItemClickHandler());
+        image.setText(item.getCaption());
+        images.put(image,item);
 
     }
 
@@ -227,7 +239,34 @@ public class ItemFragment extends Fragment implements Observer{
         return thumb;
 
     }
+    private class GetItemTask extends AsyncTask<String,Void,Item> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Item doInBackground(String... id) {
+            Item item = AppSingleton.getInstance().findItemById(id[0]);
+            if(item == null) {
+                item = Api.getItem(id[0]);
+                AppSingleton.getInstance().saveItem(item);
+            }
+            Utils.debug("This is the item:" + item);
+
+            return item;
+        }
+
+        @Override
+        protected void onPostExecute(Item result) {
+            super.onPostExecute(result);
+            /*adapter.setItemList(result);
+            adapter.notifyDataSetChanged();*/
+            AppSingleton.getInstance().saveItem(result);
+            paintReply();
+        }
+    }
     class GoToItemClickHandler implements View.OnClickListener{
         @Override
         public void onClick(View view) {
@@ -278,6 +317,8 @@ public class ItemFragment extends Fragment implements Observer{
                 SpinnerImageView thumb = addToGrid(item);
                 new FetchThumbs(thumb).execute(item);
             }
+
+            image.setLoading(false);
         }
     }
 

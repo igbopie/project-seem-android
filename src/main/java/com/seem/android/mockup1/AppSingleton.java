@@ -4,6 +4,8 @@ import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,12 @@ public class AppSingleton {
                 replies.add(item);
             }
         }
+        Collections.sort(replies,new Comparator<Item>() {
+            @Override
+            public int compare(Item item, Item item2) {
+                return item.getCreated().compareTo(item2.getCreated())*-1;
+            }
+        });
         return replies;
     }
 

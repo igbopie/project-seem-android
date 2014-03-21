@@ -19,11 +19,10 @@
 
     </HorizontalScrollView>
 
-    <com.seem.android.mockup1.customviews.SquareImageView
+    <com.seem.android.mockup1.customviews.SpinnerImageView
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:src="@drawable/boton"
+        android:id="@+id/itemMainImage"
         android:scaleType="centerCrop"
         android:padding="0dp"
         android:layout_alignParentTop="true"

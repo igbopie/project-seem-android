@@ -60,7 +60,10 @@ public class SeemsListView extends ListActivity {
         Seem seem = adapter.getItem(position);
         Utils.debug("Item Clicked! seem "+seem);
         seemClicked = seem;
-        new GetItemTask().execute(seem.getItemId());
+        //Create Seem activity
+        Intent intent = new Intent(SeemsListView.this, SeemView.class);
+        intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemClicked.getId());
+        startActivity(intent);
 
     }
 
@@ -96,42 +99,7 @@ public class SeemsListView extends ListActivity {
         }
     }
 
-    private class GetItemTask extends AsyncTask<String,Void,Item> {
-        private final ProgressDialog dialog = new ProgressDialog(SeemsListView.this);
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog.setMessage("Downloading item...");
-            dialog.show();
-        }
-
-        @Override
-        protected Item doInBackground(String... id) {
-            Item item = AppSingleton.getInstance().findItemById(id[0]);
-            if(item == null) {
-                item = Api.getItem(id[0]);
-                AppSingleton.getInstance().saveItem(item);
-            }
-            Utils.debug("This is the item:" + item);
-
-            return item;
-        }
-
-        @Override
-        protected void onPostExecute(Item result) {
-            super.onPostExecute(result);
-            /*adapter.setItemList(result);
-            adapter.notifyDataSetChanged();*/
-            dialog.dismiss();
-            AppSingleton.getInstance().saveItem(result);
-
-            //Create Seem activity
-            Intent intent = new Intent(SeemsListView.this, SeemView.class);
-            intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemClicked.getId());
-            startActivity(intent);
-        }
-    }
 
 }
 
