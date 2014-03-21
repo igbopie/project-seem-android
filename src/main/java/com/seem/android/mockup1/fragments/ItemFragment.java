@@ -26,6 +26,7 @@ import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.activities.SeemView;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.customviews.SquareImageView;
@@ -69,7 +70,6 @@ public class ItemFragment extends Fragment implements Observer{
 
 
     private Item item;
-    private Item itemInProgress;
 
     private LinearLayout horizonalGrid;
     private LinearLayout currentVerticalGrid;
@@ -192,22 +192,24 @@ public class ItemFragment extends Fragment implements Observer{
             Utils.debug("Pic taken");
 
             //Controller Logic
-            itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
+            //Item itemInProgress = AppSingleton.getInstance().getItemInProgress();
 
-            SpinnerImageView iv = addToGrid(itemInProgress);
+            /*SpinnerImageView iv = addToGrid(itemInProgress);
             iv.getImageView().setImageBitmap(itemInProgress.getTempLocalBitmap());
 
             new UploadMedia(iv).execute(itemInProgress);
 
-            itemInProgress = null;
+            AppSingleton.getInstance().setItemInProgress(null);*/
+            this.paintReply();
         }
 
     }
 
     private SpinnerImageView addToGrid(Item item){
         SpinnerImageView thumb = new SpinnerImageView(getView().getContext(),null);
-
-        thumb.setText(item.getCaption());
+        if(item.getCaption() != null ||item.getCaption().length() > 0) {
+            thumb.setText(item.getCaption());
+        }
         thumb.setOnClickListener(new GoToItemClickHandler());
         thumb.setLayoutParams(new LinearLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
         Utils.debug("Adding image to grid:" + item.getId());
@@ -322,43 +324,7 @@ public class ItemFragment extends Fragment implements Observer{
         }
     }
 
-    private class UploadMedia extends AsyncTask<Item,Void,Item> {
-        private final SpinnerImageView iv;
 
-        public UploadMedia(SpinnerImageView iv) {
-            this.iv = iv;
-        }
-
-        @Override
-        protected Item doInBackground(Item... items) {
-
-            try {
-                String mediaId = Api.createMedia(items[0].getTempLocalBitmap());
-                if(mediaId != null){
-                    items[0].setMediaId(mediaId);
-                    Item reply = Api.reply("Hardcoded caption",items[0].getMediaId(),item.getId());
-                    AppSingleton.getInstance().saveItem(reply);
-
-                    item.setReplyCount(item.getReplyCount() + 1);
-
-                    return item;
-                }else {
-                    Utils.debug("Error uploading");
-                }
-            }catch (Exception e) {
-                Utils.debug("Pete al crear la imagen",e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Item item) {
-            super.onPostExecute(item);
-
-            images.put(iv,item);
-            iv.setLoading(false);
-        }
-    }
     private class FetchThumbs extends AsyncTask<Item,Void,Item> {
         private SpinnerImageView imageView;
 
@@ -410,24 +376,19 @@ public class ItemFragment extends Fragment implements Observer{
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if(id == R.id.action_camera){
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        if(id == R.id.action_camera && item != null){
             Utils.debug("Action camera!");
 
-            itemInProgress = new Item();
-
-            itemInProgress.setTempLocalFile(Utils.getNewFileUri());
-
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, itemInProgress.getTempLocalFile());
-
-            startActivityForResult(cameraIntent, GlobalVars.TAKE_PHOTO_CODE);
+            Intent intent = new Intent(this.getActivity(), ReplyFlowActivity.class);
+            intent.putExtra(GlobalVars.EXTRA_ITEM_ID,item.getId());
+            startActivityForResult(intent,GlobalVars.TAKE_PHOTO_CODE);
 
             return true;
 
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(menuItem);
     }
 
 }

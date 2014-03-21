@@ -24,6 +24,16 @@ public class AppSingleton {
     }
 
 
+    private Item itemInProgress;
+
+    public Item getItemInProgress() {
+        return itemInProgress;
+    }
+
+    public void setItemInProgress(Item itemInProgress) {
+        this.itemInProgress = itemInProgress;
+    }
+
     private Map<String,Item> itemsDB = new HashMap<String, Item>();
 
     private Map<String,Seem> seemsDB = new HashMap<String, Seem>();
