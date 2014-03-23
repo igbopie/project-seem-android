@@ -14,7 +14,12 @@ public class GlobalVars {
     public static final String EXTRA_ITEM_ID = "replyId";
     public static final String EXTRA_DEPTH = "depth";
 
+
+    public static final String EXTRA_CURRENT_ITEM_ID = "currrentItemId";
+    public static final String EXTRA_PARENT_ITEM_ID = "parentItemId";
+
     public static final int TAKE_PHOTO_CODE = 872;
+    public static final int FULLSCREEN_BACK_CODE = 873;
 
     public static final String APP_NAME = "SeemMockup1";
     public static final String DIRECTORY_PICTURES = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/"+APP_NAME+"/";

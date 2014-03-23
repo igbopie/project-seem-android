@@ -60,7 +60,7 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Utils.debug("OnActivityResult Activity");
         if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             super.onActivityResult(requestCode,resultCode,data);
         }
@@ -74,7 +74,7 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
         Utils.debug("Hey " + id);
 
         // Create fragment and give it an argument for the selected article
-        ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(id);
+        /*ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(id);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -85,7 +85,10 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
         transaction.addToBackStack("Back");
 
         // Commit the transaction
-        transaction.commit();
+        transaction.commit();*/
+
+
+
 
     }
 

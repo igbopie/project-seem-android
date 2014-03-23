@@ -85,7 +85,7 @@ public class CreateSeemFlowActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Utils.debug("OnActivityResult");
         if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK) {
             Utils.debug("Pic taken");
             localBitmap = Utils.shrinkBitmap(localTempFile.getPath());
