@@ -73,13 +73,12 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
         boolean add = false;
         Utils.debug("Hey " + id);
 
-
-
         // Create fragment and give it an argument for the selected article
         ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(id);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
+        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
         transaction.replace(R.id.linearLayout, newFragment);
