@@ -49,9 +49,9 @@ public class Utils {
 
             int ratio = 0;
             if(width) {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 500);
+                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 1000);
             } else {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 500);
+                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 1000);
             }
             bmpFactoryOptions.inSampleSize = ratio;
 

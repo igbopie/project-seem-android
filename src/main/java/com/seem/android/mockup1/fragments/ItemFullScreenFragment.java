@@ -41,10 +41,14 @@ public class ItemFullScreenFragment extends Fragment {
         f.setArguments(args);
         return f;
     }
-
+    Timer myTimer = new Timer();
     ImageView image;
     ProgressBar progressBar;
     TextView captionTextView;
+    final int HIDE_TIMEOUT = 3000;
+    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,18 @@ public class ItemFullScreenFragment extends Fragment {
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        getView().setSystemUiVisibility(mSystemUiVisibility);
+        getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!getActivity().getActionBar().isShowing()){
+                    getActivity().getActionBar().show();
+                    myTimer.cancel();
+                    myTimer = new Timer();
+                    myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
+                }
+            }
+        });
         Utils.debug("OnActivityCreated");
         image = (ImageView) getView().findViewById(R.id.imageView);
         progressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
@@ -70,8 +86,16 @@ public class ItemFullScreenFragment extends Fragment {
 
         new GetItem(itemId).execute();
 
-        Timer myTimer = new Timer();
-        myTimer.schedule(new HideActionBar(), 3000);
+        myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
+
+        //Let's show something...
+        Item item = AppSingleton.getInstance().findItemById(itemId);
+        if(item != null && item.getImageThumb() != null){
+            image.setImageDrawable(item.getImageThumb());
+        }
+        if(item != null){
+            captionTextView.setText(item.getCaption());
+        }
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -101,6 +125,7 @@ public class ItemFullScreenFragment extends Fragment {
                 if(item == null) {
                     item = Api.getItem(itemId);
                 }
+
                 if(item.getImageLarge() == null) {
                     Api.downloadLargeImage(item);
                 }
@@ -126,7 +151,10 @@ public class ItemFullScreenFragment extends Fragment {
 
                 public void run() {
 
-                    if (getActivity().getActionBar().isShowing()){
+                    if (getActivity() != null &&
+                        getActivity().getActionBar() != null  &&
+                        getActivity().getActionBar().isShowing()){
+
                         getActivity().getActionBar().hide();
                     }
                 }

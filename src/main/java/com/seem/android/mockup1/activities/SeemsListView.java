@@ -2,12 +2,14 @@ package com.seem.android.mockup1.activities;
 
 
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -99,7 +101,40 @@ public class SeemsListView extends ListActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.seem_view, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_camera:
+                //newGame();
+                Utils.debug("NEW SEEM!");
+
+                Intent intent = new Intent(this, CreateSeemFlowActivity.class);
+                //intent.putExtra(GlobalVars.EXTRA_ITEM_ID,item.getId());
+                startActivityForResult(intent,GlobalVars.TAKE_PHOTO_CODE);
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK) {
+            Utils.debug("Pic taken");
+            adapter.setItemList(AppSingleton.getInstance().findSeems());
+        }
+    }
 
 }
 

@@ -67,7 +67,10 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
 
     public void setItemList(List<Seem> itemList) {
         this.itemList = itemList;
+        this.notifyDataSetChanged();
     }
+
+
 
 
 }

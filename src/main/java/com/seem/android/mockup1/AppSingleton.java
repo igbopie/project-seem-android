@@ -81,4 +81,7 @@ public class AppSingleton {
         seemsDB.put(seem.getId(),seem);
     }
 
+    public List<Seem> findSeems() {
+        return new ArrayList<Seem>(this.seemsDB.values());
+    }
 }

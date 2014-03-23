@@ -53,6 +53,7 @@ public class Api {
     public static final String ENDPOINT_GET_MEDIA_LARGE = "api/media/get/large/";
     public static final String ENDPOINT_GET_MEDIA_THUMB = "api/media/get/thumb/";
     public static final String ENDPOINT_CREATE_MEDIA = "api/media/create";
+    public static final String ENDPOINT_CREATE_SEEM = "api/m1/seem/create";
 
     public static final int RESPONSE_CODE_OK = 200;
 
@@ -143,7 +144,7 @@ public class Api {
     public static String createMedia(Bitmap image){
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+            image.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             String fileName = String.format("file_%d.png", new Date().getTime());
 
             ByteArrayBody bab = new ByteArrayBody(stream.toByteArray(),"image/jpeg", fileName);
@@ -205,6 +206,34 @@ public class Api {
                 Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
                 return item;
+            }
+            return null;
+        } catch (Exception e) {
+            Utils.debug("API error:",e);
+            return null;
+        }
+    }
+
+    public static Seem createSeem(String title,String caption,String mediaId){
+        try {
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("title", title);
+            params.put("mediaId", mediaId);
+            params.put("caption", caption);
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE_SEEM,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug("Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug("Output:"+output);
+
+                Seem seem = fillSeem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
+
+                return seem;
             }
             return null;
         } catch (Exception e) {

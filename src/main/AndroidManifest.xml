@@ -29,6 +29,11 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".activities.CreateSeemFlowActivity"
+            android:label="Create Seem"
+            android:screenOrientation="portrait">
+        </activity>
 
     </application>
 
