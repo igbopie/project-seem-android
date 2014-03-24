@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -16,9 +18,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.jess.ui.TwoWayGridView;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.fragments.ItemFragment;
 import com.seem.android.mockup1.fragments.ItemFullScreenFragment;
 import com.seem.android.mockup1.model.Seem;
@@ -31,12 +35,7 @@ import java.util.List;
 
 public class SeemView extends FragmentActivity implements ItemFragmentSelectedListener {
 
-
     Seem seem = null;
-
-    List<String> depthRepliesIds = new ArrayList<String>();
-
-    final Context context = this;
 
     /** Called when the activity is first created. */
     @Override
@@ -86,8 +85,6 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
 
         // Commit the transaction
         transaction.commit();*/
-
-
 
 
     }

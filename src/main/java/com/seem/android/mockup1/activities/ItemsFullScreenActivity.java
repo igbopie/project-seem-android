@@ -34,12 +34,14 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         itemList = new ArrayList<Item>();
 
         String currentItemId = getIntent().getStringExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID);
-        Item currentItem = AppSingleton.getInstance().findItemById(currentItemId);
+        String parentItemId = getIntent().getStringExtra(GlobalVars.EXTRA_PARENT_ITEM_ID);
 
+        Item currentItem = AppSingleton.getInstance().findItemById(currentItemId);
+        Item parentItem = AppSingleton.getInstance().findItemById(parentItemId);
         //Add parent first
-        itemList.add(AppSingleton.getInstance().findItemById(currentItem.getReplyTo()));
+        itemList.add(parentItem);
         //Add children
-        itemList.addAll(AppSingleton.getInstance().findItemReplies(currentItem.getReplyTo()));
+        itemList.addAll(AppSingleton.getInstance().findItemReplies(parentItem.getId()));
 
 
 
@@ -53,7 +55,6 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
 
-        //TODO locate current item position
         mViewPager.setCurrentItem(itemList.indexOf(currentItem));
 
 

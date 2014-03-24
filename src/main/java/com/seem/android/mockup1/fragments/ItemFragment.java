@@ -30,6 +30,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.jess.ui.TwoWayAdapterView;
+import com.jess.ui.TwoWayGridView;
 import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
@@ -37,6 +39,7 @@ import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.activities.ItemsFullScreenActivity;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.activities.SeemView;
+import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
@@ -81,8 +84,6 @@ public class ItemFragment extends Fragment implements Observer{
     private Item item;
     private ZoomUtil zoom;
 
-    private LinearLayout horizonalGrid;
-    private LinearLayout currentVerticalGrid;
     private List<Item> replies = new ArrayList<Item>();
 
     // Hold a reference to the current animator,
@@ -94,6 +95,8 @@ public class ItemFragment extends Fragment implements Observer{
     // very frequently.
     private int mShortAnimationDuration = 100;
 
+    TwoWayGridView twoWayGridView;
+    ThumbnailAdapter thumbnailAdapter;
 
 
     @Override
@@ -117,7 +120,6 @@ public class ItemFragment extends Fragment implements Observer{
 
         Utils.debug("OnActivityCreated");
 
-        horizonalGrid = (LinearLayout) getView().findViewById(R.id.linearLayout);
         image = (SpinnerImageView) getView().findViewById(R.id.itemMainImage);
         image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
         if (!getActivity().getActionBar().isShowing()){
@@ -125,17 +127,26 @@ public class ItemFragment extends Fragment implements Observer{
         }
         new GetItemTask().execute(getReplyId());
 
-
-        /*
-        for(Reply replyReply:reply.getReplyList()) {
-            replyReply.addObserver(this);
-        }*/
+        twoWayGridView = (TwoWayGridView) getView().findViewById(R.id.gridview);
+        twoWayGridView.setColumnWidth(GlobalVars.GRID_SIZE);
+        twoWayGridView.setRowHeight(GlobalVars.GRID_SIZE);
+        thumbnailAdapter = new ThumbnailAdapter(this.getActivity());
+        twoWayGridView.setAdapter(thumbnailAdapter);
+        twoWayGridView.setOnItemClickListener(new TwoWayAdapterView.OnItemClickListener() {
+            public void onItemClick(TwoWayAdapterView parent, View v, int position, long id) {
+                Utils.debug("ItemClicked:"+position);
+                Item item = (Item)thumbnailAdapter.getItem(position);
+                Utils.debug("Item:"+item.getId());
+                zoom = new ZoomUtil(item,((SpinnerImageView)v).getImageView());
+                zoom.startZoom();
+            }
+        });
 
         super.onActivityCreated(savedInstanceState);
     }
 
     public void paintReply(){
-        horizonalGrid.removeAllViews();
+        thumbnailAdapter.clear();
         images.clear();
 
         item = AppSingleton.getInstance().findItemById(getReplyId());
@@ -175,10 +186,6 @@ public class ItemFragment extends Fragment implements Observer{
 
     @Override
     public void onDestroy() {
-        /*for(Reply replyReply:reply.getReplyList()) {
-            replyReply.deleteObserver(this);
-        }*/
-
         super.onDestroy();
         Utils.debug("Destroing:"+getReplyId());
 
@@ -187,6 +194,7 @@ public class ItemFragment extends Fragment implements Observer{
     public String getReplyId() {
         return getArguments().getString(GlobalVars.EXTRA_ITEM_ID, null);
     }
+
     public int getDepth() {
         int defaultValue = 0;
         if(getArguments() == null){
@@ -210,16 +218,6 @@ public class ItemFragment extends Fragment implements Observer{
         Utils.debug("onActivityResult Fragment");
         if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK) {
             Utils.debug("Pic taken");
-
-            //Controller Logic
-            //Item itemInProgress = AppSingleton.getInstance().getItemInProgress();
-
-            /*SpinnerImageView iv = addToGrid(itemInProgress);
-            iv.getImageView().setImageBitmap(itemInProgress.getTempLocalBitmap());
-
-            new UploadMedia(iv).execute(itemInProgress);
-
-            AppSingleton.getInstance().setItemInProgress(null);*/
             this.paintReply();
         } else if (requestCode == GlobalVars.FULLSCREEN_BACK_CODE) {
             Utils.debug("Full Screen Back");
@@ -228,43 +226,10 @@ public class ItemFragment extends Fragment implements Observer{
             }
         }
     }
-
-    private SpinnerImageView addToGrid(Item item){
-        SpinnerImageView thumb = new SpinnerImageView(getView().getContext(),null);
-        if(item.getCaption() != null ||item.getCaption().length() > 0) {
-            thumb.setText(item.getCaption());
-        }
-        thumb.setOnClickListener(new GoToItemClickHandler());
-        thumb.setLayoutParams(new LinearLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
-        Utils.debug("Adding image to grid:" + item.getId());
-
-        int childCount = horizonalGrid.getChildCount();
-        if(childCount == 0){
-            //first time
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-            currentVerticalGrid = new LinearLayout(getActivity());
-            currentVerticalGrid.setLayoutParams(params);
-            currentVerticalGrid.setOrientation(LinearLayout.VERTICAL);
-            horizonalGrid.addView(currentVerticalGrid);
-            //On The first time we add a fake main image that is going to be behind
-            SpinnerImageView fake = new SpinnerImageView(getView().getContext(),null);
-            fake.setLayoutParams(new LinearLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
-
-            currentVerticalGrid.addView(fake);
-        }else if(currentVerticalGrid.getChildCount() >= GlobalVars.GRID_NUMBER_OF_PHOTOS){
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-            currentVerticalGrid = new LinearLayout(getActivity());
-            currentVerticalGrid.setLayoutParams(params);
-            currentVerticalGrid.setOrientation(LinearLayout.VERTICAL);
-            horizonalGrid.addView(currentVerticalGrid);
-        }
-        currentVerticalGrid.addView(thumb);
-
-        images.put(thumb, item);
-
-        return thumb;
-
+    private void addToGrid(Item item){
+        thumbnailAdapter.addItem(item);
     }
+
     private class GetItemTask extends AsyncTask<String,Void,Item> {
 
         @Override
@@ -287,8 +252,6 @@ public class ItemFragment extends Fragment implements Observer{
         @Override
         protected void onPostExecute(Item result) {
             super.onPostExecute(result);
-            /*adapter.setItemList(result);
-            adapter.notifyDataSetChanged();*/
             AppSingleton.getInstance().saveItem(result);
             paintReply();
         }
@@ -298,8 +261,7 @@ public class ItemFragment extends Fragment implements Observer{
         public void onClick(View view) {
             if(view instanceof SpinnerImageView) {
                 SpinnerImageView imageView = (SpinnerImageView)view;
-
-                zoom = new ZoomUtil(imageView,images.get(imageView).getImageThumb());
+                zoom = new ZoomUtil(images.get(imageView),imageView);
                 zoom.startZoom();
             }
 
@@ -341,8 +303,7 @@ public class ItemFragment extends Fragment implements Observer{
             replies = result;
 
             for(Item item:replies) {
-                SpinnerImageView thumb = addToGrid(item);
-                new FetchThumbs(thumb).execute(item);
+                addToGrid(item);
             }
 
             image.setLoading(false);
@@ -350,46 +311,7 @@ public class ItemFragment extends Fragment implements Observer{
     }
 
 
-    private class FetchThumbs extends AsyncTask<Item,Void,Item> {
-        private SpinnerImageView imageView;
 
-        public FetchThumbs(SpinnerImageView imageView){
-            this.imageView = imageView;
-
-        }
-
-        @Override
-        protected Item doInBackground(Item... items) {
-
-            try {
-                if(items[0].getImageThumb() == null) {
-                    Api.downloadThumbImage(items[0]);
-                }
-                return items[0];
-            } catch (IOException e) {
-                Utils.debug("Pete al bajar la imagen",e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Item item) {
-            if(item != null) {
-                if(item.getReplyCount() > 0) {
-                    Resources r = getResources();
-                    Drawable[] layers = new Drawable[2];
-                    layers[1] = r.getDrawable(R.drawable.withreplies);
-                    layers[0] =  item.getImageThumb();
-                    LayerDrawable layerDrawable = new LayerDrawable(layers);
-                    imageView.getImageView().setImageDrawable(layerDrawable);
-                }else {
-                    imageView.getImageView().setImageDrawable(item.getImageThumb());
-                }
-                imageView.setLoading(false);
-
-            }
-        }
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -424,10 +346,12 @@ public class ItemFragment extends Fragment implements Observer{
         Rect finalBounds = new Rect();
         Point globalOffset = new Point();
         float startScaleFinal;
+        Item item;
 
-        ZoomUtil(View thumbView, Drawable imageResId) {
+        ZoomUtil(Item item,View thumbView) {
             this.thumbView = thumbView;
-            this.imageResId = imageResId;
+            this.imageResId = item.getImageThumb();
+            this.item = item;
         }
 
         private void endZoom() {
@@ -549,11 +473,13 @@ public class ItemFragment extends Fragment implements Observer{
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mCurrentAnimator = null;
-                    Item item = images.get(thumbView);
                     mCallback.itemSelected(item.getId(), 0);
+
+                    Item parentItem = ItemFragment.this.item;
 
                     Intent intent = new Intent(getActivity(), ItemsFullScreenActivity.class);
                     intent.putExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID, item.getId());
+                    intent.putExtra(GlobalVars.EXTRA_PARENT_ITEM_ID, parentItem.getId());
                     startActivityForResult(intent, GlobalVars.FULLSCREEN_BACK_CODE);
 
                 }
