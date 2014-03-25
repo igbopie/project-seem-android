@@ -15,6 +15,7 @@ import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
@@ -34,10 +35,12 @@ public class ThumbnailAdapter extends BaseAdapter {
 
     Map<View,FetchThumbs> execViewMap = new HashMap<View, FetchThumbs>();
     LinkedList<FetchThumbs> fetchQeue = new LinkedList<FetchThumbs>();
+    ItemSelectedListener repliesListener;
 
-    public ThumbnailAdapter(Context context) {
+    public ThumbnailAdapter(Context context,ItemSelectedListener repliesListener) {
         super();
         this.context = context;
+        this.repliesListener = repliesListener;
     }
 
     @Override
@@ -154,18 +157,22 @@ public class ThumbnailAdapter extends BaseAdapter {
             if(this.isCancelled()){
                 //well... do not paint...
             }else if(item != null) {
+
+                imageView.getImageView().setImageDrawable(item.getImageThumb());
+
                 if(item.getReplyCount() > 0) {
-                    Resources r = context.getResources();
-                    Drawable[] layers = new Drawable[2];
-                    layers[1] = r.getDrawable(R.drawable.withreplies);
-                    layers[0] =  item.getImageThumb();
-                    LayerDrawable layerDrawable = new LayerDrawable(layers);
-                    imageView.getImageView().setImageDrawable(layerDrawable);
-                }else {
-                    imageView.getImageView().setImageDrawable(item.getImageThumb());
+                    imageView.setHasReplies(true);
+                    imageView.setViewRepliesOnClick(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Utils.debug("View");
+                            repliesListener.itemSelected(item);
+                        }
+                    });
                 }
                 imageView.getImageView().setVisibility(View.VISIBLE);
                 imageView.setLoading(false);
+
 
             }
             checkProcessing();

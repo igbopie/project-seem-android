@@ -21,7 +21,7 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
     private Context context;
 
     public SeemAdapter(List<Seem> itemList, Context ctx) {
-        super(ctx, R.layout.seem_list_item, itemList);
+        super(ctx, R.layout.component_seem_list, itemList);
         this.itemList = itemList;
         this.context = ctx;
     }
@@ -50,7 +50,7 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         View v = convertView;
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.seem_list_item, null);
+            v = inflater.inflate(R.layout.component_seem_list, null);
         }
 
         Seem c = itemList.get(position);

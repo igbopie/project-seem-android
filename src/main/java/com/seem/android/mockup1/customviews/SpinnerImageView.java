@@ -1,20 +1,17 @@
 package com.seem.android.mockup1.customviews;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.view.ViewGroupOverlay;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.seem.android.mockup1.R;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by igbopie on 20/03/14.
@@ -23,6 +20,7 @@ public class SpinnerImageView extends LinearLayout {
     SquareImageView imageView;
     ProgressBar progressBar;
     TextView textView;
+    ImageView repliesIndicator;
 
     public SpinnerImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -33,12 +31,13 @@ public class SpinnerImageView extends LinearLayout {
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.square_image_component, this, true);
+        inflater.inflate(R.layout.component_square_image, this, true);
         imageView = (SquareImageView) findViewById(R.id.componentImageView);
         imageView.setBackgroundColor(Color.LTGRAY);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         textView = (TextView) findViewById(R.id.textView);
         textView.setVisibility(INVISIBLE);
+        repliesIndicator = (ImageView) findViewById(R.id.repliesIndicator);
 
     }
 
@@ -67,5 +66,16 @@ public class SpinnerImageView extends LinearLayout {
             this.textView.setText(text);
             this.textView.setVisibility(VISIBLE);
         }
+    }
+
+    public void setHasReplies(boolean hasReplies){
+        if(hasReplies){
+            this.repliesIndicator.setVisibility(VISIBLE);
+        } else {
+            this.repliesIndicator.setVisibility(INVISIBLE);
+        }
+    }
+    public void setViewRepliesOnClick(OnClickListener l){
+        this.repliesIndicator.setOnClickListener(l);
     }
 }

@@ -31,5 +31,18 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"/>
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/repliesIndicator"
+        android:layout_alignTop="@+id/componentImageView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/nested_replies"
+        android:visibility="invisible"/>
+
+
 </RelativeLayout>
 </merge>

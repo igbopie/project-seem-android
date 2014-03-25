@@ -1,11 +1,15 @@
 package com.seem.android.mockup1.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -19,6 +23,7 @@ import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.util.Utils;
@@ -33,6 +38,7 @@ import java.util.TimerTask;
  */
 public class ItemFullScreenFragment extends Fragment {
     Handler h=new Handler();
+
 
     public static ItemFullScreenFragment newInstance(String itemId) {
         ItemFullScreenFragment f = new ItemFullScreenFragment();
@@ -142,6 +148,7 @@ public class ItemFullScreenFragment extends Fragment {
             image.setImageDrawable(result.getImageLarge());
             progressBar.setVisibility(View.INVISIBLE);
             captionTextView.setText(result.getCaption());
+
         }
     }
 
@@ -161,5 +168,33 @@ public class ItemFullScreenFragment extends Fragment {
             });
 
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.seem_view, menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        if(id == R.id.action_camera){
+            Utils.debug("Action camera!");
+
+
+            Intent intent = new Intent(this.getActivity(), ReplyFlowActivity.class);
+            intent.putExtra(GlobalVars.EXTRA_ITEM_ID,getItemId());
+            startActivityForResult(intent,GlobalVars.TAKE_PHOTO_CODE);
+
+
+            return true;
+
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 }

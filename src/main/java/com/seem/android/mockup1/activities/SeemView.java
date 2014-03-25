@@ -42,7 +42,7 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
+        Utils.debug("SeemView OnCreate");
         setContentView(R.layout.activity_seem_view);
 
         String seemId = getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);

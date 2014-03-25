@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +44,7 @@ import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
@@ -78,9 +80,6 @@ public class ItemFragment extends Fragment implements Observer{
     }
 
     private SpinnerImageView image;
-    private Map<SpinnerImageView,Item> images = new HashMap<SpinnerImageView,Item>();
-
-
     private Item item;
     private ZoomUtil zoom;
 
@@ -130,7 +129,18 @@ public class ItemFragment extends Fragment implements Observer{
         twoWayGridView = (TwoWayGridView) getView().findViewById(R.id.gridview);
         twoWayGridView.setColumnWidth(GlobalVars.GRID_SIZE);
         twoWayGridView.setRowHeight(GlobalVars.GRID_SIZE);
-        thumbnailAdapter = new ThumbnailAdapter(this.getActivity());
+        thumbnailAdapter = new ThumbnailAdapter(this.getActivity(),new ItemSelectedListener() {
+            @Override
+            public void itemSelected(Item item) {
+                //Create Itemfragment
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                ItemFragment newFragment = ItemFragment.newInstance(item.getId(),0);
+                transaction.replace(R.id.linearLayout, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
+            }
+        });
         twoWayGridView.setAdapter(thumbnailAdapter);
         twoWayGridView.setOnItemClickListener(new TwoWayAdapterView.OnItemClickListener() {
             public void onItemClick(TwoWayAdapterView parent, View v, int position, long id) {
@@ -147,7 +157,6 @@ public class ItemFragment extends Fragment implements Observer{
 
     public void paintReply(){
         thumbnailAdapter.clear();
-        images.clear();
 
         item = AppSingleton.getInstance().findItemById(getReplyId());
         //FIND replies
@@ -158,9 +167,16 @@ public class ItemFragment extends Fragment implements Observer{
         }
 
         image.getImageView().setImageDrawable(item.getImageThumb());
-        image.setOnClickListener(new GoToItemClickHandler());
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(view instanceof SpinnerImageView) {
+                    zoom = new ZoomUtil(item,image);
+                    zoom.startZoom();
+                }
+            }
+        });
         image.setText(item.getCaption());
-        images.put(image,item);
 
     }
 
@@ -255,18 +271,6 @@ public class ItemFragment extends Fragment implements Observer{
             AppSingleton.getInstance().saveItem(result);
             paintReply();
         }
-    }
-    class GoToItemClickHandler implements View.OnClickListener{
-        @Override
-        public void onClick(View view) {
-            if(view instanceof SpinnerImageView) {
-                SpinnerImageView imageView = (SpinnerImageView)view;
-                zoom = new ZoomUtil(images.get(imageView),imageView);
-                zoom.startZoom();
-            }
-
-        }
-
     }
 
     private class GetRepliesTask extends AsyncTask<Void,Void,List<Item>> {

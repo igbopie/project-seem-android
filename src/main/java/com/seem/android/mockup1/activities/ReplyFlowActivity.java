@@ -40,6 +40,8 @@ public class ReplyFlowActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Utils.debug("ReplyFlow OnCreate");
         setContentView(R.layout.activity_reply_flow);
         replyId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
 

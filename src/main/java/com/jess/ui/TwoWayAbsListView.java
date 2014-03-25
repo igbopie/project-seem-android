@@ -1026,7 +1026,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	//                    Filter f = ((Filterable) mAdapter).getFilter();
 	//                    f.filter(filterText);
 	//                }
-	//                // Set filtered to true so we will display the filter window when our jesstwowaygrid
+	//                // Set filtered to true so we will display the filter window when our component_jesstwowaygrid
 	//                // window is ready
 	//                mFiltered = true;
 	//                mDataSetObserver.clearSavedState();
