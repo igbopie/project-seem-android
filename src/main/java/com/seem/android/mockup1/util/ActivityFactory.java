@@ -1,6 +1,7 @@
 package com.seem.android.mockup1.util;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -18,10 +19,15 @@ public class ActivityFactory {
 
 
 
+    public static void startReplyItemActivity(Fragment context,String itemId) {
+        Intent intent = new Intent(context.getActivity(), ReplyFlowActivity.class);
+        intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
+        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
+    }
     public static void startReplyItemActivity(Activity context,String itemId) {
         Intent intent = new Intent(context, ReplyFlowActivity.class);
         intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
-        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
+        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_REPLY_TO_ITEM);
     }
 
     public static void startCreateSeemActivity(Activity context){
@@ -34,7 +40,7 @@ public class ActivityFactory {
         intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemId);
         intent.putExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID,currentItem);
         intent.putExtra(GlobalVars.EXTRA_PARENT_ITEM_ID,parentItem);
-        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_ITEM_FULLSCREEN);
+        context.startActivity(intent);
 
     }
 

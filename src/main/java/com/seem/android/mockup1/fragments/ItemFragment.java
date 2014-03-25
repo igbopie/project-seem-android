@@ -89,13 +89,15 @@ public class ItemFragment extends Fragment implements Observer{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        Utils.debug("ItemFragment - onCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Utils.debug("onCreateView");
+        Utils.debug("ItemFragment - onCreateView");
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_item_view, container, false);
@@ -104,7 +106,7 @@ public class ItemFragment extends Fragment implements Observer{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        Utils.debug("OnActivityCreated");
+        Utils.debug("ItemFragment - OnActivityCreated");
 
         image = (SpinnerImageView) getView().findViewById(R.id.itemMainImage);
         image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
@@ -165,6 +167,8 @@ public class ItemFragment extends Fragment implements Observer{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        Utils.debug("ItemFragment - onAttach");
+
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
@@ -209,21 +213,23 @@ public class ItemFragment extends Fragment implements Observer{
         paintReply();
     }
 
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        Utils.debug("Item Fragment - On resume");
+        if(zoom != null) {
+            zoom.endZoom();
+            zoom = null;
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug("onActivityResult Fragment");
+        Utils.debug("ItemFragment onActivityResult requestCode="+requestCode+" resultCode="+resultCode);
         if (requestCode == GlobalVars.RETURN_CODE_REPLY_TO_ITEM && resultCode == Activity.RESULT_OK) {
             Utils.debug("Pic taken");
             this.paintReply();
-        } else if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN) {
-            Utils.debug("Full Screen Back");
-            if(zoom != null) {
-                zoom.endZoom();
-            }
         }
     }
     private void addToGrid(Item item){
@@ -312,7 +318,7 @@ public class ItemFragment extends Fragment implements Observer{
         int id = menuItem.getItemId();
         if(id == R.id.action_camera && item != null){
             Utils.debug("Action camera!");
-            ActivityFactory.startReplyItemActivity(this.getActivity(),item.getId());
+            ActivityFactory.startReplyItemActivity(this,item.getId());
             return true;
 
         }

@@ -80,8 +80,13 @@ public class ReplyFlowActivity extends Activity {
 
         if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             Utils.debug("Reply Flow Activity - Pic taken");
-            itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
-            imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
+            try {
+                itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
+                imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
+            }catch(Exception e){
+                Utils.debug("ERROR trying to save the image",e);
+                ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
+            }
         } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
             Utils.debug("Reply Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);

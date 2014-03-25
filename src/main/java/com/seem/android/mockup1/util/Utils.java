@@ -45,11 +45,8 @@ public class Utils {
             //500x500
             BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
             bmpFactoryOptions.inJustDecodeBounds = true;
-
-            Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
-
+            BitmapFactory.decodeFile(file, bmpFactoryOptions);
             boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
-
             int ratio = 0;
             if(width) {
                 ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 1000);
@@ -58,14 +55,16 @@ public class Utils {
             }
             bmpFactoryOptions.inSampleSize = ratio;
 
-
             bmpFactoryOptions.inJustDecodeBounds = false;
-            bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
-
+            Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
+            if(bitmap == null){
+                Utils.debug("ERROR bitmap is null!! wrong file or what? : "+file);
+            }
             //int squareSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
 
             Matrix matrix = new Matrix();
             matrix.postRotate(rotate);
+
             Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
 
             return croppedBmp;
