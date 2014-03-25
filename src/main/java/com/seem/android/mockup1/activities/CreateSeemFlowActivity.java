@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -21,12 +19,9 @@ import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
-import com.seem.android.mockup1.customviews.SpinnerImageView;
-import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
-
-import java.util.Calendar;
 
 /**
  * Created by igbopie on 21/03/14.
@@ -76,21 +71,21 @@ public class CreateSeemFlowActivity extends Activity {
         //---
         localTempFile = Utils.getNewFileUri();
 
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, localTempFile);
-
-        startActivityForResult(cameraIntent, GlobalVars.TAKE_PHOTO_CODE);
+        ActivityFactory.startCamera(this,localTempFile);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug("OnActivityResult");
-        if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK) {
-            Utils.debug("Pic taken");
+        Utils.debug("Create Seem Flow Activity OnActivityResult");
+        if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            Utils.debug("Create Seem Flow Activity - Pic taken");
             localBitmap = Utils.shrinkBitmap(localTempFile.getPath());
             imageView.setImageBitmap(localBitmap);
 
+        } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
+            Utils.debug("Create Seem Flow Activity - Pic Cancelled");
+            ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
         }
 
     }
@@ -128,15 +123,7 @@ public class CreateSeemFlowActivity extends Activity {
             super.onPostExecute(item);
             dialog.dismiss();
 
-            //android:noHistory = "true"
-            Intent data = new Intent();
-
-            if (getParent() == null) {
-                setResult(Activity.RESULT_OK, data);
-            } else {
-                getParent().setResult(Activity.RESULT_OK, data);
-            }
-            finish();
+            ActivityFactory.finishActivity(CreateSeemFlowActivity.this, Activity.RESULT_OK);
         }
     }
 

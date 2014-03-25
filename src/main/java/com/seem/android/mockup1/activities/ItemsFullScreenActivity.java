@@ -1,5 +1,7 @@
 package com.seem.android.mockup1.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -27,14 +29,24 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
 
+
+    public String getSeemId(){
+        return getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);
+    }
+    public String getCurrentItemId(){
+        return getIntent().getStringExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID);
+    }
+    public String getParentItemId(){
+        return getIntent().getStringExtra(GlobalVars.EXTRA_PARENT_ITEM_ID);
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         itemList = new ArrayList<Item>();
 
-        String currentItemId = getIntent().getStringExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID);
-        String parentItemId = getIntent().getStringExtra(GlobalVars.EXTRA_PARENT_ITEM_ID);
+        String currentItemId = this.getCurrentItemId();
+        String parentItemId = this.getParentItemId();
 
         Item currentItem = AppSingleton.getInstance().findItemById(currentItemId);
         Item parentItem = AppSingleton.getInstance().findItemById(parentItemId);
@@ -42,10 +54,6 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         itemList.add(parentItem);
         //Add children
         itemList.addAll(AppSingleton.getInstance().findItemReplies(parentItem.getId()));
-
-
-
-
 
         setContentView(R.layout.activity_item_fullscreen_view);
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
@@ -57,9 +65,8 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
 
         mViewPager.setCurrentItem(itemList.indexOf(currentItem));
 
-
-
     }
+
 
     public class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
@@ -73,7 +80,7 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
 
         public Fragment getItem(int position) {
             Utils.debug("ItemPosition:" + position + " ID:" + position);
-            ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(itemList.get(position).getId());
+            ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(ItemsFullScreenActivity.this.getSeemId(),itemList.get(position).getId());
             return newFragment;
         }
 

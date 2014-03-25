@@ -1,5 +1,6 @@
 package com.seem.android.mockup1.fragments;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -7,14 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,13 +19,11 @@ import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
-import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
 
 /**
@@ -40,21 +33,24 @@ public class ItemFullScreenFragment extends Fragment {
     Handler h=new Handler();
 
 
-    public static ItemFullScreenFragment newInstance(String itemId) {
+    public static ItemFullScreenFragment newInstance(String seemId,String itemId) {
         ItemFullScreenFragment f = new ItemFullScreenFragment();
         Bundle args = new Bundle();
         args.putString(GlobalVars.EXTRA_ITEM_ID, itemId);
+        args.putString(GlobalVars.EXTRA_SEEM_ID, seemId);
         f.setArguments(args);
         return f;
     }
-    Timer myTimer = new Timer();
+
+    //Timer myTimer = new Timer();
     ImageView image;
     ProgressBar progressBar;
     TextView captionTextView;
-    final int HIDE_TIMEOUT = 3000;
-    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+    ImageView nestedRepliesIndicator;
+    TextView nestedRepliesIndicatorText;
+    ImageView replyButton;
+    //final int HIDE_TIMEOUT = 3000;
+    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +68,10 @@ public class ItemFullScreenFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getView().setSystemUiVisibility(mSystemUiVisibility);
-        getView().setOnClickListener(new View.OnClickListener() {
+
+        String itemId = getItemId();
+        final Item item = AppSingleton.getInstance().findItemById(itemId);
+        /*getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!getActivity().getActionBar().isShowing()){
@@ -82,31 +81,72 @@ public class ItemFullScreenFragment extends Fragment {
                     myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
                 }
             }
-        });
+        });*/
+
         Utils.debug("OnActivityCreated");
+        if (getActivity() != null &&
+                getActivity().getActionBar() != null  &&
+                getActivity().getActionBar().isShowing()){
+
+            getActivity().getActionBar().hide();
+        }
+
         image = (ImageView) getView().findViewById(R.id.imageView);
         progressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
         captionTextView = (TextView) getView().findViewById(R.id.captionTextView);
+        nestedRepliesIndicator = (ImageView) getView().findViewById(R.id.repliesIndicator);
+        nestedRepliesIndicatorText = (TextView) getView().findViewById(R.id.repliesIndicatorNumber);
+        nestedRepliesIndicatorText.setVisibility(View.INVISIBLE);
+        nestedRepliesIndicator.setVisibility(View.INVISIBLE);
+        nestedRepliesIndicator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityFactory.startItemActivity(ItemFullScreenFragment.this.getActivity(), getSeemId(), getItemId());
+            }
+        });
+        replyButton = (ImageView) getView().findViewById(R.id.cameraButton);
+        replyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityFactory.startReplyItemActivity(ItemFullScreenFragment.this.getActivity(),getItemId());
+            }
+        });
 
-        String itemId = getItemId();
+        //myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
 
-        new GetItem(itemId).execute();
+        //TODO don't show this on main items!
+        if(item.getReplyCount() > 0){
+            nestedRepliesIndicator.setVisibility(View.VISIBLE);
+            nestedRepliesIndicatorText.setVisibility(View.VISIBLE);
+            nestedRepliesIndicatorText.setText(item.getReplyCount()+"");
+        }
 
-        myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
-
-        //Let's show something...
-        Item item = AppSingleton.getInstance().findItemById(itemId);
         if(item != null && item.getImageThumb() != null){
             image.setImageDrawable(item.getImageThumb());
         }
         if(item != null){
             captionTextView.setText(item.getCaption());
         }
+
+
+        new GetItem(itemId).execute();
         super.onActivityCreated(savedInstanceState);
     }
 
     public String getItemId() {
         return getArguments().getString(GlobalVars.EXTRA_ITEM_ID, null);
+    }
+    public String getSeemId() {
+        return getArguments().getString(GlobalVars.EXTRA_SEEM_ID, null);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Utils.debug("ItemFullScreen - onActivityResult");
+        if (requestCode == GlobalVars.RETURN_CODE_REPLY_TO_ITEM && resultCode == Activity.RESULT_OK) {
+            Utils.debug("ItemFullScreen - Pic taken");
+        }
     }
 
     private class GetItem extends AsyncTask<Void,Void,Item> {
@@ -170,31 +210,5 @@ public class ItemFullScreenFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.seem_view, menu);
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        int id = menuItem.getItemId();
-        if(id == R.id.action_camera){
-            Utils.debug("Action camera!");
-
-
-            Intent intent = new Intent(this.getActivity(), ReplyFlowActivity.class);
-            intent.putExtra(GlobalVars.EXTRA_ITEM_ID,getItemId());
-            startActivityForResult(intent,GlobalVars.TAKE_PHOTO_CODE);
-
-
-            return true;
-
-        }
-        return super.onOptionsItemSelected(menuItem);
-    }
 }

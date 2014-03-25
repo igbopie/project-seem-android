@@ -21,6 +21,7 @@ public class SpinnerImageView extends LinearLayout {
     ProgressBar progressBar;
     TextView textView;
     ImageView repliesIndicator;
+    TextView repliesIndicatorNumber;
 
     public SpinnerImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -38,7 +39,9 @@ public class SpinnerImageView extends LinearLayout {
         textView = (TextView) findViewById(R.id.textView);
         textView.setVisibility(INVISIBLE);
         repliesIndicator = (ImageView) findViewById(R.id.repliesIndicator);
-
+        repliesIndicator.setVisibility(INVISIBLE);
+        repliesIndicatorNumber = (TextView) findViewById(R.id.repliesIndicatorNumber);
+        repliesIndicatorNumber.setVisibility(INVISIBLE);
     }
 
     public void setLoading(boolean loading){
@@ -68,14 +71,18 @@ public class SpinnerImageView extends LinearLayout {
         }
     }
 
-    public void setHasReplies(boolean hasReplies){
-        if(hasReplies){
+    public void setRepliesNumber(int hasReplies){
+        if(hasReplies>0){
+            this.repliesIndicatorNumber.setText(""+hasReplies);
+            this.repliesIndicatorNumber.setVisibility(VISIBLE);
             this.repliesIndicator.setVisibility(VISIBLE);
         } else {
+            this.repliesIndicatorNumber.setVisibility(INVISIBLE);
             this.repliesIndicator.setVisibility(INVISIBLE);
         }
     }
     public void setViewRepliesOnClick(OnClickListener l){
         this.repliesIndicator.setOnClickListener(l);
     }
+
 }

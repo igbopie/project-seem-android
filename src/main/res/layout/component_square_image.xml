@@ -40,8 +40,24 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/nested_replies"
-        android:visibility="invisible"/>
+        android:src="@drawable/nested_replies"/>
+    <TextView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/repliesIndicatorNumber"
+        android:layout_alignTop="@+id/componentImageView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="0"
+        android:gravity="center"
+        android:textColor="#000"
+        android:shadowColor="#fff"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="3"
+        android:textAlignment="center"
+        />
 
 
 </RelativeLayout>

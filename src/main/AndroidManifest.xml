@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activities.SeemsListView"
+            android:name=".activities.SeemListActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.SeemView"
+            android:name=".activities.ItemActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>

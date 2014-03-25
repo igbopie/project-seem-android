@@ -13,18 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.SeemAdapter;
-import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
 import java.util.ArrayList;
@@ -34,11 +31,10 @@ import java.util.List;
  * Created by igbopie on 18/03/14.
  */
 
-public class SeemsListView extends ListActivity {
+public class SeemListActivity extends ListActivity {
 
     private SeemAdapter adapter;
 
-    private Seem seemClicked = null;
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -61,16 +57,11 @@ public class SeemsListView extends ListActivity {
         // Do something when a list item is clicked
         Seem seem = adapter.getItem(position);
         Utils.debug("Item Clicked! seem "+seem);
-        seemClicked = seem;
-        //Create Seem activity
-        Intent intent = new Intent(SeemsListView.this, SeemView.class);
-        intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemClicked.getId());
-        startActivity(intent);
-
+        ActivityFactory.startItemActivity(SeemListActivity.this, seem.getId(), seem.getItemId());
     }
 
     private class GetSeemsTask extends AsyncTask<Void,Void,List<Seem>> {
-        private final ProgressDialog dialog = new ProgressDialog(SeemsListView.this);
+        private final ProgressDialog dialog = new ProgressDialog(SeemListActivity.this);
 
         @Override
         protected void onPreExecute() {
@@ -115,11 +106,7 @@ public class SeemsListView extends ListActivity {
             case R.id.action_camera:
                 //newGame();
                 Utils.debug("NEW SEEM!");
-
-                Intent intent = new Intent(this, CreateSeemFlowActivity.class);
-                //intent.putExtra(GlobalVars.EXTRA_ITEM_ID,item.getId());
-                startActivityForResult(intent,GlobalVars.TAKE_PHOTO_CODE);
-
+                ActivityFactory.startCreateSeemActivity(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -130,8 +117,8 @@ public class SeemsListView extends ListActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK) {
-            Utils.debug("Pic taken");
+        if (requestCode == GlobalVars.RETURN_CODE_CREATE_SEEM && resultCode == Activity.RESULT_OK) {
+            Utils.debug("Seem created!");
             adapter.setItemList(AppSingleton.getInstance().findSeems());
         }
     }

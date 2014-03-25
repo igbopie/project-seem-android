@@ -157,11 +157,9 @@ public class ThumbnailAdapter extends BaseAdapter {
             if(this.isCancelled()){
                 //well... do not paint...
             }else if(item != null) {
-
                 imageView.getImageView().setImageDrawable(item.getImageThumb());
-
+                imageView.setRepliesNumber(item.getReplyCount());
                 if(item.getReplyCount() > 0) {
-                    imageView.setHasReplies(true);
                     imageView.setViewRepliesOnClick(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

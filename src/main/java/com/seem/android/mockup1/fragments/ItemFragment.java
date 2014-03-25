@@ -5,20 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,9 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.jess.ui.TwoWayAdapterView;
@@ -37,21 +28,16 @@ import com.seem.android.mockup1.Api;
 import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
-import com.seem.android.mockup1.activities.ItemsFullScreenActivity;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
-import com.seem.android.mockup1.activities.SeemView;
 import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
-import com.seem.android.mockup1.customviews.SquareImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -66,11 +52,12 @@ public class ItemFragment extends Fragment implements Observer{
     /**
      * Create a new instance of ItemFragment
      */
-    public static ItemFragment newInstance(String itemId,int depth) {
+    public static ItemFragment newInstance(String seemId,String itemId,int depth) {
         ItemFragment f = new ItemFragment();
 
         Bundle args = new Bundle();
 
+        args.putString(GlobalVars.EXTRA_SEEM_ID, seemId);
         args.putString(GlobalVars.EXTRA_ITEM_ID, itemId);
         args.putInt(GlobalVars.EXTRA_DEPTH,depth);
 
@@ -124,7 +111,7 @@ public class ItemFragment extends Fragment implements Observer{
         if (!getActivity().getActionBar().isShowing()){
             getActivity().getActionBar().show();
         }
-        new GetItemTask().execute(getReplyId());
+        new GetItemTask().execute(getItemId());
 
         twoWayGridView = (TwoWayGridView) getView().findViewById(R.id.gridview);
         twoWayGridView.setColumnWidth(GlobalVars.GRID_SIZE);
@@ -132,13 +119,7 @@ public class ItemFragment extends Fragment implements Observer{
         thumbnailAdapter = new ThumbnailAdapter(this.getActivity(),new ItemSelectedListener() {
             @Override
             public void itemSelected(Item item) {
-                //Create Itemfragment
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                ItemFragment newFragment = ItemFragment.newInstance(item.getId(),0);
-                transaction.replace(R.id.linearLayout, newFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-
+                ActivityFactory.startItemActivity(ItemFragment.this.getActivity(), getSeemId(), item.getId());
             }
         });
         twoWayGridView.setAdapter(thumbnailAdapter);
@@ -158,7 +139,7 @@ public class ItemFragment extends Fragment implements Observer{
     public void paintReply(){
         thumbnailAdapter.clear();
 
-        item = AppSingleton.getInstance().findItemById(getReplyId());
+        item = AppSingleton.getInstance().findItemById(getItemId());
         //FIND replies
         if(item.getReplyCount() > 0 ){
             new GetRepliesTask(item).execute();
@@ -203,12 +184,15 @@ public class ItemFragment extends Fragment implements Observer{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Utils.debug("Destroing:"+getReplyId());
+        Utils.debug("Destroing:"+ getItemId());
 
     }
 
-    public String getReplyId() {
+    public String getItemId() {
         return getArguments().getString(GlobalVars.EXTRA_ITEM_ID, null);
+    }
+    public String getSeemId() {
+        return getArguments().getString(GlobalVars.EXTRA_SEEM_ID, null);
     }
 
     public int getDepth() {
@@ -232,10 +216,10 @@ public class ItemFragment extends Fragment implements Observer{
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Utils.debug("onActivityResult Fragment");
-        if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == GlobalVars.RETURN_CODE_REPLY_TO_ITEM && resultCode == Activity.RESULT_OK) {
             Utils.debug("Pic taken");
             this.paintReply();
-        } else if (requestCode == GlobalVars.FULLSCREEN_BACK_CODE) {
+        } else if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN) {
             Utils.debug("Full Screen Back");
             if(zoom != null) {
                 zoom.endZoom();
@@ -303,13 +287,10 @@ public class ItemFragment extends Fragment implements Observer{
         @Override
         protected void onPostExecute(List<Item> result) {
             super.onPostExecute(result);
-
             replies = result;
-
             for(Item item:replies) {
                 addToGrid(item);
             }
-
             image.setLoading(false);
         }
     }
@@ -331,11 +312,7 @@ public class ItemFragment extends Fragment implements Observer{
         int id = menuItem.getItemId();
         if(id == R.id.action_camera && item != null){
             Utils.debug("Action camera!");
-
-            Intent intent = new Intent(this.getActivity(), ReplyFlowActivity.class);
-            intent.putExtra(GlobalVars.EXTRA_ITEM_ID,item.getId());
-            startActivityForResult(intent,GlobalVars.TAKE_PHOTO_CODE);
-
+            ActivityFactory.startReplyItemActivity(this.getActivity(),item.getId());
             return true;
 
         }
@@ -351,6 +328,7 @@ public class ItemFragment extends Fragment implements Observer{
         Point globalOffset = new Point();
         float startScaleFinal;
         Item item;
+
 
         ZoomUtil(Item item,View thumbView) {
             this.thumbView = thumbView;
@@ -478,14 +456,8 @@ public class ItemFragment extends Fragment implements Observer{
                 public void onAnimationEnd(Animator animation) {
                     mCurrentAnimator = null;
                     mCallback.itemSelected(item.getId(), 0);
-
                     Item parentItem = ItemFragment.this.item;
-
-                    Intent intent = new Intent(getActivity(), ItemsFullScreenActivity.class);
-                    intent.putExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID, item.getId());
-                    intent.putExtra(GlobalVars.EXTRA_PARENT_ITEM_ID, parentItem.getId());
-                    startActivityForResult(intent, GlobalVars.FULLSCREEN_BACK_CODE);
-
+                    ActivityFactory.startItemFullscreenActivity(getActivity(), getSeemId(), parentItem.getId(), item.getId());
                 }
 
                 @Override

@@ -1,10 +1,13 @@
 package com.seem.android.mockup1.util;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.seem.android.mockup1.GlobalVars;
@@ -108,6 +111,8 @@ public class Utils {
         return Uri.fromFile(newfile);
 
     }
+
+
 
 
 

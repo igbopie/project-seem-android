@@ -33,7 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SeemView extends FragmentActivity implements ItemFragmentSelectedListener {
+public class ItemActivity extends FragmentActivity implements ItemFragmentSelectedListener {
+
+
 
     Seem seem = null;
 
@@ -42,51 +44,26 @@ public class SeemView extends FragmentActivity implements ItemFragmentSelectedLi
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Utils.debug("SeemView OnCreate");
+        Utils.debug("ItemActivity OnCreate");
         setContentView(R.layout.activity_seem_view);
 
         String seemId = getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);
+        String itemId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
         seem = AppSingleton.getInstance().findSeemById(seemId);
         this.setTitle(seem.getTitle());
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        ItemFragment newFragment = ItemFragment.newInstance(seem.getItemId(),0);
+        ItemFragment newFragment = ItemFragment.newInstance(seemId,itemId,0);
         transaction.add(R.id.linearLayout, newFragment);
         transaction.commit();
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug("OnActivityResult Activity");
-        if (requestCode == GlobalVars.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
-            super.onActivityResult(requestCode,resultCode,data);
-        }
-    }
-
-
-
-    @Override
     public void itemSelected(String id, int depth) {
         boolean add = false;
         Utils.debug("Hey " + id);
-
-        // Create fragment and give it an argument for the selected article
-        /*ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(id);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.linearLayout, newFragment);
-        transaction.addToBackStack("Back");
-
-        // Commit the transaction
-        transaction.commit();*/
-
-
     }
+
 
 }
