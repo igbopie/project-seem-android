@@ -85,7 +85,8 @@ public class ReplyFlowActivity extends Activity {
                 imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
             }catch(Exception e){
                 Utils.debug("ERROR trying to save the image",e);
-                ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
+                //
+                //ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
             }
         } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
             Utils.debug("Reply Flow Activity - Pic Cancelled");
