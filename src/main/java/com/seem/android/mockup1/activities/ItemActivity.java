@@ -1,36 +1,21 @@
 package com.seem.android.mockup1.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.provider.MediaStore;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
-import com.jess.ui.TwoWayGridView;
-import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
-import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.fragments.ItemFragment;
-import com.seem.android.mockup1.fragments.ItemFullScreenFragment;
+import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
+import com.seem.android.mockup1.service.ItemService;
+import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.Utils;
 import com.seem.android.mockup1.fragments.ItemFragmentSelectedListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class ItemActivity extends FragmentActivity implements ItemFragmentSelectedListener {
@@ -44,16 +29,13 @@ public class ItemActivity extends FragmentActivity implements ItemFragmentSelect
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Utils.debug("ItemActivity OnCreate");
+        this.recoverFromSavedState(savedInstanceState);
+
+        Utils.debug("ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
         setContentView(R.layout.activity_seem_view);
 
-        String seemId = getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);
-        String itemId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
-        seem = AppSingleton.getInstance().findSeemById(seemId);
-        this.setTitle(seem.getTitle());
-
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        ItemFragment newFragment = ItemFragment.newInstance(seemId,itemId,0);
+        ItemFragment newFragment = ItemFragment.newInstance(getSeemId(),getItemId(),0);
         transaction.add(R.id.linearLayout, newFragment);
         transaction.commit();
 
@@ -65,5 +47,43 @@ public class ItemActivity extends FragmentActivity implements ItemFragmentSelect
         Utils.debug("Hey " + id);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Utils.debug("ItemActivity - onSaveInstanceState");
+        outState.putString(GlobalVars.EXTRA_SEEM_ID, getSeemId());
+        outState.putString(GlobalVars.EXTRA_ITEM_ID,getItemId());
+    }
 
+    protected void recoverFromSavedState(Bundle savedInstanceState) {
+        if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.EXTRA_SEEM_ID)){
+            getIntent().putExtra(GlobalVars.EXTRA_SEEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_SEEM_ID));
+            getIntent().putExtra(GlobalVars.EXTRA_ITEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_ITEM_ID));
+        }
+    }
+
+
+    public String getSeemId(){
+        String seemId = getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);
+        return  seemId;
+    }
+    public String getItemId(){
+        String itemId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
+        return  itemId;
+    }
+
+    public class InitAsyncTask extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            seem = SeemService.getInstance().findSeemById(getSeemId());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            ItemActivity.this.setTitle(seem.getTitle());
+        }
+    }
 }

@@ -68,8 +68,8 @@ public class Utils {
             Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
 
             return croppedBmp;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Utils.debug("Error shrinking the photo: "+file);
         }
         return null;
     }

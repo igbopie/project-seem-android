@@ -1,18 +1,16 @@
 package com.seem.android.mockup1.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.jess.ui.TwoWayAbsListView;
-import com.seem.android.mockup1.Api;
+import com.seem.android.mockup1.executor.AsyncExecutor;
+import com.seem.android.mockup1.executor.MyAsyncTask;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
-import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.util.ItemSelectedListener;
@@ -34,7 +32,6 @@ public class ThumbnailAdapter extends BaseAdapter {
     List<Item> items = new ArrayList<Item>();
 
     Map<View,FetchThumbs> execViewMap = new HashMap<View, FetchThumbs>();
-    LinkedList<FetchThumbs> fetchQeue = new LinkedList<FetchThumbs>();
     ItemSelectedListener repliesListener;
 
     public ThumbnailAdapter(Context context,ItemSelectedListener repliesListener) {
@@ -103,32 +100,23 @@ public class ThumbnailAdapter extends BaseAdapter {
 
     private void addProcess(SpinnerImageView view,Item item){
         //be careful with reusing views...
-        synchronized (fetchQeue) {
-            FetchThumbs ft = new FetchThumbs(view, item);
-            fetchQeue.add(ft);
 
-            FetchThumbs oldExec = execViewMap.get(view);
-            execViewMap.put(view, ft);
+        FetchThumbs ft = new FetchThumbs(view, item);
+        AsyncExecutor.getInstance().add(ft);
 
-            if (oldExec != null) {
-                oldExec.cancel(true);
-            }
+
+        FetchThumbs oldExec = execViewMap.get(view);
+        execViewMap.put(view, ft);
+
+        if (oldExec != null) {
+            AsyncExecutor.getInstance().cancelTask(oldExec);
         }
-        checkProcessing();
+
     }
 
-    private  void checkProcessing(){
-        synchronized (fetchQeue) {
-            Utils.debug("Check Processing");
-            if (fetchQeue.size() > 0 &&
-                fetchQeue.getFirst().getStatus() == AsyncTask.Status.PENDING) {
-                Utils.debug("No one is executing so I execute the first one");
-                fetchQeue.pop().execute();
-            }
-        }
-    }
 
-    private class FetchThumbs extends AsyncTask<Void,Void,Void> {
+
+    private class FetchThumbs extends MyAsyncTask {
         private SpinnerImageView imageView;
         private Item item;
 
@@ -154,6 +142,7 @@ public class ThumbnailAdapter extends BaseAdapter {
 
         @Override
         protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
             if(this.isCancelled()){
                 //well... do not paint...
             }else if(item != null) {
@@ -170,10 +159,7 @@ public class ThumbnailAdapter extends BaseAdapter {
                 }
                 imageView.getImageView().setVisibility(View.VISIBLE);
                 imageView.setLoading(false);
-
-
             }
-            checkProcessing();
         }
     }
 }

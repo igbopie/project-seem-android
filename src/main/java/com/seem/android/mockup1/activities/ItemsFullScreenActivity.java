@@ -1,7 +1,6 @@
 package com.seem.android.mockup1.activities;
 
-import android.content.Context;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,11 +8,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 
-import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.fragments.ItemFullScreenFragment;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.Utils;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import java.util.List;
  */
 public class ItemsFullScreenActivity extends ActionBarActivity {
 
-    List<Item> itemList;
+    List<Item> itemList = new ArrayList<Item>();
     ViewPager mViewPager;
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
@@ -43,18 +42,6 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        itemList = new ArrayList<Item>();
-
-        String currentItemId = this.getCurrentItemId();
-        String parentItemId = this.getParentItemId();
-
-        Item currentItem = AppSingleton.getInstance().findItemById(currentItemId);
-        Item parentItem = AppSingleton.getInstance().findItemById(parentItemId);
-        //Add parent first
-        itemList.add(parentItem);
-        //Add children
-        itemList.addAll(AppSingleton.getInstance().findItemReplies(parentItem.getId()));
-
         setContentView(R.layout.activity_item_fullscreen_view);
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
 
@@ -63,8 +50,14 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
 
-        mViewPager.setCurrentItem(itemList.indexOf(currentItem));
+        itemList = new ArrayList<Item>();
+        mAppSectionsPagerAdapter.notifyDataSetChanged();
 
+        if (getActionBar() != null  && getActionBar().isShowing()){
+            getActionBar().hide();
+        }
+
+        new InitAsyncTask().execute();
     }
 
 
@@ -86,7 +79,7 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
 
         public int getItemPosition(Object fr) {
             ItemFullScreenFragment fragment = (ItemFullScreenFragment)fr;
-            Item item = AppSingleton.getInstance().findItemById(fragment.getItemId());
+            Item item =  ItemService.getInstance().findItemById(fragment.getItemId());
             int position = itemList.indexOf(item);
             Utils.debug("ItemPosition:"+position);
             if (position >= 0) {
@@ -97,6 +90,35 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         }
         public CharSequence getPageTitle(int position) {
             return "Image "+position;
+        }
+    }
+
+    public class InitAsyncTask extends AsyncTask<Void,Void,List<Item>>{
+        String currentItemId = ItemsFullScreenActivity.this.getCurrentItemId();
+        String parentItemId = ItemsFullScreenActivity.this.getParentItemId();
+        Item currentItem;
+
+        @Override
+        protected List<Item> doInBackground(Void... voids) {
+            List<Item> items = new ArrayList<Item>();
+            //this can be a potentially slow operation. Should be loaded in the background
+            currentItem = ItemService.getInstance().findItemById(currentItemId);
+            Item parentItem = ItemService.getInstance().findItemById(parentItemId);
+            //Add parent first
+            items.add(parentItem);
+            //Add children
+            items.addAll(ItemService.getInstance().findItemReplies(parentItem.getId()));
+
+            return items;
+        }
+
+        @Override
+        protected void onPostExecute(List<Item> items) {
+            super.onPostExecute(items);
+            itemList.clear();
+            itemList.addAll(items);
+            mAppSectionsPagerAdapter.notifyDataSetChanged();
+            mViewPager.setCurrentItem(itemList.indexOf(currentItem));
         }
     }
 }

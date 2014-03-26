@@ -1,4 +1,4 @@
-package com.seem.android.mockup1;
+package com.seem.android.mockup1.service;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -242,10 +242,11 @@ public class Api {
         }
     }
 
-    public static List<Item> getReplies(String itemId){
+    public static List<Item> getReplies(String itemId,int page){
         try {
             HashMap<String,String>params = new HashMap<String, String>();
             params.put("itemId",itemId);
+            params.put("page",page+"");
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLIES,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();

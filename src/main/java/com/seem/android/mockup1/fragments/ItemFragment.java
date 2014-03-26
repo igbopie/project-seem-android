@@ -24,14 +24,12 @@ import android.widget.RelativeLayout;
 
 import com.jess.ui.TwoWayAdapterView;
 import com.jess.ui.TwoWayGridView;
-import com.seem.android.mockup1.Api;
-import com.seem.android.mockup1.AppSingleton;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
-import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
@@ -113,7 +111,7 @@ public class ItemFragment extends Fragment implements Observer{
         if (!getActivity().getActionBar().isShowing()){
             getActivity().getActionBar().show();
         }
-        new GetItemTask().execute(getItemId());
+        new GetItemAndPaintTask().execute(getItemId());
 
         twoWayGridView = (TwoWayGridView) getView().findViewById(R.id.gridview);
         twoWayGridView.setColumnWidth(GlobalVars.GRID_SIZE);
@@ -141,7 +139,6 @@ public class ItemFragment extends Fragment implements Observer{
     public void paintReply(){
         thumbnailAdapter.clear();
 
-        item = AppSingleton.getInstance().findItemById(getItemId());
         //FIND replies
         if(item.getReplyCount() > 0 ){
             new GetRepliesTask(item).execute();
@@ -236,7 +233,7 @@ public class ItemFragment extends Fragment implements Observer{
         thumbnailAdapter.addItem(item);
     }
 
-    private class GetItemTask extends AsyncTask<String,Void,Item> {
+    private class GetItemAndPaintTask extends AsyncTask<String,Void,Item> {
 
         @Override
         protected void onPreExecute() {
@@ -245,20 +242,14 @@ public class ItemFragment extends Fragment implements Observer{
 
         @Override
         protected Item doInBackground(String... id) {
-            Item item = AppSingleton.getInstance().findItemById(id[0]);
-            if(item == null) {
-                item = Api.getItem(id[0]);
-                AppSingleton.getInstance().saveItem(item);
-            }
+            item = ItemService.getInstance().findItemById(id[0]);
             Utils.debug("This is the item:" + item);
-
             return item;
         }
 
         @Override
         protected void onPostExecute(Item result) {
             super.onPostExecute(result);
-            AppSingleton.getInstance().saveItem(result);
             paintReply();
         }
     }
@@ -278,15 +269,7 @@ public class ItemFragment extends Fragment implements Observer{
 
         @Override
         protected List<Item> doInBackground(Void... voids) {
-            List<Item> items = AppSingleton.getInstance().findItemReplies(item.getId());
-            if(items.size() != item.getReplyCount()){
-                //DIRTY! We need to load more
-                items = Api.getReplies(item.getId());
-                for(Item item:items){
-                    AppSingleton.getInstance().saveItem(item);
-                }
-            }
-
+            List<Item> items = ItemService.getInstance().findItemReplies(item.getId());
             return items;
         }
 

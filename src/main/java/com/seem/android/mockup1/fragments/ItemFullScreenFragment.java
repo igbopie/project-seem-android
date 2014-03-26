@@ -14,12 +14,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.seem.android.mockup1.Api;
-import com.seem.android.mockup1.AppSingleton;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
-import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
@@ -49,6 +48,7 @@ public class ItemFullScreenFragment extends Fragment {
     ImageView nestedRepliesIndicator;
     TextView nestedRepliesIndicatorText;
     ImageView replyButton;
+    Item item;
     //final int HIDE_TIMEOUT = 3000;
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
@@ -69,8 +69,6 @@ public class ItemFullScreenFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         getView().setSystemUiVisibility(mSystemUiVisibility);
 
-        String itemId = getItemId();
-        final Item item = AppSingleton.getInstance().findItemById(itemId);
         /*getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,23 +111,7 @@ public class ItemFullScreenFragment extends Fragment {
         });
 
         //myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
-
-        //TODO don't show this on main items!
-        if(item.getReplyCount() > 0){
-            nestedRepliesIndicator.setVisibility(View.VISIBLE);
-            nestedRepliesIndicatorText.setVisibility(View.VISIBLE);
-            nestedRepliesIndicatorText.setText(item.getReplyCount()+"");
-        }
-
-        if(item != null && item.getImageThumb() != null){
-            image.setImageDrawable(item.getImageThumb());
-        }
-        if(item != null){
-            captionTextView.setText(item.getCaption());
-        }
-
-
-        new GetItem(itemId).execute();
+        new GetItem().execute();
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -148,16 +130,35 @@ public class ItemFullScreenFragment extends Fragment {
             Utils.debug("ItemFullScreen - Pic taken");
         }
     }
+    private class GetItem extends AsyncTask<Void,Void,Void> {
 
-    private class GetItem extends AsyncTask<Void,Void,Item> {
-        private final ProgressDialog dialog = new ProgressDialog(ItemFullScreenFragment.this.getView().getContext());
-
-        private String itemId;
-
-        public GetItem(String itemId){
-            this.itemId = itemId;
+        @Override
+        protected Void doInBackground(Void... voids) {
+            item = ItemService.getInstance().findItemById(getItemId());
+            return null;
         }
 
+        @Override
+        protected void onPostExecute(Void result) {
+            if (item.getReplyCount() > 0)
+            {
+                nestedRepliesIndicator.setVisibility(View.VISIBLE);
+                nestedRepliesIndicatorText.setVisibility(View.VISIBLE);
+                nestedRepliesIndicatorText.setText(item.getReplyCount() + "");
+            }
+            if (item != null && item.getImageThumb() != null)
+            {
+                image.setImageDrawable(item.getImageThumb());
+            }
+            if (item != null)
+            {
+                captionTextView.setText(item.getCaption());
+            }
+            new DownloadLargeImage().execute();
+        }
+    }
+
+    private class DownloadLargeImage extends AsyncTask<Void,Void,Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -165,17 +166,12 @@ public class ItemFullScreenFragment extends Fragment {
         }
 
         @Override
-        protected Item doInBackground(Void... voids) {
+        protected Void doInBackground(Void... voids) {
             try {
-                Item item = AppSingleton.getInstance().findItemById(itemId);
-                if(item == null) {
-                    item = Api.getItem(itemId);
-                }
-
                 if(item.getImageLarge() == null) {
                     Api.downloadLargeImage(item);
                 }
-                return item;
+                return null;
             } catch (IOException e) {
                 Utils.debug("Error",e);
             }
@@ -183,12 +179,10 @@ public class ItemFullScreenFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Item result) {
+        protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            image.setImageDrawable(result.getImageLarge());
+            image.setImageDrawable(item.getImageLarge());
             progressBar.setVisibility(View.INVISIBLE);
-            captionTextView.setText(result.getCaption());
-
         }
     }
 

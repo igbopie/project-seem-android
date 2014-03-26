@@ -3,6 +3,7 @@ package com.seem.android.mockup1.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -13,11 +14,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.seem.android.mockup1.Api;
-import com.seem.android.mockup1.AppSingleton;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
@@ -33,6 +34,7 @@ public class ReplyFlowActivity extends Activity {
     EditText editText;
     Button submit;
     String replyId;
+    boolean cameraStarted;
 
 
     @Override
@@ -68,10 +70,27 @@ public class ReplyFlowActivity extends Activity {
             }
         });
         //---
-        itemInProgress = new Item();
-        itemInProgress.setTempLocalFile(Utils.getNewFileUri());
+        if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
+            Utils.debug("Reply Flow - Camera Value recovered");
+            cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
+            itemInProgress = new Item();
+            itemInProgress.setTempLocalFile(Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)));
+        }
 
-        ActivityFactory.startCamera(this, itemInProgress.getTempLocalFile());
+        if(!cameraStarted) {
+            cameraStarted = true;
+            itemInProgress = new Item();
+            itemInProgress.setTempLocalFile(Utils.getNewFileUri());
+            ActivityFactory.startCamera(this, itemInProgress.getTempLocalFile());
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Utils.debug("Reply Flow - onSaveInstanceState");
+        outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
+        outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE, itemInProgress.getTempLocalFile().getPath());
     }
 
     @Override
@@ -112,13 +131,8 @@ public class ReplyFlowActivity extends Activity {
                 String mediaId = Api.createMedia(items[0].getTempLocalBitmap());
                 if(mediaId != null){
                     items[0].setMediaId(mediaId);
-                    Item reply = Api.reply(items[0].getCaption(),items[0].getMediaId(),replyId);
-                    AppSingleton.getInstance().saveItem(reply);
-
-                    Item parentReply = AppSingleton.getInstance().findItemById(replyId);
-                    parentReply.setReplyCount(parentReply.getReplyCount() + 1);
-
-                    return items[0];
+                    items[0].setReplyTo(replyId);
+                    return ItemService.getInstance().reply(items[0]);
                 }else {
                     Utils.debug("Error uploading");
                 }

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
  */
 public class GlobalVars {
 
+    public static final String SAVED_BUNDLE_CAMERASTARTED ="cameraStarted";
+    public static final String SAVED_BUNDLE_CAMERA_OUT_FILE ="cameraOutFile";
 
     public static final String EXTRA_SEEM_ID = "seemId";
 

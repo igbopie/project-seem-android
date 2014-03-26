@@ -15,12 +15,12 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ListView;
 
-import com.seem.android.mockup1.Api;
-import com.seem.android.mockup1.AppSingleton;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.SeemAdapter;
 import com.seem.android.mockup1.model.Seem;
+import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
@@ -60,37 +60,7 @@ public class SeemListActivity extends ListActivity {
         ActivityFactory.startItemActivity(SeemListActivity.this, seem.getId(), seem.getItemId());
     }
 
-    private class GetSeemsTask extends AsyncTask<Void,Void,List<Seem>> {
-        private final ProgressDialog dialog = new ProgressDialog(SeemListActivity.this);
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog.setMessage("Downloading seems...");
-            dialog.show();
-        }
-
-        @Override
-        protected List<Seem> doInBackground(Void... voids) {
-            List<Seem> seems = Api.getSeems();
-            Utils.debug("This is the seems:" + seems);
-
-            return seems;
-        }
-
-        @Override
-        protected void onPostExecute(List<Seem> result) {
-            super.onPostExecute(result);
-            adapter.setItemList(result);
-            adapter.notifyDataSetChanged();
-            dialog.dismiss();
-
-            for(Seem seem:result){
-                AppSingleton.getInstance().saveSeem(seem);
-            }
-
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,7 +89,36 @@ public class SeemListActivity extends ListActivity {
 
         if (requestCode == GlobalVars.RETURN_CODE_CREATE_SEEM && resultCode == Activity.RESULT_OK) {
             Utils.debug("Seem created!");
-            adapter.setItemList(AppSingleton.getInstance().findSeems());
+            new GetSeemsTask().execute();
+        }
+    }
+
+
+
+    private class GetSeemsTask extends AsyncTask<Void,Void,List<Seem>> {
+        private final ProgressDialog dialog = new ProgressDialog(SeemListActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Downloading seems...");
+            dialog.show();
+        }
+
+        @Override
+        protected List<Seem> doInBackground(Void... voids) {
+            List<Seem> seems = SeemService.getInstance().findSeems();
+            Utils.debug("This is the seems:" + seems);
+
+            return seems;
+        }
+
+        @Override
+        protected void onPostExecute(List<Seem> result) {
+            super.onPostExecute(result);
+            adapter.setItemList(result);
+            adapter.notifyDataSetChanged();
+            dialog.dismiss();
         }
     }
 

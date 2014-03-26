@@ -15,11 +15,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.seem.android.mockup1.Api;
-import com.seem.android.mockup1.AppSingleton;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.model.Seem;
+import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
@@ -36,6 +36,7 @@ public class CreateSeemFlowActivity extends Activity {
     Button submit;
     Uri localTempFile;
     Bitmap localBitmap;
+    Boolean cameraStarted = false;
 
 
     @Override
@@ -69,9 +70,18 @@ public class CreateSeemFlowActivity extends Activity {
             }
         });
         //---
-        localTempFile = Utils.getNewFileUri();
 
-        ActivityFactory.startCamera(this,localTempFile);
+        if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
+            Utils.debug("Camera Value recovered");
+            cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
+            localTempFile = Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE));
+        }
+
+        if(!cameraStarted) {
+            cameraStarted = true;
+            localTempFile = Utils.getNewFileUri();
+            ActivityFactory.startCamera(this, localTempFile);
+        }
     }
 
     @Override
@@ -90,6 +100,14 @@ public class CreateSeemFlowActivity extends Activity {
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Utils.debug("Create Seem Flow - onSaveInstanceState");
+        outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
+        outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE,localTempFile.getPath());
+    }
+
     private class UploadMedia extends AsyncTask<Void,Void,Seem> {
         private final ProgressDialog dialog = new ProgressDialog(CreateSeemFlowActivity.this);
 
@@ -106,9 +124,7 @@ public class CreateSeemFlowActivity extends Activity {
             try {
                 String mediaId = Api.createMedia(localBitmap);
                 if(mediaId != null){
-                    Seem seem = Api.createSeem(title,caption,mediaId);
-                    AppSingleton.getInstance().saveSeem(seem);
-                    return seem;
+                    return SeemService.getInstance().save(title,caption,mediaId);
                 }else {
                     Utils.debug("Error uploading");
                 }
