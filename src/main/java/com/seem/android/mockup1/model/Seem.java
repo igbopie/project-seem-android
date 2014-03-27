@@ -16,6 +16,7 @@ public class Seem {
     private String itemId;
     private Date created;
     private int itemCount;
+    private Date updated;
 
     public String getId() {
         return id;
@@ -65,5 +66,13 @@ public class Seem {
                 ", itemId='" + itemId + '\'' +
                 ", created=" + created +
                 '}';
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    public Date getUpdated() {
+        return updated;
     }
 }

@@ -38,7 +38,7 @@ public class SeemListActivity extends ListActivity {
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        new GetSeemsTask().execute();
+        new GetSeemsTask(false).execute();
         adapter = new SeemAdapter(new ArrayList<Seem>(),this);
         setListAdapter(adapter);
 
@@ -78,6 +78,11 @@ public class SeemListActivity extends ListActivity {
                 Utils.debug("NEW SEEM!");
                 ActivityFactory.startCreateSeemActivity(this);
                 return true;
+            case R.id.action_refresh:
+                //newGame();
+                Utils.debug("Refresh Seems!");
+                new GetSeemsTask(true).execute();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -89,14 +94,19 @@ public class SeemListActivity extends ListActivity {
 
         if (requestCode == GlobalVars.RETURN_CODE_CREATE_SEEM && resultCode == Activity.RESULT_OK) {
             Utils.debug("Seem created!");
-            new GetSeemsTask().execute();
+            new GetSeemsTask(false).execute();
         }
     }
 
 
 
     private class GetSeemsTask extends AsyncTask<Void,Void,List<Seem>> {
+        private boolean refresh = false;
         private final ProgressDialog dialog = new ProgressDialog(SeemListActivity.this);
+
+        private GetSeemsTask(boolean refresh) {
+            this.refresh = refresh;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -107,7 +117,7 @@ public class SeemListActivity extends ListActivity {
 
         @Override
         protected List<Seem> doInBackground(Void... voids) {
-            List<Seem> seems = SeemService.getInstance().findSeems();
+            List<Seem> seems = SeemService.getInstance().findSeems(refresh);
             Utils.debug("This is the seems:" + seems);
 
             return seems;

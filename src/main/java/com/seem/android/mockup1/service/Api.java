@@ -67,6 +67,7 @@ public class Api {
     public static final String JSON_TAG_SEEM_ID = "_id";
     public static final String JSON_TAG_SEEM_ITEM_COUNT = "itemCount";
     public static final String JSON_TAG_SEEM_CREATED = "created";
+    public static final String JSON_TAG_SEEM_UPDATED = "updated";
 
     //ITEM Model
 
@@ -295,6 +296,8 @@ public class Api {
         seem.setTitle(seemJson.getString(JSON_TAG_SEEM_TITLE));
         seem.setCreated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_CREATED)).getTime());
         seem.setItemCount(seemJson.getInt(JSON_TAG_SEEM_ITEM_COUNT));
+
+        seem.setUpdated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_UPDATED)).getTime());
         return seem;
     }
 

@@ -33,9 +33,12 @@ public class ItemService {
 
     private Map<String,Item> itemsDB = new HashMap<String, Item>();
 
-    public Item findItemById(String id){
+    public Item findItemById(String id) {
+        return findItemById(id,false);
+    }
+    public Item findItemById(String id,boolean refresh){
         Item item = itemsDB.get(id);
-        if(item == null){
+        if(item == null || refresh){
             Utils.debug("Cache miss item: "+id);
             item = Api.getItem(id);
             if(item == null){
@@ -47,11 +50,14 @@ public class ItemService {
     }
 
     public List<Item> findItemReplies(String parentItemId){
-        return this.findItemReplies(parentItemId,0);
+        return this.findItemReplies(parentItemId,0,false);
     }
-    public List<Item> findItemReplies(String parentItemId, int page){
+    public List<Item> findItemReplies(String parentItemId,boolean refresh){
+        return this.findItemReplies(parentItemId,0,refresh);
+    }
+    public List<Item> findItemReplies(String parentItemId, int page,boolean refresh){
 
-        Item parentItem = findItemById(parentItemId);
+        Item parentItem = findItemById(parentItemId,refresh);
         if(parentItem == null){
             Utils.debug("Parent not found");
             return null;
@@ -67,7 +73,12 @@ public class ItemService {
         }
 
         int returnSize = 1;
+        if(refresh){
+            //TODO... ejem...
+            this.saveItems(Api.getReplies(parentItemId,0));
+        }
         //TODO This should be done in a internal db by a query
+
 
         List<Item>replies = new ArrayList<Item>();
         for(Item item:itemsDB.values()){
@@ -130,7 +141,7 @@ public class ItemService {
         if(cached != null && cached.getImageLarge() != null){
             item.setImageLarge(cached.getImageLarge());
         }
-        if(cached != null && cached.getImageLarge() != null){
+        if(cached != null && cached.getImageThumb() != null){
             item.setImageThumb(cached.getImageThumb());
         }
         itemsDB.put(item.getId(),item);

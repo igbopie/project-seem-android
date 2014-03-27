@@ -1,6 +1,7 @@
 package com.seem.android.mockup1.adapters;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,9 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         TextView itemCount= (TextView)v.findViewById(R.id.seemItemCount);
         itemCount.setText(""+c.getItemCount());
 
+        long epoch = c.getUpdated().getTime();
+        TextView updatedText= (TextView)v.findViewById(R.id.updatedText);
+        updatedText.setText(DateUtils.getRelativeTimeSpanString(epoch,System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
         return v;
 
     }

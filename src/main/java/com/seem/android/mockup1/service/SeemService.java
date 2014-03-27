@@ -45,14 +45,18 @@ public class SeemService {
     }
 
     public List<Seem> findSeems() {
-        if(seemsDB.size() == 0){
+        return this.findSeems(false);
+    }
+
+    public List<Seem> findSeems(boolean refresh) {
+        if(seemsDB.size() == 0 || refresh){
             saveSeems(Api.getSeems());
         }
         List<Seem> collection = new ArrayList<Seem>(this.seemsDB.values());
         Collections.sort(collection, new Comparator<Seem>() {
             @Override
             public int compare(Seem item, Seem item2) {
-                return item.getCreated().compareTo(item2.getCreated()) * -1;
+                return item.getUpdated().compareTo(item2.getUpdated()) * -1;
             }
         });
         return collection;

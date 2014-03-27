@@ -46,7 +46,7 @@ import java.util.Observer;
 public class ItemFragment extends Fragment implements Observer{
 
 
-
+    private boolean refresh = false;
     private ItemFragmentSelectedListener mCallback;
     /**
      * Create a new instance of ItemFragment
@@ -240,11 +240,12 @@ public class ItemFragment extends Fragment implements Observer{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            image.setLoading(true);
         }
 
         @Override
         protected Item doInBackground(String... id) {
-            item = ItemService.getInstance().findItemById(id[0]);
+            item = ItemService.getInstance().findItemById(id[0],refresh);
             Utils.debug("This is the item:" + item);
             return item;
         }
@@ -271,7 +272,7 @@ public class ItemFragment extends Fragment implements Observer{
 
         @Override
         protected List<Item> doInBackground(Void... voids) {
-            List<Item> items = ItemService.getInstance().findItemReplies(item.getId());
+            List<Item> items = ItemService.getInstance().findItemReplies(item.getId(),refresh);
             return items;
         }
 
@@ -306,6 +307,13 @@ public class ItemFragment extends Fragment implements Observer{
             ActivityFactory.startReplyItemActivity(this,item.getId());
             return true;
 
+        }
+        if(id == R.id.action_refresh) {
+            //newGame();
+            Utils.debug("Refresh Main Item and Replies");
+            this.refresh = true;
+            new GetItemAndPaintTask().execute(getItemId());
+            return true;
         }
         if(id == android.R.id.home) {
             //NavUtils.navigateUpFromSameTask(this.getActivity());
