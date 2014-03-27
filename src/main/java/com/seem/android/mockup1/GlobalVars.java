@@ -8,6 +8,8 @@ import android.view.ViewGroup;
  */
 public class GlobalVars {
 
+
+    public static final String SAVED_BUNDLE_CURRENT_ITEM_ID = "currentItemId";
     public static final String SAVED_BUNDLE_CAMERASTARTED ="cameraStarted";
     public static final String SAVED_BUNDLE_CAMERA_OUT_FILE ="cameraOutFile";
 
@@ -18,7 +20,7 @@ public class GlobalVars {
     public static final String EXTRA_DEPTH = "depth";
 
 
-    public static final String EXTRA_CURRENT_ITEM_ID = "currrentItemId";
+    public static final String EXTRA_CURRENT_ITEM_ID = "currentItemId";
     public static final String EXTRA_PARENT_ITEM_ID = "parentItemId";
 
     public static final int RETURN_CODE_TAKE_PHOTO = 872;

@@ -57,9 +57,22 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
             getActionBar().hide();
         }
 
+        if(savedInstanceState  != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CURRENT_ITEM_ID)){
+            getIntent().putExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID,
+                    savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CURRENT_ITEM_ID));
+        }
+
         new InitAsyncTask().execute();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Item currentItem = itemList.get(mViewPager.getCurrentItem());
+        outState.putString(GlobalVars.SAVED_BUNDLE_CURRENT_ITEM_ID,currentItem.getId());
+
+        Utils.debug("Items Fullscreen Activity-Saved Instance currentItem "+currentItem.getId());
+    }
 
     public class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
