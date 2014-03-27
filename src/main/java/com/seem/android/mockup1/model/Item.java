@@ -19,6 +19,8 @@ public class Item {
     private String mediaId;
     private Date created;
     private String replyTo;
+    private String seemId;
+    private int depth;
 
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
@@ -75,6 +77,22 @@ public class Item {
 
     public void setReplyTo(String replyTo) {
         this.replyTo = replyTo;
+    }
+
+    public String getSeemId() {
+        return seemId;
+    }
+
+    public void setSeemId(String seemId) {
+        this.seemId = seemId;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 
     public Drawable getImageLarge() {

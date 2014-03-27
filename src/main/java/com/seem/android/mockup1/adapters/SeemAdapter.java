@@ -56,6 +56,8 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         Seem c = itemList.get(position);
         TextView text = (TextView) v.findViewById(R.id.text_view);
         text.setText(c.getTitle());
+        TextView itemCount= (TextView)v.findViewById(R.id.seemItemCount);
+        itemCount.setText(""+c.getItemCount());
 
         return v;
 

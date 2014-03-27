@@ -45,11 +45,12 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/repliesIndicator"
-        android:src="@drawable/go_to_replies"
+        android:src="@drawable/replies"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/cameraButton"
         android:shadowDx="0"
         android:shadowDy="0"
+        android:alpha=".8"
         android:shadowRadius="3"/>
     <TextView
         android:layout_width="40dp"
@@ -62,6 +63,10 @@
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="3"
+
+        android:paddingEnd="9dp"
+        android:paddingTop="9dp"
+        android:textSize="18sp"
         android:textAlignment="center"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/cameraButton" />

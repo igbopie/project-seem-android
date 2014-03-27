@@ -65,6 +65,7 @@ public class Api {
     public static final String JSON_TAG_SEEM_ITEM_ID = "itemId";
     public static final String JSON_TAG_SEEM_TITLE = "title";
     public static final String JSON_TAG_SEEM_ID = "_id";
+    public static final String JSON_TAG_SEEM_ITEM_COUNT = "itemCount";
     public static final String JSON_TAG_SEEM_CREATED = "created";
 
     //ITEM Model
@@ -74,6 +75,8 @@ public class Api {
     public static final String JSON_TAG_ITEM_MEDIA_ID = "mediaId";
     public static final String JSON_TAG_ITEM_CREATED = "created";
     public static final String JSON_TAG_ITEM_REPLY_COUNT = "replyCount";
+    public static final String JSON_TAG_ITEM_SEEM_ID = "seemId";
+    public static final String JSON_TAG_ITEM_DEPTH = "depth";
     public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
 
     public static List<Seem> getSeems(){
@@ -291,6 +294,7 @@ public class Api {
         seem.setId(seemJson.getString(JSON_TAG_SEEM_ID));
         seem.setTitle(seemJson.getString(JSON_TAG_SEEM_TITLE));
         seem.setCreated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_CREATED)).getTime());
+        seem.setItemCount(seemJson.getInt(JSON_TAG_SEEM_ITEM_COUNT));
         return seem;
     }
 
@@ -310,6 +314,8 @@ public class Api {
         item.setMediaId(itemJson.getString(JSON_TAG_ITEM_MEDIA_ID));
         item.setCreated(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_CREATED)).getTime());
         item.setReplyCount(itemJson.getInt(JSON_TAG_ITEM_REPLY_COUNT));
+        item.setDepth(itemJson.getInt(JSON_TAG_ITEM_DEPTH));
+        item.setSeemId(itemJson.getString(JSON_TAG_ITEM_SEEM_ID));
         if(itemJson.has(JSON_TAG_ITEM_REPLY_TO)) {
             item.setReplyTo(itemJson.getString(JSON_TAG_ITEM_REPLY_TO));
         }

@@ -15,6 +15,7 @@ public class Seem {
     private String title;
     private String itemId;
     private Date created;
+    private int itemCount;
 
     public String getId() {
         return id;
@@ -46,6 +47,14 @@ public class Seem {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
     }
 
     @Override

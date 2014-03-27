@@ -13,6 +13,7 @@ public class GlobalVars {
 
     public static final String EXTRA_SEEM_ID = "seemId";
 
+    public static final String EXTRA_IS_MAIN_ITEM = "isMainItem";
     public static final String EXTRA_ITEM_ID = "replyId";
     public static final String EXTRA_DEPTH = "depth";
 

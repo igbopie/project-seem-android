@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -97,6 +98,7 @@ public class ItemFragment extends Fragment implements Observer{
 
         Utils.debug("ItemFragment - onCreateView");
 
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_item_view, container, false);
     }
@@ -132,7 +134,7 @@ public class ItemFragment extends Fragment implements Observer{
                 zoom.startZoom();
             }
         });
-
+        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -304,6 +306,11 @@ public class ItemFragment extends Fragment implements Observer{
             ActivityFactory.startReplyItemActivity(this,item.getId());
             return true;
 
+        }
+        if(id == android.R.id.home) {
+            //NavUtils.navigateUpFromSameTask(this.getActivity());
+            getActivity().onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(menuItem);
     }

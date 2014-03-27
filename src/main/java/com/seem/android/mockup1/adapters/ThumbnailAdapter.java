@@ -62,6 +62,7 @@ public class ThumbnailAdapter extends BaseAdapter {
                 view = (SpinnerImageView) convertView;
                 view.setLoading(true);
                 view.getImageView().setVisibility(View.INVISIBLE);
+                view.setRepliesNumber(0);
             }
             Item item = (Item) getItem(position);
 

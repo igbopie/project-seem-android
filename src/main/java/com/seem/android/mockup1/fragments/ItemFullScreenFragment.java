@@ -32,11 +32,12 @@ public class ItemFullScreenFragment extends Fragment {
     Handler h=new Handler();
 
 
-    public static ItemFullScreenFragment newInstance(String seemId,String itemId) {
+    public static ItemFullScreenFragment newInstance(String seemId,String itemId,boolean isMainItem) {
         ItemFullScreenFragment f = new ItemFullScreenFragment();
         Bundle args = new Bundle();
         args.putString(GlobalVars.EXTRA_ITEM_ID, itemId);
         args.putString(GlobalVars.EXTRA_SEEM_ID, seemId);
+        args.putBoolean(GlobalVars.EXTRA_IS_MAIN_ITEM,isMainItem);
         f.setArguments(args);
         return f;
     }
@@ -121,6 +122,9 @@ public class ItemFullScreenFragment extends Fragment {
     public String getSeemId() {
         return getArguments().getString(GlobalVars.EXTRA_SEEM_ID, null);
     }
+    public boolean isMainItem() {
+        return getArguments().getBoolean(GlobalVars.EXTRA_IS_MAIN_ITEM, false);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -140,7 +144,7 @@ public class ItemFullScreenFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void result) {
-            if (item.getReplyCount() > 0)
+            if (item.getReplyCount() > 0 && !isMainItem())
             {
                 nestedRepliesIndicator.setVisibility(View.VISIBLE);
                 nestedRepliesIndicatorText.setVisibility(View.VISIBLE);

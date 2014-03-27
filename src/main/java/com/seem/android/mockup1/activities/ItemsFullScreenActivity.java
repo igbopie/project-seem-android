@@ -73,7 +73,8 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
 
         public Fragment getItem(int position) {
             Utils.debug("ItemPosition:" + position + " ID:" + position);
-            ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(ItemsFullScreenActivity.this.getSeemId(),itemList.get(position).getId());
+            Item currentItem = itemList.get(position);
+            ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(ItemsFullScreenActivity.this.getSeemId(),currentItem.getId(),currentItem.getId().equals(getParentItemId()));
             return newFragment;
         }
 
