@@ -11,6 +11,9 @@ import com.seem.android.mockup1.activities.CreateSeemFlowActivity;
 import com.seem.android.mockup1.activities.ItemActivity;
 import com.seem.android.mockup1.activities.ItemsFullScreenActivity;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
+import com.seem.android.mockup1.activities.ThreadedViewActivity;
+import com.seem.android.mockup1.adapters.ThreadedAdapter;
+import com.seem.android.mockup1.model.Item;
 
 /**
  * Created by igbopie on 25/03/14.
@@ -55,6 +58,13 @@ public class ActivityFactory {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, returnPhoto);
         activity.startActivityForResult(cameraIntent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
+    }
+
+
+    public static void startThreadedActivity(Activity activity,String itemId){
+        Intent intent = new Intent(activity, ThreadedViewActivity.class);
+        intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
+        activity.startActivity(intent);
     }
 
     public static void finishActivity(Activity activity,int result){

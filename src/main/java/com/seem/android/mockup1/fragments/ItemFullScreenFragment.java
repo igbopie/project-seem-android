@@ -161,6 +161,12 @@ public class ItemFullScreenFragment extends Fragment {
                 depthNumber.setText(item.getDepth()+"");
                 depthNumber.setVisibility(View.VISIBLE);
                 depthIcon.setVisibility(View.VISIBLE);
+                depthIcon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ActivityFactory.startThreadedActivity(getActivity(),item.getId());
+                    }
+                });
             }
             if (item != null && item.getImageThumb() != null)
             {
