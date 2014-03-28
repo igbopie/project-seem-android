@@ -58,7 +58,7 @@ public class Utils {
             bmpFactoryOptions.inJustDecodeBounds = false;
             Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
             if(bitmap == null){
-                Utils.debug("ERROR bitmap is null!! wrong file or what? : "+file);
+                Utils.debug(Utils.class,"ERROR bitmap is null!! wrong file or what? : "+file);
             }
             //int squareSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
 
@@ -69,7 +69,7 @@ public class Utils {
 
             return croppedBmp;
         } catch (Exception e) {
-            Utils.debug("Error shrinking the photo: "+file);
+            Utils.debug(Utils.class,"Error shrinking the photo: "+file);
         }
         return null;
     }
@@ -78,11 +78,11 @@ public class Utils {
         createBaseDirs();
     }
 
-    public static void debug(String msg){
-        Log.d(GlobalVars.APP_NAME,msg);
+    public static void debug(Class clazz,String msg){
+        Log.d(GlobalVars.APP_NAME,clazz+":"+msg);
     }
-    public static void debug(String msg,Exception e){
-        Log.d(GlobalVars.APP_NAME,msg,e);
+    public static void debug(Class clazz,String msg,Exception e){
+        Log.d(GlobalVars.APP_NAME,clazz+":"+msg,e);
     }
 
     private static void createBaseDirs(){
@@ -105,7 +105,7 @@ public class Utils {
         try {
             newfile.createNewFile();
         } catch (IOException e) {
-            Utils.debug("Error creating file " + file + " :", e);
+            Utils.debug(Utils.class,"Error creating file " + file + " :", e);
         }
         return Uri.fromFile(newfile);
 

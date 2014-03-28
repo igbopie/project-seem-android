@@ -31,7 +31,7 @@ public class ItemActivity extends FragmentActivity implements ItemFragmentSelect
         super.onCreate(savedInstanceState);
         this.recoverFromSavedState(savedInstanceState);
 
-        Utils.debug("ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
+        Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
         setContentView(R.layout.activity_seem_view);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -44,13 +44,13 @@ public class ItemActivity extends FragmentActivity implements ItemFragmentSelect
     @Override
     public void itemSelected(String id, int depth) {
         boolean add = false;
-        Utils.debug("Hey " + id);
+        Utils.debug(this.getClass(),"Hey " + id);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Utils.debug("ItemActivity - onSaveInstanceState");
+        Utils.debug(this.getClass(),"ItemActivity - onSaveInstanceState");
         outState.putString(GlobalVars.EXTRA_SEEM_ID, getSeemId());
         outState.putString(GlobalVars.EXTRA_ITEM_ID,getItemId());
     }

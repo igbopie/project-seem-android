@@ -22,6 +22,9 @@ public class SpinnerImageView extends LinearLayout {
     TextView textView;
     ImageView repliesIndicator;
     TextView repliesIndicatorNumber;
+    ImageView depthIcon;
+    TextView depthNumber;
+
 
     public SpinnerImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,9 +42,13 @@ public class SpinnerImageView extends LinearLayout {
         textView = (TextView) findViewById(R.id.textView);
         textView.setVisibility(INVISIBLE);
         repliesIndicator = (ImageView) findViewById(R.id.repliesIndicator);
-        repliesIndicator.setVisibility(INVISIBLE);
         repliesIndicatorNumber = (TextView) findViewById(R.id.repliesIndicatorNumber);
         repliesIndicatorNumber.setVisibility(INVISIBLE);
+        repliesIndicator.setVisibility(INVISIBLE);
+        depthIcon = (ImageView) findViewById(R.id.depthIconView);
+        depthNumber = (TextView) findViewById(R.id.depthNumber);
+        depthIcon.setVisibility(INVISIBLE);
+        depthNumber.setVisibility(INVISIBLE);
     }
 
     public void setLoading(boolean loading){
@@ -79,6 +86,17 @@ public class SpinnerImageView extends LinearLayout {
         } else {
             this.repliesIndicatorNumber.setVisibility(INVISIBLE);
             this.repliesIndicator.setVisibility(INVISIBLE);
+        }
+    }
+
+    public void setDepthNumber(int depth){
+        if(depth>0){
+            this.depthNumber.setText(""+depth);
+            this.depthNumber.setVisibility(VISIBLE);
+            this.depthIcon.setVisibility(VISIBLE);
+        } else {
+            this.depthNumber.setVisibility(INVISIBLE);
+            this.depthIcon.setVisibility(INVISIBLE);
         }
     }
     public void setViewRepliesOnClick(OnClickListener l){

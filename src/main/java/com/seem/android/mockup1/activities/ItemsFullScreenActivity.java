@@ -71,7 +71,7 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         Item currentItem = itemList.get(mViewPager.getCurrentItem());
         outState.putString(GlobalVars.SAVED_BUNDLE_CURRENT_ITEM_ID,currentItem.getId());
 
-        Utils.debug("Items Fullscreen Activity-Saved Instance currentItem "+currentItem.getId());
+        Utils.debug(this.getClass(),"Items Fullscreen Activity-Saved Instance currentItem "+currentItem.getId());
     }
 
     public class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
@@ -85,7 +85,7 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         }
 
         public Fragment getItem(int position) {
-            Utils.debug("ItemPosition:" + position + " ID:" + position);
+            Utils.debug(this.getClass(),"ItemPosition:" + position + " ID:" + position);
             Item currentItem = itemList.get(position);
             ItemFullScreenFragment newFragment = ItemFullScreenFragment.newInstance(ItemsFullScreenActivity.this.getSeemId(),currentItem.getId(),currentItem.getId().equals(getParentItemId()));
             return newFragment;
@@ -95,7 +95,7 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
             ItemFullScreenFragment fragment = (ItemFullScreenFragment)fr;
             Item item =  ItemService.getInstance().findItemById(fragment.getItemId());
             int position = itemList.indexOf(item);
-            Utils.debug("ItemPosition:"+position);
+            Utils.debug(this.getClass(),"ItemPosition:"+position);
             if (position >= 0) {
                 return position;
             } else {

@@ -136,7 +136,7 @@ public class ThumbnailAdapter extends BaseAdapter {
                 }
                 return null;
             } catch (IOException e) {
-                Utils.debug("Pete al bajar la imagen", e);
+                Utils.debug(this.getClass(),"Pete al bajar la imagen", e);
             }
             return null;
         }
@@ -153,11 +153,12 @@ public class ThumbnailAdapter extends BaseAdapter {
                     imageView.setViewRepliesOnClick(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Utils.debug("View");
+                            Utils.debug(this.getClass(),"View");
                             repliesListener.itemSelected(item);
                         }
                     });
                 }
+
                 imageView.getImageView().setVisibility(View.VISIBLE);
                 imageView.setLoading(false);
             }

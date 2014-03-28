@@ -72,7 +72,7 @@ public class CreateSeemFlowActivity extends Activity {
         //---
 
         if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
-            Utils.debug("Camera Value recovered");
+            Utils.debug(this.getClass(),"Camera Value recovered");
             cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
             localTempFile = Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE));
         }
@@ -87,14 +87,14 @@ public class CreateSeemFlowActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug("Create Seem Flow Activity OnActivityResult");
+        Utils.debug(this.getClass(),"Create Seem Flow Activity OnActivityResult");
         if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            Utils.debug("Create Seem Flow Activity - Pic taken");
+            Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic taken");
             localBitmap = Utils.shrinkBitmap(localTempFile.getPath());
             imageView.setImageBitmap(localBitmap);
 
         } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
-            Utils.debug("Create Seem Flow Activity - Pic Cancelled");
+            Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
         }
 
@@ -103,7 +103,7 @@ public class CreateSeemFlowActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Utils.debug("Create Seem Flow - onSaveInstanceState");
+        Utils.debug(this.getClass(),"Create Seem Flow - onSaveInstanceState");
         outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
         outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE,localTempFile.getPath());
     }
@@ -126,10 +126,10 @@ public class CreateSeemFlowActivity extends Activity {
                 if(mediaId != null){
                     return SeemService.getInstance().save(title,caption,mediaId);
                 }else {
-                    Utils.debug("Error uploading");
+                    Utils.debug(this.getClass(),"Error uploading");
                 }
             }catch (Exception e) {
-                Utils.debug("Pete al crear la imagen",e);
+                Utils.debug(this.getClass(),"Pete al crear la imagen",e);
             }
             return null;
         }

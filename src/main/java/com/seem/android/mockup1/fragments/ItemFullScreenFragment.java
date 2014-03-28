@@ -48,6 +48,8 @@ public class ItemFullScreenFragment extends Fragment {
     TextView captionTextView;
     ImageView nestedRepliesIndicator;
     TextView nestedRepliesIndicatorText;
+    TextView depthNumber;
+    ImageView depthIcon;
     ImageView replyButton;
     Item item;
     //final int HIDE_TIMEOUT = 3000;
@@ -62,7 +64,7 @@ public class ItemFullScreenFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Utils.debug("onCreateView");
+        Utils.debug(this.getClass(),"onCreateView");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_item_fullscreen_view, container, false);
     }
@@ -82,7 +84,7 @@ public class ItemFullScreenFragment extends Fragment {
             }
         });*/
 
-        Utils.debug("OnActivityCreated");
+        Utils.debug(this.getClass(),"OnActivityCreated");
         if (getActivity() != null &&
                 getActivity().getActionBar() != null  &&
                 getActivity().getActionBar().isShowing()){
@@ -95,8 +97,12 @@ public class ItemFullScreenFragment extends Fragment {
         captionTextView = (TextView) getView().findViewById(R.id.captionTextView);
         nestedRepliesIndicator = (ImageView) getView().findViewById(R.id.repliesIndicator);
         nestedRepliesIndicatorText = (TextView) getView().findViewById(R.id.repliesIndicatorNumber);
+        depthIcon = (ImageView) getView().findViewById(R.id.depthIconView);
+        depthNumber = (TextView) getView().findViewById(R.id.depthNumber);
         nestedRepliesIndicatorText.setVisibility(View.INVISIBLE);
         nestedRepliesIndicator.setVisibility(View.INVISIBLE);
+        depthIcon.setVisibility(View.INVISIBLE);
+        depthNumber.setVisibility(View.INVISIBLE);
         nestedRepliesIndicator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,9 +135,9 @@ public class ItemFullScreenFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug("ItemFullScreen - onActivityResult");
+        Utils.debug(this.getClass(),"ItemFullScreen - onActivityResult");
         if (requestCode == GlobalVars.RETURN_CODE_REPLY_TO_ITEM && resultCode == Activity.RESULT_OK) {
-            Utils.debug("ItemFullScreen - Pic taken");
+            Utils.debug(this.getClass(),"ItemFullScreen - Pic taken");
         }
     }
     private class GetItem extends AsyncTask<Void,Void,Void> {
@@ -149,6 +155,12 @@ public class ItemFullScreenFragment extends Fragment {
                 nestedRepliesIndicator.setVisibility(View.VISIBLE);
                 nestedRepliesIndicatorText.setVisibility(View.VISIBLE);
                 nestedRepliesIndicatorText.setText(item.getReplyCount() + "");
+            }
+
+            if(isMainItem() && item.getDepth() > 0){
+                depthNumber.setText(item.getDepth()+"");
+                depthNumber.setVisibility(View.VISIBLE);
+                depthIcon.setVisibility(View.VISIBLE);
             }
             if (item != null && item.getImageThumb() != null)
             {
@@ -177,7 +189,7 @@ public class ItemFullScreenFragment extends Fragment {
                 }
                 return null;
             } catch (IOException e) {
-                Utils.debug("Error",e);
+                Utils.debug(this.getClass(),"Error",e);
             }
             return null;
         }

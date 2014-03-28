@@ -41,7 +41,7 @@ public class ReplyFlowActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Utils.debug("ReplyFlow OnCreate");
+        Utils.debug(this.getClass(),"ReplyFlow OnCreate");
         setContentView(R.layout.activity_reply_flow);
         replyId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
 
@@ -71,7 +71,7 @@ public class ReplyFlowActivity extends Activity {
         });
         //---
         if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
-            Utils.debug("Reply Flow - Camera Value recovered");
+            Utils.debug(this.getClass(),"Reply Flow - Camera Value recovered");
             cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
             itemInProgress = new Item();
             itemInProgress.setTempLocalFile(Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)));
@@ -88,7 +88,7 @@ public class ReplyFlowActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Utils.debug("Reply Flow - onSaveInstanceState");
+        Utils.debug(this.getClass(),"Reply Flow - onSaveInstanceState");
         outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
         outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE, itemInProgress.getTempLocalFile().getPath());
     }
@@ -98,17 +98,17 @@ public class ReplyFlowActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            Utils.debug("Reply Flow Activity - Pic taken");
+            Utils.debug(this.getClass(),"Reply Flow Activity - Pic taken");
             try {
                 itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
                 imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
             }catch(Exception e){
-                Utils.debug("ERROR trying to save the image",e);
+                Utils.debug(this.getClass(),"ERROR trying to save the image",e);
                 //
                 //ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
             }
         } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
-            Utils.debug("Reply Flow Activity - Pic Cancelled");
+            Utils.debug(this.getClass(),"Reply Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
         }
 
@@ -134,10 +134,10 @@ public class ReplyFlowActivity extends Activity {
                     items[0].setReplyTo(replyId);
                     return ItemService.getInstance().reply(items[0]);
                 }else {
-                    Utils.debug("Error uploading");
+                    Utils.debug(this.getClass(),"Error uploading");
                 }
             }catch (Exception e) {
-                Utils.debug("Pete al crear la imagen",e);
+                Utils.debug(this.getClass(),"Pete al crear la imagen",e);
             }
             return null;
         }

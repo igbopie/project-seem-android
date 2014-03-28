@@ -19,7 +19,7 @@ public class SeemService {
 
     public static synchronized SeemService getInstance(){
         if(singleton == null){
-            Utils.debug("Creating a new singleton... ");
+            Utils.debug(SeemService.class,"Creating a new singleton... ");
             singleton = new SeemService();
         }
         return singleton;
@@ -34,7 +34,7 @@ public class SeemService {
     public Seem findSeemById(String id){
         Seem seem = seemsDB.get(id);
         if(seem == null){
-            Utils.debug("Cache miss item: "+id);
+            Utils.debug(this.getClass(),"Cache miss item: "+id);
             saveSeems(Api.getSeems());
             seem = seemsDB.get(id);
             if(seem == null){

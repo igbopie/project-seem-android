@@ -27,19 +27,19 @@ public class AsyncExecutor  {
 
     public synchronized void next(){
         if(currentTask == null && qeue.size() > 0) {
-            Utils.debug("Executing a new task");
+            Utils.debug(this.getClass(),"Executing a new task");
             currentTask = qeue.pop();
             currentTask.setParent(this);
             currentTask.execute();
         }
     }
     public void add(MyAsyncTask myAsyncTask){
-        Utils.debug("Adding a new task");
+        Utils.debug(this.getClass(),"Adding a new task");
         qeue.push(myAsyncTask);
         next();
     }
     protected synchronized void finished(MyAsyncTask myAsyncTask) {
-        Utils.debug("Finished");
+        Utils.debug(this.getClass(),"Finished");
         if(myAsyncTask == currentTask){
             currentTask.setParent(null);
             currentTask = null;

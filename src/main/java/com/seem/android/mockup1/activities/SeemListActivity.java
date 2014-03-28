@@ -56,7 +56,7 @@ public class SeemListActivity extends ListActivity {
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Do something when a list item is clicked
         Seem seem = adapter.getItem(position);
-        Utils.debug("Item Clicked! seem "+seem);
+        Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
         ActivityFactory.startItemActivity(SeemListActivity.this, seem.getId(), seem.getItemId());
     }
 
@@ -75,12 +75,12 @@ public class SeemListActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_camera:
                 //newGame();
-                Utils.debug("NEW SEEM!");
+                Utils.debug(this.getClass(),"NEW SEEM!");
                 ActivityFactory.startCreateSeemActivity(this);
                 return true;
             case R.id.action_refresh:
                 //newGame();
-                Utils.debug("Refresh Seems!");
+                Utils.debug(this.getClass(),"Refresh Seems!");
                 new GetSeemsTask(true).execute();
                 return true;
             default:
@@ -93,7 +93,7 @@ public class SeemListActivity extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GlobalVars.RETURN_CODE_CREATE_SEEM && resultCode == Activity.RESULT_OK) {
-            Utils.debug("Seem created!");
+            Utils.debug(this.getClass(),"Seem created!");
             new GetSeemsTask(false).execute();
         }
     }
@@ -118,7 +118,7 @@ public class SeemListActivity extends ListActivity {
         @Override
         protected List<Seem> doInBackground(Void... voids) {
             List<Seem> seems = SeemService.getInstance().findSeems(refresh);
-            Utils.debug("This is the seems:" + seems);
+            Utils.debug(this.getClass(),"This is the seems:" + seems);
 
             return seems;
         }

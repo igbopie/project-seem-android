@@ -22,7 +22,7 @@ public class ItemService {
 
     public static synchronized ItemService getInstance(){
         if(singleton == null){
-            Utils.debug("Creating a new singleton... ");
+            Utils.debug(ItemService.class,"Creating a new singleton... ");
             singleton = new ItemService();
         }
         return singleton;
@@ -39,7 +39,7 @@ public class ItemService {
     public Item findItemById(String id,boolean refresh){
         Item item = itemsDB.get(id);
         if(item == null || refresh){
-            Utils.debug("Cache miss item: "+id);
+            Utils.debug(this.getClass(),"Cache miss item: "+id);
             item = Api.getItem(id);
             if(item == null){
                 return null;
@@ -59,7 +59,7 @@ public class ItemService {
 
         Item parentItem = findItemById(parentItemId,refresh);
         if(parentItem == null){
-            Utils.debug("Parent not found");
+            Utils.debug(this.getClass(),"Parent not found");
             return null;
         }
         int replyCount = parentItem.getReplyCount();
@@ -68,7 +68,7 @@ public class ItemService {
         int toItem = Math.min(fromItem + MAX_ITEMS_PER_QUERY,replyCount);
 
         if(replyCount < fromItem){
-            Utils.debug("Invalid page number");
+            Utils.debug(this.getClass(),"Invalid page number");
             return null;
         }
 
@@ -91,7 +91,7 @@ public class ItemService {
             //We need to load more from the server!
             List<Item> apiReplies = Api.getReplies(parentItemId,pageNumber);
             if(apiReplies == null){
-                Utils.debug("There was an error and replies could be retrieve");
+                Utils.debug(this.getClass(),"There was an error and replies could be retrieve");
                 return null;
             }
             returnSize = apiReplies.size();

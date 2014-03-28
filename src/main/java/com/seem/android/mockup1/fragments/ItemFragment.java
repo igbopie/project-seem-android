@@ -89,14 +89,14 @@ public class ItemFragment extends Fragment implements Observer{
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Utils.debug("ItemFragment - onCreate");
+        Utils.debug(this.getClass(),"ItemFragment - onCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Utils.debug("ItemFragment - onCreateView");
+        Utils.debug(this.getClass(),"ItemFragment - onCreateView");
 
 
         // Inflate the layout for this fragment
@@ -106,7 +106,7 @@ public class ItemFragment extends Fragment implements Observer{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        Utils.debug("ItemFragment - OnActivityCreated");
+        Utils.debug(this.getClass(),"ItemFragment - OnActivityCreated");
 
         image = (SpinnerImageView) getView().findViewById(R.id.itemMainImage);
         image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
@@ -127,9 +127,9 @@ public class ItemFragment extends Fragment implements Observer{
         twoWayGridView.setAdapter(thumbnailAdapter);
         twoWayGridView.setOnItemClickListener(new TwoWayAdapterView.OnItemClickListener() {
             public void onItemClick(TwoWayAdapterView parent, View v, int position, long id) {
-                Utils.debug("ItemClicked:"+position);
+                Utils.debug(this.getClass(),"ItemClicked:"+position);
                 Item item = (Item)thumbnailAdapter.getItem(position);
-                Utils.debug("Item:"+item.getId());
+                Utils.debug(this.getClass(),"Item:"+item.getId());
                 zoom = new ZoomUtil(item,((SpinnerImageView)v).getImageView());
                 zoom.startZoom();
             }
@@ -141,6 +141,8 @@ public class ItemFragment extends Fragment implements Observer{
     public void paintReply(){
         thumbnailAdapter.clear();
 
+
+        image.setDepthNumber(item.getDepth());
         //FIND replies
         if(item.getReplyCount() > 0 ){
             new GetRepliesTask(item).execute();
@@ -166,7 +168,7 @@ public class ItemFragment extends Fragment implements Observer{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        Utils.debug("ItemFragment - onAttach");
+        Utils.debug(this.getClass(),"ItemFragment - onAttach");
 
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
@@ -187,7 +189,7 @@ public class ItemFragment extends Fragment implements Observer{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Utils.debug("Destroing:"+ getItemId());
+        Utils.debug(this.getClass(),"Destroing:"+ getItemId());
 
     }
 
@@ -208,14 +210,14 @@ public class ItemFragment extends Fragment implements Observer{
 
     @Override
     public void update(Observable observable, Object o) {
-        Utils.debug("I am notified! I have to refresh:" + item.getId());
+        Utils.debug(this.getClass(),"I am notified! I have to refresh:" + item.getId());
         paintReply();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Utils.debug("Item Fragment - On resume");
+        Utils.debug(this.getClass(),"Item Fragment - On resume");
         if(zoom != null) {
             zoom.endZoom();
             zoom = null;
@@ -225,9 +227,9 @@ public class ItemFragment extends Fragment implements Observer{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug("ItemFragment onActivityResult requestCode="+requestCode+" resultCode="+resultCode);
+        Utils.debug(this.getClass(),"ItemFragment onActivityResult requestCode="+requestCode+" resultCode="+resultCode);
         if (requestCode == GlobalVars.RETURN_CODE_REPLY_TO_ITEM && resultCode == Activity.RESULT_OK) {
-            Utils.debug("Pic taken");
+            Utils.debug(this.getClass(),"Pic taken");
             this.paintReply();
         }
     }
@@ -246,7 +248,7 @@ public class ItemFragment extends Fragment implements Observer{
         @Override
         protected Item doInBackground(String... id) {
             item = ItemService.getInstance().findItemById(id[0],refresh);
-            Utils.debug("This is the item:" + item);
+            Utils.debug(this.getClass(),"This is the item:" + item);
             return item;
         }
 
@@ -303,14 +305,14 @@ public class ItemFragment extends Fragment implements Observer{
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id = menuItem.getItemId();
         if(id == R.id.action_camera && item != null){
-            Utils.debug("Action camera!");
+            Utils.debug(this.getClass(),"Action camera!");
             ActivityFactory.startReplyItemActivity(this,item.getId());
             return true;
 
         }
         if(id == R.id.action_refresh) {
             //newGame();
-            Utils.debug("Refresh Main Item and Replies");
+            Utils.debug(this.getClass(),"Refresh Main Item and Replies");
             this.refresh = true;
             new GetItemAndPaintTask().execute(getItemId());
             return true;
