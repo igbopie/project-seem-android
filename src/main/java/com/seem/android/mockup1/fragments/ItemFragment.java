@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 
 import com.jess.ui.TwoWayAdapterView;
@@ -311,9 +312,27 @@ public class ItemFragment extends Fragment implements Observer{
         int id = menuItem.getItemId();
         if(id == R.id.action_camera && item != null){
             Utils.debug(this.getClass(),"Action camera!");
-            ActivityFactory.startReplyItemActivity(this,item.getId());
+            PopupMenu popup = new PopupMenu(this.getActivity(), getActivity().findViewById(R.id.action_camera));
+            MenuInflater inflater = popup.getMenuInflater();
+            inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.actionPopupCamera:
+                            Utils.debug(this.getClass(), "NEW SEEM!");
+                            ActivityFactory.startReplyItemActivity(ItemFragment.this,item.getId(), GlobalVars.PhotoSource.CAMERA);
+                            return true;
+                        case R.id.actionPopupGallery:
+                            Utils.debug(this.getClass(), "NEW SEEM!");
+                            ActivityFactory.startReplyItemActivity(ItemFragment.this,item.getId(), GlobalVars.PhotoSource.GALLERY);
+                            return true;
+                    }
+                    return false;
+                }
+            });
+            popup.show();
             return true;
-
         }
         if(id == R.id.action_refresh) {
             //newGame();

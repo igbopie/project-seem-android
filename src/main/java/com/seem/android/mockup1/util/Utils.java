@@ -2,6 +2,7 @@ package com.seem.android.mockup1.util;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -112,7 +113,21 @@ public class Utils {
     }
 
 
-
+    //UPDATED!
+    public static String getRealPathFromGalleryUri(Activity activity,Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
+        if(cursor!=null)
+        {
+            //HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
+            //THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        else return null;
+    }
 
 
 }

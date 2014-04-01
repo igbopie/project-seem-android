@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -113,7 +116,27 @@ public class ItemFullScreenFragment extends Fragment {
         replyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivityFactory.startReplyItemActivity(ItemFullScreenFragment.this.getActivity(),getItemId());
+                Utils.debug(this.getClass(),"Action camera!");
+                PopupMenu popup = new PopupMenu(ItemFullScreenFragment.this.getActivity(), view);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.actionPopupCamera:
+                                Utils.debug(this.getClass(), "NEW SEEM!");
+                                ActivityFactory.startReplyItemActivity(ItemFullScreenFragment.this,item.getId(), GlobalVars.PhotoSource.CAMERA);
+                                return true;
+                            case R.id.actionPopupGallery:
+                                Utils.debug(this.getClass(), "NEW SEEM!");
+                                ActivityFactory.startReplyItemActivity(ItemFullScreenFragment.this,item.getId(), GlobalVars.PhotoSource.GALLERY);
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
             }
         });
 

@@ -3,10 +3,12 @@ package com.seem.android.mockup1.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -28,6 +30,7 @@ import com.seem.android.mockup1.util.Utils;
  */
 public class CreateSeemFlowActivity extends Activity {
 
+
     String title;
     String caption;
     ImageView imageView;
@@ -37,6 +40,8 @@ public class CreateSeemFlowActivity extends Activity {
     Uri localTempFile;
     Bitmap localBitmap;
     Boolean cameraStarted = false;
+
+    GlobalVars.PhotoSource source;
 
 
     @Override
@@ -71,16 +76,24 @@ public class CreateSeemFlowActivity extends Activity {
         });
         //---
 
+        source = GlobalVars.PhotoSource.valueOf(getIntent().getStringExtra(GlobalVars.EXTRA_PHOTO_SOURCE));
+
         if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
             Utils.debug(this.getClass(),"Camera Value recovered");
             cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
-            localTempFile = Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE));
+            if(savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)) {
+                localTempFile = Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE));
+            }
         }
 
         if(!cameraStarted) {
             cameraStarted = true;
-            localTempFile = Utils.getNewFileUri();
-            ActivityFactory.startCamera(this, localTempFile);
+            if(source.equals(GlobalVars.PhotoSource.CAMERA)) {
+                localTempFile = Utils.getNewFileUri();
+                ActivityFactory.startCamera(this, localTempFile);
+            }else{
+                ActivityFactory.startGallery(this);
+            }
         }
     }
 
@@ -92,20 +105,27 @@ public class CreateSeemFlowActivity extends Activity {
             Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic taken");
             localBitmap = Utils.shrinkBitmap(localTempFile.getPath());
             imageView.setImageBitmap(localBitmap);
-
-        } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
+        } else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
+            //localTempFile = ;
+            localBitmap = Utils.shrinkBitmap(Utils.getRealPathFromGalleryUri(this,data.getData()));
+            imageView.setImageBitmap(localBitmap);
+        } else {
             Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
         }
 
     }
 
+
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Utils.debug(this.getClass(),"Create Seem Flow - onSaveInstanceState");
         outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
-        outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE,localTempFile.getPath());
+        if(localTempFile != null) {
+            outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE, localTempFile.getPath());
+        }
     }
 
     private class UploadMedia extends AsyncTask<Void,Void,Seem> {

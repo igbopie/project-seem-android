@@ -23,19 +23,24 @@ public class ActivityFactory {
 
 
 
-    public static void startReplyItemActivity(Fragment context,String itemId) {
+    public static void startReplyItemActivity(Fragment context,String itemId,GlobalVars.PhotoSource photoSource) {
         Intent intent = new Intent(context.getActivity(), ReplyFlowActivity.class);
         intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
+
+        intent.putExtra(GlobalVars.EXTRA_PHOTO_SOURCE,photoSource.toString());
         context.startActivityForResult(intent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
     }
-    public static void startReplyItemActivity(Activity context,String itemId) {
+    public static void startReplyItemActivity(Activity context,String itemId,GlobalVars.PhotoSource photoSource) {
         Intent intent = new Intent(context, ReplyFlowActivity.class);
         intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
+
+        intent.putExtra(GlobalVars.EXTRA_PHOTO_SOURCE,photoSource.toString());
         context.startActivityForResult(intent, GlobalVars.RETURN_CODE_REPLY_TO_ITEM);
     }
 
-    public static void startCreateSeemActivity(Activity context){
+    public static void startCreateSeemActivity(Activity context,GlobalVars.PhotoSource photoSource){
         Intent intent = new Intent(context, CreateSeemFlowActivity.class);
+        intent.putExtra(GlobalVars.EXTRA_PHOTO_SOURCE,photoSource.toString());
         context.startActivityForResult(intent, GlobalVars.RETURN_CODE_CREATE_SEEM);
     }
 
@@ -59,6 +64,14 @@ public class ActivityFactory {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, returnPhoto);
         activity.startActivityForResult(cameraIntent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
+    }
+
+    public static void startGallery(Activity activity){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true); //TODO API>=honeycomb
+        activity.startActivityForResult(Intent.createChooser(intent,"Select Picture"), GlobalVars.RETURN_CODE_GALLERY);
     }
 
 

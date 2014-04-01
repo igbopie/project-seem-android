@@ -37,6 +37,10 @@ public class ReplyFlowActivity extends Activity {
     boolean cameraStarted;
 
 
+
+    GlobalVars.PhotoSource source;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,19 +73,27 @@ public class ReplyFlowActivity extends Activity {
                 new UploadMedia().execute(itemInProgress);
             }
         });
+
+        source = GlobalVars.PhotoSource.valueOf(getIntent().getStringExtra(GlobalVars.EXTRA_PHOTO_SOURCE));
         //---
         if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
             Utils.debug(this.getClass(),"Reply Flow - Camera Value recovered");
             cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
             itemInProgress = new Item();
-            itemInProgress.setTempLocalFile(Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)));
+            if(savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)) {
+                itemInProgress.setTempLocalFile(Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)));
+            }
         }
 
         if(!cameraStarted) {
             cameraStarted = true;
             itemInProgress = new Item();
-            itemInProgress.setTempLocalFile(Utils.getNewFileUri());
-            ActivityFactory.startCamera(this, itemInProgress.getTempLocalFile());
+            if(source.equals(GlobalVars.PhotoSource.CAMERA)) {
+                itemInProgress.setTempLocalFile(Utils.getNewFileUri());
+                ActivityFactory.startCamera(this, itemInProgress.getTempLocalFile());
+            }else{
+                ActivityFactory.startGallery(this);
+            }
         }
     }
 
@@ -90,7 +102,9 @@ public class ReplyFlowActivity extends Activity {
         super.onSaveInstanceState(outState);
         Utils.debug(this.getClass(),"Reply Flow - onSaveInstanceState");
         outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
-        outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE, itemInProgress.getTempLocalFile().getPath());
+        if(itemInProgress != null && itemInProgress.getTempLocalFile() != null) {
+            outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE, itemInProgress.getTempLocalFile().getPath());
+        }
     }
 
     @Override
@@ -107,7 +121,11 @@ public class ReplyFlowActivity extends Activity {
                 //
                 //ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
             }
-        } else if(requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO){
+        }  else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
+            //localTempFile = ;
+            itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(Utils.getRealPathFromGalleryUri(this,data.getData())));
+            imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
+        } else {
             Utils.debug(this.getClass(),"Reply Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
         }

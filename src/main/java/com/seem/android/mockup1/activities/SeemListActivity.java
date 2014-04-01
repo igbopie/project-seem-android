@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 
 import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
@@ -66,6 +67,7 @@ public class SeemListActivity extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.seem_view, menu);
+
         return true;
     }
 
@@ -74,10 +76,28 @@ public class SeemListActivity extends ListActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_camera:
-                //newGame();
-                Utils.debug(this.getClass(),"NEW SEEM!");
-                ActivityFactory.startCreateSeemActivity(this);
+                PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_camera));
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.actionPopupCamera:
+                                Utils.debug(this.getClass(), "NEW SEEM!");
+                                ActivityFactory.startCreateSeemActivity(SeemListActivity.this, GlobalVars.PhotoSource.CAMERA);
+                                return true;
+                            case R.id.actionPopupGallery:
+                                Utils.debug(this.getClass(), "NEW SEEM!");
+                                ActivityFactory.startCreateSeemActivity(SeemListActivity.this, GlobalVars.PhotoSource.GALLERY);
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
                 return true;
+
             case R.id.action_refresh:
                 //newGame();
                 Utils.debug(this.getClass(),"Refresh Seems!");
