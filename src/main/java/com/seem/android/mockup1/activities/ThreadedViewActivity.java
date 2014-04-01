@@ -4,6 +4,8 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
 
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.adapters.SeemAdapter;
@@ -14,6 +16,7 @@ import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.service.SeemService;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
@@ -36,6 +39,14 @@ public class ThreadedViewActivity extends ListActivity {
         setListAdapter(adapter);
         bottomItemId = this.getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
         new GetThreadsView(false).execute();
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        // Do something when a list item is clicked
+        Item item = adapter.getItem(position);
+        Utils.debug(this.getClass(),"Item Clicked! seem "+item);
+        ActivityFactory.startItemActivity(this,item.getSeemId(), item.getId());
     }
 
     private class GetThreadsView extends AsyncTask<Void,Void,List<Item>> {

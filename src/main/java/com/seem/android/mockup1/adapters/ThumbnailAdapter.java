@@ -13,6 +13,7 @@ import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
 
@@ -33,7 +34,6 @@ public class ThumbnailAdapter extends BaseAdapter {
 
     Map<View,FetchThumbs> execViewMap = new HashMap<View, FetchThumbs>();
     ItemSelectedListener repliesListener;
-
     public ThumbnailAdapter(Context context,ItemSelectedListener repliesListener) {
         super();
         this.context = context;

@@ -103,4 +103,8 @@ public class SpinnerImageView extends LinearLayout {
         this.repliesIndicator.setOnClickListener(l);
     }
 
+    public void setViewThreadOnClick(OnClickListener l){
+        this.depthIcon.setOnClickListener(l);
+    }
+
 }

@@ -118,12 +118,14 @@ public class ItemFragment extends Fragment implements Observer{
         twoWayGridView = (TwoWayGridView) getView().findViewById(R.id.gridview);
         twoWayGridView.setColumnWidth(GlobalVars.GRID_SIZE);
         twoWayGridView.setRowHeight(GlobalVars.GRID_SIZE);
-        thumbnailAdapter = new ThumbnailAdapter(this.getActivity(),new ItemSelectedListener() {
-            @Override
-            public void itemSelected(Item item) {
-                ActivityFactory.startItemActivity(ItemFragment.this.getActivity(), getSeemId(), item.getId());
-            }
-        });
+        thumbnailAdapter = new ThumbnailAdapter(this.getActivity(),
+                new ItemSelectedListener() {
+                    @Override
+                    public void itemSelected(Item item) {
+                        ActivityFactory.startItemActivity(ItemFragment.this.getActivity(), getSeemId(), item.getId());
+                    }
+                }
+        );
         twoWayGridView.setAdapter(thumbnailAdapter);
         twoWayGridView.setOnItemClickListener(new TwoWayAdapterView.OnItemClickListener() {
             public void onItemClick(TwoWayAdapterView parent, View v, int position, long id) {
@@ -143,6 +145,14 @@ public class ItemFragment extends Fragment implements Observer{
 
 
         image.setDepthNumber(item.getDepth());
+        if(item.getDepth() > 0) {
+            image.setViewThreadOnClick(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ActivityFactory.startThreadedActivity(ItemFragment.this.getActivity(), item.getId());
+                }
+            });
+        }
         //FIND replies
         if(item.getReplyCount() > 0 ){
             new GetRepliesTask(item).execute();
@@ -154,12 +164,14 @@ public class ItemFragment extends Fragment implements Observer{
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(view instanceof SpinnerImageView) {
-                    zoom = new ZoomUtil(item,image);
+                if (view instanceof SpinnerImageView) {
+                    zoom = new ZoomUtil(item, image);
                     zoom.startZoom();
                 }
             }
         });
+
+
         image.setText(item.getCaption());
 
     }
@@ -200,13 +212,6 @@ public class ItemFragment extends Fragment implements Observer{
         return getArguments().getString(GlobalVars.EXTRA_SEEM_ID, null);
     }
 
-    public int getDepth() {
-        int defaultValue = 0;
-        if(getArguments() == null){
-            return defaultValue;
-        }
-        return getArguments().getInt(GlobalVars.EXTRA_DEPTH, defaultValue);
-    }
 
     @Override
     public void update(Observable observable, Object o) {
@@ -319,7 +324,12 @@ public class ItemFragment extends Fragment implements Observer{
         }
         if(id == android.R.id.home) {
             //NavUtils.navigateUpFromSameTask(this.getActivity());
-            getActivity().onBackPressed();
+            if(this.item.getReplyTo() != null){
+                ActivityFactory.startItemActivity(this.getActivity(),this.item.getSeemId(),this.item.getReplyTo());
+            } else {
+                ActivityFactory.startListSeemActivity(this.getActivity());
+            }
+
             return true;
         }
         return super.onOptionsItemSelected(menuItem);

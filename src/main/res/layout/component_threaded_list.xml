@@ -19,12 +19,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Caption Here"
-        android:id="@+id/textView"
+        android:id="@+id/captionTextView"
         android:layout_alignBottom="@+id/threadImageView"
         android:layout_toRightOf="@+id/threadImageView"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:textSize="25sp"
+        android:textSize="15sp"
         android:paddingLeft="10dp"/>
 
     <TextView
@@ -32,11 +32,12 @@
         android:layout_height="wrap_content"
         android:text="0"
         android:gravity="center"
-        android:textSize="25sp"
-        android:id="@+id/textView2"
+        android:textSize="20sp"
+        android:id="@+id/depthTextView"
         android:layout_alignParentTop="true"
         android:layout_above="@+id/textView"
         android:layout_toRightOf="@+id/threadImageView"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingLeft="10dp" />
 </RelativeLayout>
