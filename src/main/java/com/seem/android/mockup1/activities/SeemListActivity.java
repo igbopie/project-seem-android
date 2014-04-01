@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import com.bugsense.trace.BugSenseHandler;
 
 import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
@@ -39,6 +40,8 @@ public class SeemListActivity extends ListActivity {
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        BugSenseHandler.initAndStartSession(this, "71b1dd17");
         new GetSeemsTask(false).execute();
         adapter = new SeemAdapter(new ArrayList<Seem>(),this);
         setListAdapter(adapter);
