@@ -13,8 +13,8 @@ import com.seem.android.mockup1.adapters.ThreadedAdapter;
 import com.seem.android.mockup1.model.Seem;
 
 import com.seem.android.mockup1.model.Item;
-import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.service.ItemService;
+import com.seem.android.mockup1.service.MediaService;
 import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
@@ -69,24 +69,12 @@ public class ThreadedViewActivity extends ListActivity {
 
             List<Item> stack = new ArrayList<Item>();
             Item next = ItemService.getInstance().findItemById(bottomItemId);
-            if(next.getImageThumb() == null){
-                try {
-                    Api.downloadThumbImage(next);
-                } catch (IOException e) {
-                    Utils.debug(this.getClass(),"Error al bajarse la imagen");
-                }
-            }
+            MediaService.getInstance().getThumb(next.getMedia());
             stack.add(0, next);
 
             while(next.getReplyTo() != null){
                 next = ItemService.getInstance().findItemById(next.getReplyTo());
-                if(next.getImageThumb() == null){
-                    try {
-                        Api.downloadThumbImage(next);
-                    } catch (IOException e) {
-                        Utils.debug(this.getClass(),"Error al bajarse la imagen");
-                    }
-                }
+                MediaService.getInstance().getThumb(next.getMedia());
                 stack.add(0, next);
             }
 

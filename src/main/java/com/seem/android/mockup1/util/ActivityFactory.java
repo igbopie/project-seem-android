@@ -86,13 +86,14 @@ public class ActivityFactory {
     }
 
     public static void finishActivity(Activity activity,int result){
-        //android:noHistory = "true"
         Intent data = new Intent();
-        if (activity.getParent() == null) {
+        activity.setResult(result, data);
+        //android:noHistory = "true"
+        /*if (activity.getParent() == null) {
             activity.setResult(result, data);
         } else {
             activity.getParent().setResult(result, data);
-        }
+        }*/
         activity.finish();
     }
 }

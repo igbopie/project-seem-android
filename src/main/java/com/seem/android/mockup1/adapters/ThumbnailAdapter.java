@@ -9,10 +9,10 @@ import android.widget.BaseAdapter;
 import com.jess.ui.TwoWayAbsListView;
 import com.seem.android.mockup1.executor.AsyncExecutor;
 import com.seem.android.mockup1.executor.MyAsyncTask;
-import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.service.MediaService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
@@ -129,15 +129,7 @@ public class ThumbnailAdapter extends BaseAdapter {
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-            try {
-                if(item.getImageThumb() == null) {
-                    Api.downloadThumbImage(item);
-                }
-                return null;
-            } catch (IOException e) {
-                Utils.debug(this.getClass(),"Pete al bajar la imagen", e);
-            }
+            MediaService.getInstance().getThumb(item.getMedia());
             return null;
         }
 
@@ -147,7 +139,7 @@ public class ThumbnailAdapter extends BaseAdapter {
             if(this.isCancelled()){
                 //well... do not paint...
             }else if(item != null) {
-                imageView.getImageView().setImageDrawable(item.getImageThumb());
+                imageView.getImageView().setImageDrawable(item.getMedia().getImageThumb());
                 imageView.setRepliesNumber(item.getReplyCount());
                 if(item.getReplyCount() > 0) {
                     imageView.setViewRepliesOnClick(new View.OnClickListener() {

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.model.Media;
 import com.seem.android.mockup1.model.Seem;
 import com.seem.android.mockup1.util.Iso8601;
 import com.seem.android.mockup1.util.Utils;
@@ -130,7 +131,7 @@ public class Api {
 
                 //fetch IMAGEs
                 //downloadLargeImage(item);
-                downloadThumbImage(item);
+                //downloadThumbImage(item);
 
                 Utils.debug(Api.class,"Images fetched");
                 return item;
@@ -325,14 +326,13 @@ public class Api {
         return item;
     }
 
-    public static void downloadLargeImage(Item item) throws IOException {
-        InputStream is = (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_LARGE+item.getMediaId()).getContent();
-        item.setImageLarge(Drawable.createFromStream(is, item.getId()));
+    public static InputStream downloadLargeImage(Media media) throws IOException {
+       return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_LARGE+media.getId()).getContent();
+        //media.setImageLarge(Drawable.createFromStream(is, media.getId()));
     }
 
-    public static void downloadThumbImage(Item item) throws IOException {
-        InputStream is = (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_THUMB+item.getMediaId()).getContent();
-        item.setImageThumb(Drawable.createFromStream(is, item.getId()));
+    public static InputStream downloadThumbImage(Media media) throws IOException {
+        return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_THUMB+media.getId()).getContent();
     }
 
 

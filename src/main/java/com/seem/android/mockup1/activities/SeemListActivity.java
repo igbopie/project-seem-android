@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import com.bugsense.trace.BugSenseHandler;
 
-import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.SeemAdapter;

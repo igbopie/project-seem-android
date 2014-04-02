@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class Item {
 
-    private int replyCount;
     private String id;
     private String caption;
     private String mediaId;
@@ -21,14 +20,24 @@ public class Item {
     private String replyTo;
     private String seemId;
     private int depth;
+    private int replyCount;
 
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
 
+    private Media media;
 
-    private Drawable imageLarge;
-    private Drawable imageThumb;
+    public Media getMedia() {
+        if(media == null){
+            media = new Media();
+            media.setId(this.getMediaId());
+        }
+        return media;
+    }
 
+    public void setMedia(Media media) {
+        this.media = media;
+    }
 
     public String getId() {
         return id;
@@ -95,23 +104,6 @@ public class Item {
         this.depth = depth;
     }
 
-    public Drawable getImageLarge() {
-        return imageLarge;
-    }
-
-    public void setImageLarge(Drawable imageLarge) {
-        this.imageLarge = imageLarge;
-    }
-
-    public Drawable getImageThumb() {
-        return imageThumb;
-    }
-
-    public void setImageThumb(Drawable imageThumb) {
-        this.imageThumb = imageThumb;
-    }
-
-
 
     public Uri getTempLocalFile() {
         return tempLocalFile;
@@ -128,6 +120,17 @@ public class Item {
 
     public void setTempLocalBitmap(Bitmap tempLocalBitmap) {
         this.tempLocalBitmap = tempLocalBitmap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Item && ((Item) o).getId() != null && this.getId() != null){
+            Item other = (Item)o;
+            return this.getId().equals(other.getId());
+
+        } else {
+            return super.equals(o);
+        }
     }
 
     @Override

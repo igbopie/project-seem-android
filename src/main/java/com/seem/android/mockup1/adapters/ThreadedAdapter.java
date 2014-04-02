@@ -59,7 +59,7 @@ public class ThreadedAdapter extends ArrayAdapter<Item> {
 
         Item c = itemList.get(position);
         ImageView imageView = (ImageView) v.findViewById(R.id.threadImageView);
-        imageView.setImageDrawable(c.getImageThumb());
+        imageView.setImageDrawable(c.getMedia().getImageThumb());
 
         TextView depthTextView = (TextView) v.findViewById(R.id.depthTextView);
         depthTextView.setText(c.getDepth()+"");

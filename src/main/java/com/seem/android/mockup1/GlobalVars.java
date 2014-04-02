@@ -36,6 +36,7 @@ public class GlobalVars {
 
     public static final String APP_NAME = "SeemMockup1";
     public static final String DIRECTORY_PICTURES = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/"+APP_NAME+"/";
+    //public static final String INTERNAL_DIRECTORY_PICTURES = Environment.getgetExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/"+APP_NAME+"/";
 
     public static int GRID_SIZE;
 

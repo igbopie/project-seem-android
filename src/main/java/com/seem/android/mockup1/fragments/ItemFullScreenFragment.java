@@ -17,11 +17,11 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.ItemService;
+import com.seem.android.mockup1.service.MediaService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
@@ -168,6 +168,7 @@ public class ItemFullScreenFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             item = ItemService.getInstance().findItemById(getItemId());
+            MediaService.getInstance().getThumb(item.getMedia());
             return null;
         }
 
@@ -191,9 +192,9 @@ public class ItemFullScreenFragment extends Fragment {
                     }
                 });
             }
-            if (item != null && item.getImageThumb() != null)
+            if (item != null)
             {
-                image.setImageDrawable(item.getImageThumb());
+                image.setImageDrawable(item.getMedia().getImageThumb());
             }
             if (item != null)
             {
@@ -212,21 +213,14 @@ public class ItemFullScreenFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            try {
-                if(item.getImageLarge() == null) {
-                    Api.downloadLargeImage(item);
-                }
-                return null;
-            } catch (IOException e) {
-                Utils.debug(this.getClass(),"Error",e);
-            }
+            MediaService.getInstance().getLarge(item.getMedia());
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            image.setImageDrawable(item.getImageLarge());
+            image.setImageDrawable(item.getMedia().getImageLarge());
             progressBar.setVisibility(View.INVISIBLE);
         }
     }
