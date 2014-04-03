@@ -181,7 +181,7 @@ public class ItemFullScreenFragment extends Fragment {
                 nestedRepliesIndicatorText.setText(item.getReplyCount() + "");
             }
 
-            if(isMainItem() && item.getDepth() > 0){
+            if(item.getDepth() > 0){
                 depthNumber.setText(item.getDepth()+"");
                 depthNumber.setVisibility(View.VISIBLE);
                 depthIcon.setVisibility(View.VISIBLE);

@@ -90,6 +90,12 @@ public class ItemActivity extends Activity {
                     public void itemSelected(Item item) {
                         ActivityFactory.startItemActivity(ItemActivity.this, getSeemId(), item.getId());
                     }
+                },
+                new ItemSelectedListener() {
+                    @Override
+                    public void itemSelected(Item item) {
+                        ActivityFactory.startThreadedActivity(ItemActivity.this,item.getId());
+                    }
                 }
         );
         twoWayGridView.setAdapter(thumbnailAdapter);

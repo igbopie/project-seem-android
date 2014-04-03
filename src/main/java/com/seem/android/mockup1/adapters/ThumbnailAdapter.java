@@ -34,10 +34,12 @@ public class ThumbnailAdapter extends BaseAdapter {
 
     Map<View,FetchThumbs> execViewMap = new HashMap<View, FetchThumbs>();
     ItemSelectedListener repliesListener;
-    public ThumbnailAdapter(Context context,ItemSelectedListener repliesListener) {
+    ItemSelectedListener threadViewListener;
+    public ThumbnailAdapter(Context context,ItemSelectedListener repliesListener,ItemSelectedListener threadViewListener) {
         super();
         this.context = context;
         this.repliesListener = repliesListener;
+        this.threadViewListener = threadViewListener;
     }
 
     @Override
@@ -147,6 +149,15 @@ public class ThumbnailAdapter extends BaseAdapter {
                         public void onClick(View view) {
                             Utils.debug(this.getClass(),"View");
                             repliesListener.itemSelected(item);
+                        }
+                    });
+                }
+                if(item.getDepth() > 0 ){
+                    imageView.setDepthNumber(item.getDepth());
+                    imageView.setViewThreadOnClick(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            threadViewListener.itemSelected(item);
                         }
                     });
                 }
