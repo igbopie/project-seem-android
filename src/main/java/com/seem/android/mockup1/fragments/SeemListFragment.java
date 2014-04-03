@@ -1,21 +1,20 @@
-package com.seem.android.mockup1.activities;
-
-
+package com.seem.android.mockup1.fragments;
 
 import android.app.Activity;
-import android.app.ListActivity;
+import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import com.bugsense.trace.BugSenseHandler;
 
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
@@ -29,20 +28,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by igbopie on 18/03/14.
+ * Created by igbopie on 03/04/14.
  */
+public class SeemListFragment extends ListFragment {
 
-public class SeemListActivity extends ListActivity {
 
     private SeemAdapter adapter;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        Utils.debug(this.getClass(), "onCreateView");
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_seem_list, container, false);
+    }
 
-        BugSenseHandler.initAndStartSession(this, "71b1dd17");
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
         new GetSeemsTask(false).execute();
-        adapter = new SeemAdapter(new ArrayList<Seem>(),this);
+        adapter = new SeemAdapter(new ArrayList<Seem>(),this.getActivity());
         setListAdapter(adapter);
 
         getListView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -53,32 +64,33 @@ public class SeemListActivity extends ListActivity {
                 GlobalVars.GRID_SIZE = parentHeight / GlobalVars.GRID_NUMBER_OF_PHOTOS;
             }
         });
+
+
+        super.onActivityCreated(savedInstanceState);
     }
+
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Do something when a list item is clicked
         Seem seem = adapter.getItem(position);
         Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
-        ActivityFactory.startItemActivity(SeemListActivity.this, seem.getId(), seem.getItemId());
+        ActivityFactory.startItemActivity(this.getActivity(), seem.getId(), seem.getItemId());
     }
-
-
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.seem_view, menu);
-
-        return true;
+        super.onCreateOptionsMenu(menu,inflater);
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_camera:
-                PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_camera));
+                PopupMenu popup = new PopupMenu(this.getActivity(), getView().findViewById(R.id.action_camera));
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -87,11 +99,11 @@ public class SeemListActivity extends ListActivity {
                         switch (menuItem.getItemId()) {
                             case R.id.actionPopupCamera:
                                 Utils.debug(this.getClass(), "NEW SEEM!");
-                                ActivityFactory.startCreateSeemActivity(SeemListActivity.this, GlobalVars.PhotoSource.CAMERA);
+                                ActivityFactory.startCreateSeemActivity(SeemListFragment.this.getActivity(), GlobalVars.PhotoSource.CAMERA);
                                 return true;
                             case R.id.actionPopupGallery:
                                 Utils.debug(this.getClass(), "NEW SEEM!");
-                                ActivityFactory.startCreateSeemActivity(SeemListActivity.this, GlobalVars.PhotoSource.GALLERY);
+                                ActivityFactory.startCreateSeemActivity(SeemListFragment.this.getActivity(), GlobalVars.PhotoSource.GALLERY);
                                 return true;
                         }
                         return false;
@@ -124,7 +136,7 @@ public class SeemListActivity extends ListActivity {
 
     private class GetSeemsTask extends AsyncTask<Void,Void,List<Seem>> {
         private boolean refresh = false;
-        private final ProgressDialog dialog = new ProgressDialog(SeemListActivity.this);
+        private final ProgressDialog dialog = new ProgressDialog(SeemListFragment.this.getActivity());
 
         private GetSeemsTask(boolean refresh) {
             this.refresh = refresh;
@@ -153,6 +165,4 @@ public class SeemListActivity extends ListActivity {
             dialog.dismiss();
         }
     }
-
 }
-

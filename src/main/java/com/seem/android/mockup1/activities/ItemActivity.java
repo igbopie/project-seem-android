@@ -10,7 +10,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,7 +34,6 @@ import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
 import com.seem.android.mockup1.util.Utils;
-import com.seem.android.mockup1.fragments.ItemFragmentSelectedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -223,7 +221,7 @@ public class ItemActivity extends Activity {
             if(this.item.getReplyTo() != null){
                 ActivityFactory.startItemActivity(this,this.item.getSeemId(),this.item.getReplyTo());
             } else {
-                ActivityFactory.startListSeemActivity(this);
+                ActivityFactory.startMainActivity(this);
             }
 
             return true;

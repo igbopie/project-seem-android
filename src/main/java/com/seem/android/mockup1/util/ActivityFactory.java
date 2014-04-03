@@ -10,8 +10,8 @@ import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.activities.CreateSeemFlowActivity;
 import com.seem.android.mockup1.activities.ItemActivity;
 import com.seem.android.mockup1.activities.ItemsFullScreenActivity;
+import com.seem.android.mockup1.activities.MainActivity;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
-import com.seem.android.mockup1.activities.SeemListActivity;
 import com.seem.android.mockup1.activities.ThreadedViewActivity;
 import com.seem.android.mockup1.adapters.ThreadedAdapter;
 import com.seem.android.mockup1.model.Item;
@@ -80,8 +80,8 @@ public class ActivityFactory {
         intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
         activity.startActivity(intent);
     }
-    public static void startListSeemActivity(Activity activity) {
-        Intent intent = new Intent(activity, SeemListActivity.class);
+    public static void startMainActivity(Activity activity) {
+        Intent intent = new Intent(activity, MainActivity.class);
         activity.startActivity(intent);
     }
 
