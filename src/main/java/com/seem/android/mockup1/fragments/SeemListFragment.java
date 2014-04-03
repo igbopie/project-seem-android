@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 
 import com.seem.android.mockup1.GlobalVars;
+import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.SeemAdapter;
 import com.seem.android.mockup1.model.Seem;
@@ -72,6 +73,11 @@ public class SeemListFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.seem_view, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_camera);
+        if(!MyApplication.isLoggedIn()){
+            menuItem.setVisible(false);
+        }
+
         super.onCreateOptionsMenu(menu,inflater);
     }
 

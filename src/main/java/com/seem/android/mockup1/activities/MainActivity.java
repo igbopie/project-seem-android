@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -17,9 +16,11 @@ import android.widget.ListView;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.seem.android.mockup1.GlobalVars;
+import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
+import com.seem.android.mockup1.fragments.UserProfileFragment;
 import com.seem.android.mockup1.uimodel.NavDrawerItem;
 import com.seem.android.mockup1.uimodel.NavDrawerListAdapter;
 import com.seem.android.mockup1.util.Utils;
@@ -29,10 +30,17 @@ import java.util.ArrayList;
 /**
  * Created by igbopie on 03/04/14.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements LoginFragment.OnLoggedInInteractionListener,UserProfileFragment.UserProfileInteractionListener {
+
+
+    private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
+    private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
+    private NavDrawerItem drawerItemLogin = new NavDrawerItem("Login", R.drawable.sign_in);
+    private NavDrawerItem drawerItemUserProfile = new NavDrawerItem("User Profile", R.drawable.user);
+
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private ListView mDrawerList ;
     private ActionBarDrawerToggle mDrawerToggle;
 
     // nav drawer title
@@ -42,7 +50,6 @@ public class MainActivity extends Activity {
     private CharSequence mTitle;
 
 
-    private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
     @Override
@@ -68,19 +75,13 @@ public class MainActivity extends Activity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
 
-        navDrawerItems = new ArrayList<NavDrawerItem>();
-
-        // adding nav drawer items to array
-        // Home
-        navDrawerItems.add(new NavDrawerItem("Home", R.drawable.home));
-        navDrawerItems.add(new NavDrawerItem("Login", R.drawable.sign_in));
-
-
         // setting the nav drawer list adapter
         adapter = new NavDrawerListAdapter(getApplicationContext(),
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
+
+        buildDrawerMenu();
 
         // enabling action bar app icon and behaving it as toggle button
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -107,8 +108,21 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState == null) {
             // on first time display view for first nav item
-            displayView(0);
+            displayView(0,drawerItemHome);
         }
+    }
+
+    private void buildDrawerMenu(){
+        navDrawerItems.clear();
+
+        navDrawerItems.add(drawerItemHome);
+        if(MyApplication.isLoggedIn()) {
+            navDrawerItems.add(drawerItemUserProfile);
+        }else{
+            navDrawerItems.add(drawerItemLogin);
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -146,21 +160,16 @@ public class MainActivity extends Activity {
     /**
      * Diplaying fragment view for selected nav drawer list item
      * */
-    private void displayView(int position) {
+    private void displayView(int position, NavDrawerItem navDrawerItem) {
         // update the main content by replacing fragments
         Fragment fragment = null;
-        String menuTitle ="";
-        switch (position) {
-            case 0:
-                fragment = new SeemListFragment();
-                menuTitle = "List of seems";
-                break;
-            case 1:
-                fragment = LoginFragment.newInstance();
-                menuTitle = "Login";
-                break;
-            default:
-                break;
+        String menuTitle =navDrawerItem.getTitle();
+        if(navDrawerItem == drawerItemHome){
+            fragment = new SeemListFragment();
+        } else if(navDrawerItem == drawerItemLogin){
+            fragment = LoginFragment.newInstance();
+        } else if(navDrawerItem == drawerItemUserProfile){
+            fragment = UserProfileFragment.newInstance();
         }
 
         if (fragment != null) {
@@ -205,12 +214,26 @@ public class MainActivity extends Activity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public void hasLoggedIn() {
+        buildDrawerMenu();
+        displayView(0,drawerItemHome);
+    }
+
+    @Override
+    public void hasLoggedOut() {
+        buildDrawerMenu();
+        displayView(0,drawerItemHome);
+    }
+
+
+
 
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // display view for selected nav drawer item
-                displayView(position);
+                displayView(position,(NavDrawerItem) adapter.getItem(position));
         }
     }
 }

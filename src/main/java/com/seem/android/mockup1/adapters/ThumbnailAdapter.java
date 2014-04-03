@@ -152,6 +152,7 @@ public class ThumbnailAdapter extends BaseAdapter {
                         }
                     });
                 }
+                /*
                 if(item.getDepth() > 0 ){
                     imageView.setDepthNumber(item.getDepth());
                     imageView.setViewThreadOnClick(new View.OnClickListener() {
@@ -160,7 +161,7 @@ public class ThumbnailAdapter extends BaseAdapter {
                             threadViewListener.itemSelected(item);
                         }
                     });
-                }
+                }*/
 
                 imageView.getImageView().setVisibility(View.VISIBLE);
                 imageView.setLoading(false);

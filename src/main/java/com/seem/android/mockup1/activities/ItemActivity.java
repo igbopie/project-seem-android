@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import com.jess.ui.TwoWayAdapterView;
 import com.jess.ui.TwoWayGridView;
 import com.seem.android.mockup1.GlobalVars;
+import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.ThumbnailAdapter;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
@@ -177,6 +178,10 @@ public class ItemActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.seem_view, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_camera);
+        if(!MyApplication.isLoggedIn()){
+            menuItem.setVisible(false);
+        }
 
         return true;
     }

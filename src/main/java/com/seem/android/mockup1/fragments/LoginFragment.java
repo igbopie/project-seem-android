@@ -1,13 +1,10 @@
 package com.seem.android.mockup1.fragments;
 
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.service.Api;
@@ -26,7 +22,7 @@ import com.seem.android.mockup1.util.Utils;
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link LoginFragment.OnFragmentInteractionListener} interface
+ * {@link com.seem.android.mockup1.fragments.LoginFragment.OnLoggedInInteractionListener} interface
  * to handle interaction events.
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -38,7 +34,7 @@ public class LoginFragment extends Fragment {
     private EditText username;
     private EditText password;
 
-    private OnFragmentInteractionListener mListener;
+    private OnLoggedInInteractionListener mListener;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -89,12 +85,12 @@ public class LoginFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        /*try {
-            mListener = (OnFragmentInteractionListener) activity;
+        try {
+            mListener = (OnLoggedInInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+                    + " must implement UserProfileInteractionListener");
+        }
     }
 
     @Override
@@ -113,9 +109,8 @@ public class LoginFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+    public interface OnLoggedInInteractionListener {
+        public void hasLoggedIn();
     }
 
     class LoginAction extends AsyncTask<Void,Void,String>{
@@ -153,23 +148,13 @@ public class LoginFragment extends Fragment {
         @Override
         protected void onPostExecute(String token) {
             super.onPostExecute(token);
-            SharedPreferences prefs = MyApplication.getAppContext().getSharedPreferences(GlobalVars.SHARED_PREF, Context.MODE_PRIVATE);
 
             dialog.dismiss();
             if(token != null) {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(GlobalVars.SHARED_PREF_USERNAME,username);
-                editor.putString(GlobalVars.SHARED_PREF_PASSWORD,password);
-                editor.putString(GlobalVars.SHARED_PREF_TOKEN,token);
-                editor.putBoolean(GlobalVars.SHARED_PREF_AUTHENTICATED,true);
-                editor.commit();
+                MyApplication.login(username, password, token);
+                mListener.hasLoggedIn();
             } else {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(GlobalVars.SHARED_PREF_USERNAME,null);
-                editor.putString(GlobalVars.SHARED_PREF_PASSWORD,null);
-                editor.putString(GlobalVars.SHARED_PREF_TOKEN,null);
-                editor.putBoolean(GlobalVars.SHARED_PREF_AUTHENTICATED,false);
-                editor.commit();
+                MyApplication.logout();
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LoginFragment.this.getActivity());
 
@@ -180,8 +165,8 @@ public class LoginFragment extends Fragment {
                 alertDialogBuilder
                         .setMessage("Invalid username or password")
                         .setCancelable(false)
-                        .setNeutralButton("Oookey",new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
+                        .setNeutralButton("Oookey", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
                                 // if this button is clicked, close
                                 // current activity
                                 dialog.cancel();

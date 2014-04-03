@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.seem.android.mockup1.GlobalVars;
+import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.ItemService;
@@ -139,6 +140,9 @@ public class ItemFullScreenFragment extends Fragment {
                 popup.show();
             }
         });
+        if(!MyApplication.isLoggedIn()){
+            replyButton.setVisibility(View.INVISIBLE);
+        }
 
         //myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
         new GetItem().execute();

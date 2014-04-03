@@ -3,6 +3,7 @@ package com.seem.android.mockup1.service;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
+import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Media;
 import com.seem.android.mockup1.model.Seem;
@@ -60,6 +61,7 @@ public class Api {
 
 
     public static final int RESPONSE_CODE_OK = 200;
+    public static final int CLIENT_LOGIN_TIMEOUT = 440;
 
     public static final String JSON_TAG_CODE = "code";
     public static final String JSON_TAG_MESSAGE = "message";
@@ -200,6 +202,7 @@ public class Api {
             params.put("itemId", itemId);
             params.put("mediaId", mediaId);
             params.put("caption", caption);
+            params.put("token", MyApplication.getToken());
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLY,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
@@ -214,6 +217,12 @@ public class Api {
                 Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
                 return item;
+            } else if(responseCode == CLIENT_LOGIN_TIMEOUT ) {
+                String token = login(MyApplication.getUsername(),MyApplication.getPassword());
+                if(token != null){
+                    MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
+                    return reply(caption,mediaId,itemId);
+                }
             }
             return null;
         } catch (Exception e) {
@@ -228,6 +237,7 @@ public class Api {
             params.put("title", title);
             params.put("mediaId", mediaId);
             params.put("caption", caption);
+            params.put("token", MyApplication.getToken());
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE_SEEM,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
@@ -242,6 +252,12 @@ public class Api {
                 Seem seem = fillSeem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
                 return seem;
+            }else if(responseCode == CLIENT_LOGIN_TIMEOUT ) {
+                String token = login(MyApplication.getUsername(),MyApplication.getPassword());
+                if(token != null){
+                    MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
+                    return createSeem(title,caption,mediaId);
+                }
             }
             return null;
         } catch (Exception e) {
