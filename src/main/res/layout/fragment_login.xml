@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.seem.android.mockup1.fragments.LoginFragment" android:background="#54b4d0">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/logoImageView"
+        android:src="@drawable/seem_logo_text"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/seemlogodescription"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"/>
+
+    <!--android:digits="_,qwertzuiopasdfghjklyxcvbnm,QWERTYUIOPASDFGHJKLZXCVBNM,0123456789"-->
+    <EditText
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/usernameEditText"
+    android:layout_gravity="left|top"
+    android:layout_below="@+id/logoImageView"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:hint="username"
+    android:textColor="#fff"
+    android:textColorHint="#dadada"
+        android:layout_marginTop="20dp"
+        android:singleLine="true"
+
+        />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/passwordEditText"
+        android:layout_gravity="left|top"
+        android:layout_below="@+id/usernameEditText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:hint="password"
+        android:textColor="#fff"
+        android:textColorHint="#dadada"
+        android:password="true"
+        android:layout_marginTop="20dp"
+        android:singleLine="true"
+    />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:id="@+id/loginButton"
+        android:layout_below="@+id/passwordEditText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"
+        android:textColor="#fff"/>
+
+</RelativeLayout>

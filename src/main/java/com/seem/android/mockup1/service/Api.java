@@ -55,6 +55,9 @@ public class Api {
     public static final String ENDPOINT_GET_MEDIA_THUMB = "api/media/get/thumb/";
     public static final String ENDPOINT_CREATE_MEDIA = "api/media/create";
     public static final String ENDPOINT_CREATE_SEEM = "api/m1/seem/create";
+    public static final String ENDPOINT_LOGIN = "api/user/login";
+
+
 
     public static final int RESPONSE_CODE_OK = 200;
 
@@ -281,6 +284,26 @@ public class Api {
         }
     }
 
+    public static String login(String username, String password) throws Exception {
+        HashMap<String,String>params = new HashMap<String, String>();
+        params.put("username",username);
+        params.put("password",password);
+
+        HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_LOGIN,params);
+        int responseCode = httpResponse.getStatusLine().getStatusCode();
+        if(responseCode == RESPONSE_CODE_OK){
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            httpResponse.getEntity().writeTo(os);
+            String output = os.toString( "UTF-8" );
+            Utils.debug(Api.class,"Output:"+output);
+            JSONObject jsonObj = new JSONObject(output);
+            String token = jsonObj.getString(JSON_TAG_RESPONSE);
+            return token;
+
+        }
+        return null;
+    }
+
     private static List<Seem> fillSeems(JSONArray seemsArray) throws JSONException, ParseException {
         List<Seem> seemList = new ArrayList<Seem>();
         for (int i = 0; i < seemsArray.length(); i++) {
@@ -301,6 +324,8 @@ public class Api {
         seem.setUpdated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_UPDATED)).getTime());
         return seem;
     }
+
+
 
     private static List<Item> fillItems(JSONArray itemArray) throws JSONException, ParseException {
         List<Item> itemList = new ArrayList<Item>();
@@ -325,6 +350,8 @@ public class Api {
         }
         return item;
     }
+
+
 
     public static InputStream downloadLargeImage(Media media) throws IOException {
        return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_LARGE+media.getId()).getContent();

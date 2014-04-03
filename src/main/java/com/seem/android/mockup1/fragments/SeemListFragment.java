@@ -56,15 +56,6 @@ public class SeemListFragment extends ListFragment {
         adapter = new SeemAdapter(new ArrayList<Seem>(),this.getActivity());
         setListAdapter(adapter);
 
-        getListView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int parentWidth = getListView().getWidth();
-                int parentHeight = getListView().getHeight();
-                GlobalVars.GRID_SIZE = parentHeight / GlobalVars.GRID_NUMBER_OF_PHOTOS;
-            }
-        });
-
 
         super.onActivityCreated(savedInstanceState);
     }

@@ -11,10 +11,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
 import com.seem.android.mockup1.uimodel.NavDrawerItem;
 import com.seem.android.mockup1.uimodel.NavDrawerListAdapter;
@@ -45,7 +49,18 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BugSenseHandler.initAndStartSession(this, "71b1dd17");
+
         setContentView(R.layout.activity_main);
+
+        findViewById(R.id.drawer_layout).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int parentWidth = findViewById(R.id.drawer_layout).getWidth();
+                int parentHeight = findViewById(R.id.drawer_layout).getHeight();
+                GlobalVars.GRID_SIZE = parentHeight / GlobalVars.GRID_NUMBER_OF_PHOTOS;
+            }
+        });
+
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -60,10 +75,12 @@ public class MainActivity extends Activity {
         navDrawerItems.add(new NavDrawerItem("Home", R.drawable.home));
         navDrawerItems.add(new NavDrawerItem("Login", R.drawable.sign_in));
 
+
         // setting the nav drawer list adapter
         adapter = new NavDrawerListAdapter(getApplicationContext(),
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
+        mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
 
         // enabling action bar app icon and behaving it as toggle button
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -132,9 +149,15 @@ public class MainActivity extends Activity {
     private void displayView(int position) {
         // update the main content by replacing fragments
         Fragment fragment = null;
+        String menuTitle ="";
         switch (position) {
             case 0:
                 fragment = new SeemListFragment();
+                menuTitle = "List of seems";
+                break;
+            case 1:
+                fragment = LoginFragment.newInstance();
+                menuTitle = "Login";
                 break;
             default:
                 break;
@@ -148,7 +171,7 @@ public class MainActivity extends Activity {
             // update selected item and title, then close the drawer
             mDrawerList.setItemChecked(position, true);
             mDrawerList.setSelection(position);
-            //setTitle(navMenuTitles[position]);
+            setTitle(menuTitle);
             mDrawerLayout.closeDrawer(mDrawerList);
         } else {
             // error in creating fragment
@@ -180,5 +203,14 @@ public class MainActivity extends Activity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+
+    private class SlideMenuClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // display view for selected nav drawer item
+                displayView(position);
+        }
     }
 }
