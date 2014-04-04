@@ -127,7 +127,7 @@ public class LoginFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Login in...");
+            dialog.setMessage("Logging in...");
             dialog.show();
         }
 

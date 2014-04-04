@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import com.seem.android.mockup1.MyApplication;
+import com.seem.android.mockup1.exceptions.EmailAlreadyExistsException;
+import com.seem.android.mockup1.exceptions.UsernameAlreadyExistsException;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Media;
 import com.seem.android.mockup1.model.Seem;
@@ -57,11 +59,15 @@ public class Api {
     public static final String ENDPOINT_CREATE_MEDIA = "api/media/create";
     public static final String ENDPOINT_CREATE_SEEM = "api/m1/seem/create";
     public static final String ENDPOINT_LOGIN = "api/user/login";
+    public static final String ENDPOINT_CREATE = "api/user/create";
 
 
 
     public static final int RESPONSE_CODE_OK = 200;
-    public static final int CLIENT_LOGIN_TIMEOUT = 440;
+    public static final int RESPONSE_CODE_OK_CREATED = 201;
+    public static final int RESPONSE_CODE_CLIENT_LOGIN_TIMEOUT = 440;
+    public static final int RESPONSE_CODE_CLIENT_USERNAME_ALREADY_EXISTS = 466;
+    public static final int RESPONSE_CODE_CLIENT_EMAIL_ALREADY_EXISTS = 467;
 
     public static final String JSON_TAG_CODE = "code";
     public static final String JSON_TAG_MESSAGE = "message";
@@ -217,7 +223,7 @@ public class Api {
                 Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
                 return item;
-            } else if(responseCode == CLIENT_LOGIN_TIMEOUT ) {
+            } else if(responseCode == RESPONSE_CODE_CLIENT_LOGIN_TIMEOUT ) {
                 String token = login(MyApplication.getUsername(),MyApplication.getPassword());
                 if(token != null){
                     MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
@@ -252,7 +258,7 @@ public class Api {
                 Seem seem = fillSeem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
                 return seem;
-            }else if(responseCode == CLIENT_LOGIN_TIMEOUT ) {
+            }else if(responseCode == RESPONSE_CODE_CLIENT_LOGIN_TIMEOUT ) {
                 String token = login(MyApplication.getUsername(),MyApplication.getPassword());
                 if(token != null){
                     MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
@@ -316,6 +322,27 @@ public class Api {
             String token = jsonObj.getString(JSON_TAG_RESPONSE);
             return token;
 
+        }
+        return null;
+    }
+
+    public static String signUp(String username, String password,String email) throws Exception {
+        HashMap<String,String>params = new HashMap<String, String>();
+        params.put("username",username);
+        params.put("password",password);
+        params.put("email",email);
+
+        HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE,params);
+        int responseCode = httpResponse.getStatusLine().getStatusCode();
+        if(responseCode == RESPONSE_CODE_OK_CREATED){
+            return login(username,password);
+        } else if(responseCode == RESPONSE_CODE_CLIENT_USERNAME_ALREADY_EXISTS) {
+            throw new UsernameAlreadyExistsException();
+        } else if(responseCode == RESPONSE_CODE_CLIENT_EMAIL_ALREADY_EXISTS) {
+            throw new EmailAlreadyExistsException();
+
+        }else {
+            Utils.debug(Api.class,"Api response code:"+responseCode);
         }
         return null;
     }
