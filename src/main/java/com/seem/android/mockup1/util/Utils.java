@@ -9,12 +9,15 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import com.seem.android.mockup1.GlobalVars;
+import com.seem.android.mockup1.MyApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +28,32 @@ import java.util.Calendar;
  */
 public class Utils {
 
+    public static Drawable fromFile(String file) throws IOException {
+        ExifInterface exif  = new ExifInterface(file);;
+        int rotate = 0;
+
+        int orientation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                rotate = 270;
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                rotate = 180;
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                rotate = 90;
+                break;
+        }
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotate);
+        BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
+        Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+        return new BitmapDrawable(MyApplication.getAppContext().getResources(),croppedBmp);
+    }
     public static Bitmap shrinkBitmap(String file){
         try {
             ExifInterface exif  = new ExifInterface(file);;

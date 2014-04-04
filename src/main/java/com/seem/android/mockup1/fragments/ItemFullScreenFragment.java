@@ -56,6 +56,11 @@ public class ItemFullScreenFragment extends Fragment {
     ImageView depthIcon;
     ImageView replyButton;
     Item item;
+    ImageView userIconImageView;
+    TextView userTextView;
+    TextView closeText;
+    ImageView closeIcon;
+
     //final int HIDE_TIMEOUT = 3000;
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
@@ -103,6 +108,29 @@ public class ItemFullScreenFragment extends Fragment {
         nestedRepliesIndicatorText = (TextView) getView().findViewById(R.id.repliesIndicatorNumber);
         depthIcon = (ImageView) getView().findViewById(R.id.depthIconView);
         depthNumber = (TextView) getView().findViewById(R.id.depthNumber);
+        userIconImageView = (ImageView) getView().findViewById(R.id.userIconImageView);
+        userTextView = (TextView) getView().findViewById(R.id.userTextView);
+
+        closeText =(TextView) getView().findViewById(R.id.closeText);
+        closeIcon =(ImageView) getView().findViewById(R.id.closeImageView);
+
+        closeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityFactory.finishActivity(getActivity(),Activity.RESULT_OK);
+            }
+        });
+        closeIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityFactory.finishActivity(getActivity(),Activity.RESULT_OK);
+            }
+        });
+
+
+        userIconImageView.setVisibility(View.INVISIBLE);
+        userTextView.setVisibility(View.INVISIBLE);
+
         nestedRepliesIndicatorText.setVisibility(View.INVISIBLE);
         nestedRepliesIndicator.setVisibility(View.INVISIBLE);
         depthIcon.setVisibility(View.INVISIBLE);
@@ -195,6 +223,11 @@ public class ItemFullScreenFragment extends Fragment {
                         ActivityFactory.startThreadedActivity(getActivity(),item.getId());
                     }
                 });
+            }
+            if(item.getUsername() != null){
+                userIconImageView.setVisibility(View.VISIBLE);
+                userTextView.setVisibility(View.VISIBLE);
+                userTextView.setText(item.getUsername());
             }
             if (item != null)
             {

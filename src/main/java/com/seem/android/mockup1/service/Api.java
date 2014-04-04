@@ -91,6 +91,8 @@ public class Api {
     public static final String JSON_TAG_ITEM_SEEM_ID = "seemId";
     public static final String JSON_TAG_ITEM_DEPTH = "depth";
     public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
+    public static final String JSON_TAG_ITEM_USERNAME = "username";
+    public static final String JSON_TAG_ITEM_USER_ID = "userId";
 
     public static List<Seem> getSeems(){
         try {
@@ -390,6 +392,10 @@ public class Api {
         item.setSeemId(itemJson.getString(JSON_TAG_ITEM_SEEM_ID));
         if(itemJson.has(JSON_TAG_ITEM_REPLY_TO)) {
             item.setReplyTo(itemJson.getString(JSON_TAG_ITEM_REPLY_TO));
+        }
+        if(itemJson.has(JSON_TAG_ITEM_USER_ID)) {
+            item.setUserId(itemJson.getString(JSON_TAG_ITEM_USER_ID));
+            item.setUsername(itemJson.getString(JSON_TAG_ITEM_USERNAME));
         }
         return item;
     }

@@ -56,7 +56,11 @@ public class MediaService {
                 Utils.debug(this.getClass(),ex.getMessage());
             }
         }
-        media.setImageThumb(Drawable.createFromPath(file.getAbsolutePath()));
+        try {
+            media.setImageThumb(Utils.fromFile(file.getAbsolutePath()));
+        }catch(IOException ex){
+            Utils.debug(this.getClass(),ex.getMessage());
+        }
     }
 
     public void getLarge(Media media){
@@ -77,7 +81,11 @@ public class MediaService {
                 Utils.debug(this.getClass(),ex.getMessage());
             }
         }
-        media.setImageLarge(Drawable.createFromPath(file.getAbsolutePath()));
+        try {
+            media.setImageLarge(Utils.fromFile(file.getAbsolutePath()));
+        }catch(IOException ex){
+            Utils.debug(this.getClass(),ex.getMessage());
+        }
 
     }
 

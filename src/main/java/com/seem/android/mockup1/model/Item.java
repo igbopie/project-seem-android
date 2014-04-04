@@ -21,6 +21,8 @@ public class Item {
     private String seemId;
     private int depth;
     private int replyCount;
+    private String username;
+    private String userId;
 
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
@@ -104,6 +106,21 @@ public class Item {
         this.depth = depth;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public Uri getTempLocalFile() {
         return tempLocalFile;

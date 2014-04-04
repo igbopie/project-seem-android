@@ -48,7 +48,9 @@ public class ItemService {
             MySQLiteHelper.COLUMN_ITEMS_REPLY_TO,
             MySQLiteHelper.COLUMN_ITEMS_CAPTION,
             MySQLiteHelper.COLUMN_ITEMS_CREATED,
-            MySQLiteHelper.COLUMN_ITEMS_MEDIA_ID};
+            MySQLiteHelper.COLUMN_ITEMS_MEDIA_ID,
+            MySQLiteHelper.COLUMN_ITEMS_USER_ID,
+            MySQLiteHelper.COLUMN_ITEMS_USERNAME};
 
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
@@ -70,6 +72,8 @@ public class ItemService {
         d.setTime(cursor.getLong(6));
         item.setCreated(d);
         item.setMediaId(cursor.getString(7));
+        item.setUserId(cursor.getString(8));
+        item.setUsername(cursor.getString(9));
         return item;
     }
 
@@ -222,6 +226,8 @@ public class ItemService {
         values.put(MySQLiteHelper.COLUMN_ITEMS_REPLY_COUNT, item.getReplyCount());
         values.put(MySQLiteHelper.COLUMN_ITEMS_REPLY_TO, item.getReplyTo());
         values.put(MySQLiteHelper.COLUMN_ITEMS_SEEM_ID, item.getSeemId());
+        values.put(MySQLiteHelper.COLUMN_ITEMS_USER_ID, item.getUserId());
+        values.put(MySQLiteHelper.COLUMN_ITEMS_USERNAME, item.getUsername());
         database.replace(MySQLiteHelper.TABLE_ITEMS, null, values);
 
     }
