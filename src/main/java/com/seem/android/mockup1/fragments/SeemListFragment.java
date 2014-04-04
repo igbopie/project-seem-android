@@ -87,7 +87,7 @@ public class SeemListFragment extends ListFragment {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_camera:
-                PopupMenu popup = new PopupMenu(this.getActivity(), getView().findViewById(R.id.action_camera));
+                PopupMenu popup = new PopupMenu(this.getActivity(), getActivity().findViewById(R.id.action_camera));
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
