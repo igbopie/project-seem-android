@@ -48,7 +48,7 @@ import java.util.Map;
  */
 public class Api {
 
-
+    public static final String S3_ENPOINT="http://seem-dev-test.s3-website-us-west-2.amazonaws.com/";
     public static final String ENDPOINT = "https://seem-test.herokuapp.com/";
     public static final String ENDPOINT_GET_SEEMS = "api/m1/seem";
     public static final String ENDPOINT_GET_ITEM = "api/m1/seem/item/get";
@@ -403,12 +403,14 @@ public class Api {
 
 
     public static InputStream downloadLargeImage(Media media) throws IOException {
-       return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_LARGE+media.getId()).getContent();
+        return  (InputStream) new URL(S3_ENPOINT+media.getId()+"_"+"large").getContent();
+       //return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_LARGE+media.getId()).getContent();
         //media.setImageLarge(Drawable.createFromStream(is, media.getId()));
     }
 
     public static InputStream downloadThumbImage(Media media) throws IOException {
-        return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_THUMB+media.getId()).getContent();
+        return  (InputStream) new URL(S3_ENPOINT+media.getId()+"_"+"thumb").getContent();
+        //return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_THUMB+media.getId()).getContent();
     }
 
 
