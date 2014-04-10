@@ -18,6 +18,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.fragments.FeedListFragment;
 import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
 import com.seem.android.mockup1.fragments.SignUpFragment;
@@ -36,6 +37,7 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
 
     private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
     private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
+    //private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
     private NavDrawerItem drawerItemLogin = new NavDrawerItem("Login", R.drawable.sign_in);
     private NavDrawerItem drawerItemSignUp = new NavDrawerItem("Sign Up", R.drawable.plus_square);
     private NavDrawerItem drawerItemUserProfile = new NavDrawerItem("User Profile", R.drawable.user);
@@ -168,7 +170,7 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         Fragment fragment = null;
         String menuTitle =navDrawerItem.getTitle();
         if(navDrawerItem == drawerItemHome){
-            fragment = new SeemListFragment();
+            fragment = new FeedListFragment();
         } else if(navDrawerItem == drawerItemLogin){
             fragment = LoginFragment.newInstance();
         } else if(navDrawerItem == drawerItemSignUp){

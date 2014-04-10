@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.exceptions.EmailAlreadyExistsException;
 import com.seem.android.mockup1.exceptions.UsernameAlreadyExistsException;
+import com.seem.android.mockup1.model.Feed;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Media;
 import com.seem.android.mockup1.model.Seem;
@@ -64,6 +65,7 @@ public class Api {
     public static final String ENDPOINT_USER_PROFILE = "api/user/profile";
     public static final String ENDPOINT_FOLLOW = "api/follow";
     public static final String ENDPOINT_UNFOLLOW = "api/unfollow";
+    public static final String ENDPOINT_FEED = "api/feed";
 
 
 
@@ -109,6 +111,22 @@ public class Api {
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWED_BY_ME= "isFollowedByMe";
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME= "isFollowingMe";
 
+
+    //FEED
+    public static final String JSON_TAG_FEED_CREATED = "created";
+    public static final String JSON_TAG_FEED_ITEM_ID = "itemId";
+    public static final String JSON_TAG_FEED_ITEM_MEDIA_ID = "itemMediaId";
+    public static final String JSON_TAG_FEED_ITEM_CAPTION = "itemCaption";
+    public static final String JSON_TAG_FEED_REPLY_TO_ID = "replyToId";
+    public static final String JSON_TAG_FEED_REPLY_TO_MEDIA_ID = "replyToMediaId";
+    public static final String JSON_TAG_FEED_REPLY_TO_CAPTION = "replyToCaption";
+    public static final String JSON_TAG_FEED_REPLY_TO_USERNAME = "replyToUsername";
+    public static final String JSON_TAG_FEED_REPLY_TO_USER_ID = "replyToUserId";
+    public static final String JSON_TAG_FEED_SEEM_ID = "seemId";
+    public static final String JSON_TAG_FEED_SEEM_TITLE = "seemTitle";
+    public static final String JSON_TAG_FEED_ACTION = "action";
+    public static final String JSON_TAG_FEED_USER_ID = "userId";
+    public static final String JSON_TAG_FEED_USERNAME = "username";
 
     public static List<Seem> getSeems(){
         try {
@@ -402,6 +420,42 @@ public class Api {
         }
     }
 
+    public static List<Feed> getFeeds(String token,int page){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("token",token);
+            params.put("page",page+"");
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FEED,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+
+                JSONObject jsonObj = new JSONObject(output);
+                JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
+                List<Feed> feeds = fillFeeds(itemJson);
+                Utils.debug(Api.class,"Items fetched: "+feeds);
+
+                return feeds;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return null;
+        }
+    }
+
+
+
     public static String login(String username, String password) throws Exception {
         HashMap<String,String>params = new HashMap<String, String>();
         params.put("username",username);
@@ -464,6 +518,43 @@ public class Api {
         return seem;
     }
 
+    private static List<Feed> fillFeeds(JSONArray feedsArray) throws JSONException, ParseException {
+        List<Feed> feedList = new ArrayList<Feed>();
+        for (int i = 0; i < feedsArray.length(); i++) {
+            JSONObject feedJson = feedsArray.getJSONObject(i);
+            feedList.add(fillFeed(feedJson));
+        }
+        return feedList;
+    }
+
+    private static Feed fillFeed(JSONObject feedJson) throws JSONException, ParseException {
+        Feed feed = new Feed();
+
+        feed.setCreated(Iso8601.toCalendar(feedJson.getString(JSON_TAG_FEED_CREATED)).getTime());
+        feed.setItemId(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_ID));
+        feed.setItemMediaId(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_MEDIA_ID));
+        feed.setItemCaption(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_CAPTION));
+        feed.setReplyToId(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_ID));
+        feed.setReplyToMediaId(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_MEDIA_ID));
+        feed.setReplyToCaption(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_CAPTION));
+        feed.setReplyToUsername(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_USERNAME));
+        feed.setReplyToUserId(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_USER_ID));
+        feed.setSeemId(getStringJsonField(feedJson, JSON_TAG_FEED_SEEM_ID));
+        feed.setSeemTitle(getStringJsonField(feedJson, JSON_TAG_FEED_SEEM_TITLE));
+        feed.setAction(Feed.FeedAction.getEnum(getStringJsonField(feedJson, JSON_TAG_FEED_ACTION)));
+        feed.setUserId(getStringJsonField(feedJson, JSON_TAG_FEED_USER_ID));
+        feed.setUsername(getStringJsonField(feedJson, JSON_TAG_FEED_USERNAME));
+        return feed;
+
+    }
+
+    private static String getStringJsonField(JSONObject jsonObject, String property) throws JSONException {
+        if(jsonObject.has(property)){
+            return jsonObject.getString(property);
+        }
+        return null;
+
+    }
 
 
     private static List<Item> fillItems(JSONArray itemArray) throws JSONException, ParseException {
