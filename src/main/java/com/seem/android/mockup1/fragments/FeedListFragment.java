@@ -3,6 +3,7 @@ package com.seem.android.mockup1.fragments;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
@@ -34,8 +38,12 @@ import java.util.List;
  */
 public class FeedListFragment extends ListFragment {
 
-
+    private List<Feed> feedList = new ArrayList<Feed>();
     private FeedAdapter adapter;
+    private int page = 0;
+    private boolean waiting = false;
+    private boolean moreItems = true;
+    private MenuItem refreshItem;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,19 +62,40 @@ public class FeedListFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        new GetFeedTask().execute();
-        adapter = new FeedAdapter(new ArrayList<Feed>(),this.getActivity());
+        adapter = new FeedAdapter(feedList,this.getActivity());
         setListAdapter(adapter);
+
+        adapter.setFetchLastItemListener(new FeedAdapter.FetchLastItemListener() {
+            @Override
+            public void lastItemFetched() {
+                //fetchmore...
+                if(!waiting && moreItems) {
+                    waiting = true;
+                    new GetFeedTask(page).execute();
+                    page++;
+                }
+            }
+        });
 
 
         super.onActivityCreated(savedInstanceState);
+
+
+        new GetFeedTask(page).execute();
+
+        page++;
     }
 
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Do something when a list item is clicked
-        //Seem seem = adapter.getItem(position);
+        Feed feed = adapter.getItem(position);
+        if(feed.getAction() == Feed.FeedAction.CREATE_SEEM){
+            ActivityFactory.startItemActivity(FeedListFragment.this.getActivity(), feed.getSeemId(), feed.getItemId());
+        }else {
+            ActivityFactory.startThreadedActivity(FeedListFragment.this.getActivity(), feed.getItemId());
+        }
         //Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
         //ActivityFactory.startItemActivity(this.getActivity(), seem.getId(), seem.getItemId());
     }
@@ -78,8 +107,11 @@ public class FeedListFragment extends ListFragment {
         if(!MyApplication.isLoggedIn()){
             menuItem.setVisible(false);
         }
+        refreshItem = menu.findItem(R.id.action_refresh);
 
         super.onCreateOptionsMenu(menu,inflater);
+
+
     }
 
 
@@ -113,7 +145,7 @@ public class FeedListFragment extends ListFragment {
             case R.id.action_refresh:
                 //newGame();
                 Utils.debug(this.getClass(),"Refresh Seems!");
-                new GetFeedTask().execute();
+                new GetFeedTask(0).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -126,38 +158,66 @@ public class FeedListFragment extends ListFragment {
 
         if (requestCode == GlobalVars.RETURN_CODE_CREATE_SEEM && resultCode == Activity.RESULT_OK) {
             //Utils.debug(this.getClass(),"Seem created!");
-            new GetFeedTask().execute();
+            new GetFeedTask(0).execute();
         }
     }
 
 
 
+
     private class GetFeedTask extends AsyncTask<Void,Void,List<Feed>> {
         private final ProgressDialog dialog = new ProgressDialog(FeedListFragment.this.getActivity());
+        private int page = 0;
 
-        private GetFeedTask() {
-
+        private GetFeedTask(int page) {
+            this.page = page;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Downloading seems...");
+            dialog.setMessage("Loading...");
             dialog.show();
+            //Descomentar para hacer que rote el refresh...
+            /* Attach a rotating ImageView to the refresh item as an ActionView */
+            /*LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            ImageView iv = (ImageView) inflater.inflate(R.layout.component_refresh_action_view, null);
+
+            Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate);
+            rotation.setRepeatCount(Animation.INFINITE);
+            iv.startAnimation(rotation);
+
+            refreshItem.setActionView(iv);*/
         }
 
         @Override
         protected List<Feed> doInBackground(Void... voids) {
-            List<Feed> feed = Api.getFeeds(MyApplication.getToken(),0);
+            List<Feed> feed = Api.getFeeds(MyApplication.getToken(),page);
             return feed;
         }
 
         @Override
         protected void onPostExecute(List<Feed> result) {
             super.onPostExecute(result);
-            adapter.setItemList(result);
+            for(Feed feed:result){
+                if(!feedList.contains(feed)){
+                    feedList.add(feed);
+                }
+            }
+            if(result.size() == 0){
+                moreItems = false;
+            }
+            waiting= false;
             adapter.notifyDataSetChanged();
+
             dialog.dismiss();
+
+            /*
+            refreshItem.getActionView().clearAnimation();
+            refreshItem.setActionView(null);
+            */
+            //getListView().setSelection(0);
+
         }
     }
 }

@@ -37,7 +37,7 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
 
     private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
     private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
-    //private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
+    private NavDrawerItem drawerItemSeemList = new NavDrawerItem("Seem List", R.drawable.home);
     private NavDrawerItem drawerItemLogin = new NavDrawerItem("Login", R.drawable.sign_in);
     private NavDrawerItem drawerItemSignUp = new NavDrawerItem("Sign Up", R.drawable.plus_square);
     private NavDrawerItem drawerItemUserProfile = new NavDrawerItem("User Profile", R.drawable.user);
@@ -119,10 +119,14 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
     private void buildDrawerMenu(){
         navDrawerItems.clear();
 
-        navDrawerItems.add(drawerItemHome);
+
+
         if(MyApplication.isLoggedIn()) {
+            navDrawerItems.add(drawerItemHome);
+            navDrawerItems.add(drawerItemSeemList);
             navDrawerItems.add(drawerItemUserProfile);
         }else{
+            navDrawerItems.add(drawerItemSeemList);
             navDrawerItems.add(drawerItemLogin);
             navDrawerItems.add(drawerItemSignUp);
         }
@@ -171,6 +175,8 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         String menuTitle =navDrawerItem.getTitle();
         if(navDrawerItem == drawerItemHome){
             fragment = new FeedListFragment();
+        } else if(navDrawerItem == drawerItemSeemList){
+            fragment = new SeemListFragment();
         } else if(navDrawerItem == drawerItemLogin){
             fragment = LoginFragment.newInstance();
         } else if(navDrawerItem == drawerItemSignUp){

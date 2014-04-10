@@ -35,6 +35,8 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
     private Context context;
     private Map<View,List<AsyncTask>> processMap;
 
+    private FetchLastItemListener fetchLastItemListener;
+
     public FeedAdapter(List<Feed> itemList, Context ctx) {
         super(ctx, R.layout.component_seem_list, itemList);
         this.itemList = itemList;
@@ -49,8 +51,14 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
     }
 
     public Feed getItem(int position) {
-        if (itemList != null)
+        if(itemList != null){
+            if(position == itemList.size()-1 && this.fetchLastItemListener != null){
+                fetchLastItemListener.lastItemFetched();
+            }
+
             return itemList.get(position);
+        }
+
         return null;
     }
 
@@ -98,7 +106,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         long epoch = feed.getCreated().getTime();
         dateTextView.setText(DateUtils.getRelativeTimeSpanString(epoch,System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
 
-        Media media = feed.getItemMedia();
+        Media media = new Media(feed.getItemMediaId());
         mainImageView.setText(feed.getItemCaption());
         mainImageView.setLoading(true);
         mainImageView.getImageView().setImageDrawable(null);
@@ -108,6 +116,8 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
 
         //TODO specific stuff
         if(fa == Feed.FeedAction.CREATE_SEEM) {
+            TextView seemTitleTextView = (TextView) convertView.findViewById(R.id.seemTitleTextView);
+            seemTitleTextView.setText(feed.getSeemTitle());
 
         }else if(fa == Feed.FeedAction.FAVOURITE) {
 
@@ -115,7 +125,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
             TextView originalPostAuthor = (TextView) convertView.findViewById(R.id.originalPostAuthor);
             originalPostAuthor.setText("@"+feed.getReplyToUsername());
             SpinnerImageView originalPost = (SpinnerImageView) convertView.findViewById(R.id.originalPost);
-            Media originalPostMedia = feed.getReplyToMedia();
+            Media originalPostMedia =  new Media(feed.getReplyToMediaId());
             originalPost.setText(feed.getReplyToCaption());
             originalPost.setLoading(true);
             originalPost.getImageView().setImageDrawable(null);
@@ -178,6 +188,18 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
                 imageView.setLoading(false);
             }
         }
+    }
+
+    public FetchLastItemListener getFetchLastItemListener() {
+        return fetchLastItemListener;
+    }
+
+    public void setFetchLastItemListener(FetchLastItemListener fetchLastItemListener) {
+        this.fetchLastItemListener = fetchLastItemListener;
+    }
+
+    public interface FetchLastItemListener {
+        public void lastItemFetched();
     }
 
 }

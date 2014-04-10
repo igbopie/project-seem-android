@@ -38,6 +38,7 @@ public class Feed {
         }
     }
 
+    private String id;
     private Date created;
     private String itemId;
     private String itemMediaId;
@@ -53,8 +54,13 @@ public class Feed {
     private String userId;
     private String username;
 
-    private Media itemMedia;
-    private Media replyToMedia;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public Date getCreated() {
         return created;
@@ -168,18 +174,22 @@ public class Feed {
         this.username = username;
     }
 
-    public Media getItemMedia() {
-        if(itemMedia == null){
-            itemMedia = new Media();
-            itemMedia.setId(this.getItemMediaId());
-        }
-        return itemMedia;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Feed feed = (Feed) o;
+
+        if (!id.equals(feed.id)) return false;
+
+        return true;
     }
-    public Media getReplyToMedia() {
-        if(replyToMedia == null){
-            replyToMedia = new Media();
-            replyToMedia.setId(this.getReplyToMediaId());
-        }
-        return replyToMedia;
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

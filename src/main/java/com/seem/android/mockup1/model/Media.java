@@ -12,6 +12,9 @@ public class Media {
     private Drawable imageLarge;
     private Drawable imageThumb;
 
+    public Media(String id) {
+        this.id = id;
+    }
 
     public String getId() {
         return id;

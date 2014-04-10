@@ -113,6 +113,7 @@ public class Api {
 
 
     //FEED
+    public static final String JSON_TAG_FEED_ID = "_id";
     public static final String JSON_TAG_FEED_CREATED = "created";
     public static final String JSON_TAG_FEED_ITEM_ID = "itemId";
     public static final String JSON_TAG_FEED_ITEM_MEDIA_ID = "itemMediaId";
@@ -529,7 +530,7 @@ public class Api {
 
     private static Feed fillFeed(JSONObject feedJson) throws JSONException, ParseException {
         Feed feed = new Feed();
-
+        feed.setId(getStringJsonField(feedJson, JSON_TAG_FEED_ID));
         feed.setCreated(Iso8601.toCalendar(feedJson.getString(JSON_TAG_FEED_CREATED)).getTime());
         feed.setItemId(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_ID));
         feed.setItemMediaId(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_MEDIA_ID));

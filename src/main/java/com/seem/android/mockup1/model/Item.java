@@ -31,8 +31,7 @@ public class Item {
 
     public Media getMedia() {
         if(media == null){
-            media = new Media();
-            media.setId(this.getMediaId());
+            media = new Media(this.getMediaId());
         }
         return media;
     }
