@@ -13,6 +13,7 @@ import com.seem.android.mockup1.activities.ItemsFullScreenActivity;
 import com.seem.android.mockup1.activities.MainActivity;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.activities.ThreadedViewActivity;
+import com.seem.android.mockup1.activities.UserProfileActivity;
 import com.seem.android.mockup1.adapters.ThreadedAdapter;
 import com.seem.android.mockup1.model.Item;
 
@@ -22,7 +23,11 @@ import com.seem.android.mockup1.model.Item;
 public class ActivityFactory {
 
 
-
+    public static void startUserProfileActivity(Fragment context,String username) {
+        Intent intent = new Intent(context.getActivity(),UserProfileActivity.class);
+        intent.putExtra(GlobalVars.EXTRA_USERNAME, username);
+        context.startActivity(intent);
+    }
     public static void startReplyItemActivity(Fragment context,String itemId,GlobalVars.PhotoSource photoSource) {
         Intent intent = new Intent(context.getActivity(), ReplyFlowActivity.class);
         intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);

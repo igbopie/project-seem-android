@@ -26,7 +26,7 @@ public class MyApplication extends Application {
     }
     public static String getToken(){
         SharedPreferences prefs = MyApplication.getAppContext().getSharedPreferences(GlobalVars.SHARED_PREF, Context.MODE_PRIVATE);
-        return prefs.getString(GlobalVars.SHARED_PREF_TOKEN,"");
+        return prefs.getString(GlobalVars.SHARED_PREF_TOKEN,null);
     }
     public static String getUsername(){
         SharedPreferences prefs = MyApplication.getAppContext().getSharedPreferences(GlobalVars.SHARED_PREF, Context.MODE_PRIVATE);

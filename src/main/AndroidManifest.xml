@@ -48,6 +48,11 @@
             android:label="Thread View"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".activities.UserProfileActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_user_profile" >
+        </activity>
     </application>
 
 </manifest>

@@ -9,6 +9,7 @@ import com.seem.android.mockup1.exceptions.UsernameAlreadyExistsException;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Media;
 import com.seem.android.mockup1.model.Seem;
+import com.seem.android.mockup1.model.UserProfile;
 import com.seem.android.mockup1.util.Iso8601;
 import com.seem.android.mockup1.util.Utils;
 
@@ -50,16 +51,19 @@ public class Api {
 
     public static final String S3_ENPOINT="http://seem-dev-test.s3-website-us-west-2.amazonaws.com/";
     public static final String ENDPOINT = "https://seem-test.herokuapp.com/";
-    public static final String ENDPOINT_GET_SEEMS = "api/m1/seem";
-    public static final String ENDPOINT_GET_ITEM = "api/m1/seem/item/get";
-    public static final String ENDPOINT_GET_REPLY = "api/m1/seem/item/reply";
-    public static final String ENDPOINT_GET_REPLIES = "api/m1/seem/item/replies";
+    public static final String ENDPOINT_GET_SEEMS = "api/seem";
+    public static final String ENDPOINT_GET_ITEM = "api/seem/item/get";
+    public static final String ENDPOINT_GET_REPLY = "api/seem/item/reply";
+    public static final String ENDPOINT_GET_REPLIES = "api/seem/item/replies";
     public static final String ENDPOINT_GET_MEDIA_LARGE = "api/media/get/large/";
     public static final String ENDPOINT_GET_MEDIA_THUMB = "api/media/get/thumb/";
     public static final String ENDPOINT_CREATE_MEDIA = "api/media/create";
-    public static final String ENDPOINT_CREATE_SEEM = "api/m1/seem/create";
+    public static final String ENDPOINT_CREATE_SEEM = "api/seem/create";
     public static final String ENDPOINT_LOGIN = "api/user/login";
     public static final String ENDPOINT_CREATE = "api/user/create";
+    public static final String ENDPOINT_USER_PROFILE = "api/user/profile";
+    public static final String ENDPOINT_FOLLOW = "api/follow";
+    public static final String ENDPOINT_UNFOLLOW = "api/unfollow";
 
 
 
@@ -93,6 +97,18 @@ public class Api {
     public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
     public static final String JSON_TAG_ITEM_USERNAME = "username";
     public static final String JSON_TAG_ITEM_USER_ID = "userId";
+
+
+    //USERPROFILE
+
+    public static final String JSON_TAG_USER_PROFILE_ID = "_id";
+    public static final String JSON_TAG_USER_PROFILE_USERNAME = "username";
+    public static final String JSON_TAG_USER_PROFILE_FOLLOWERS = "followers";
+    public static final String JSON_TAG_USER_PROFILE_FOLLOWING= "following";
+    public static final String JSON_TAG_USER_PROFILE_MEDIA_ID= "mediaId";
+    public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWED_BY_ME= "isFollowedByMe";
+    public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME= "isFollowingMe";
+
 
     public static List<Seem> getSeems(){
         try {
@@ -148,6 +164,84 @@ public class Api {
 
                 Utils.debug(Api.class,"Images fetched");
                 return item;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return null;
+        }
+    }
+    public static boolean follow(String username,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("token",token);
+            params.put("username",username);
+            Utils.debug(Api.class,"Username:"+username);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FOLLOW,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false;
+        }
+    }
+
+    public static boolean unfollow(String username,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("token",token);
+            params.put("username",username);
+            Utils.debug(Api.class,"Username:"+username);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFOLLOW,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false ;
+        }
+    }
+
+    public static UserProfile getUserProfile(String username,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("username",username);
+            if(token != null){
+                params.put("token",token);
+            }
+            Utils.debug(Api.class,"Username:"+username);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_USER_PROFILE,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+
+                JSONObject jsonObj = new JSONObject(output);
+                JSONObject itemJson = jsonObj.getJSONObject(JSON_TAG_RESPONSE);
+                UserProfile userProfile = fillUserProfile(itemJson);
+                Utils.debug(Api.class,"Userprofile fetched: "+userProfile);
+                return userProfile;
 
             } else {
                 Utils.debug(Api.class,"API response code is: "+responseCode);
@@ -379,6 +473,23 @@ public class Api {
             itemList.add(fillItem(itemJSON));
         }
         return itemList;
+    }
+    private static UserProfile fillUserProfile(JSONObject itemJson) throws JSONException, ParseException {
+        UserProfile user = new UserProfile();
+        user.setId(itemJson.getString(JSON_TAG_USER_PROFILE_ID));
+        user.setUsername(itemJson.getString(JSON_TAG_USER_PROFILE_USERNAME));
+        user.setFollowers(itemJson.getInt(JSON_TAG_USER_PROFILE_FOLLOWERS));
+        user.setFollowing(itemJson.getInt(JSON_TAG_USER_PROFILE_FOLLOWING));
+        if(itemJson.has(JSON_TAG_USER_PROFILE_MEDIA_ID)) {
+            user.setId(itemJson.getString(JSON_TAG_USER_PROFILE_MEDIA_ID));
+        }
+        if(itemJson.has(JSON_TAG_USER_PROFILE_IS_FOLLOWED_BY_ME)){
+            user.setIsFollowedByMe(itemJson.getBoolean(JSON_TAG_USER_PROFILE_IS_FOLLOWED_BY_ME));
+        }
+        if(itemJson.has(JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME)){
+            user.setIsFollowingMe(itemJson.getBoolean(JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME));
+        }
+        return user;
     }
 
     private static Item fillItem(JSONObject itemJson) throws JSONException, ParseException {

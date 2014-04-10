@@ -129,7 +129,19 @@ public class ItemFullScreenFragment extends Fragment {
 
 
         userIconImageView.setVisibility(View.INVISIBLE);
+        userIconImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                userTextView.callOnClick();
+            }
+        });
         userTextView.setVisibility(View.INVISIBLE);
+        userTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityFactory.startUserProfileActivity(ItemFullScreenFragment.this,userTextView.getText().toString());
+            }
+        });
 
         nestedRepliesIndicatorText.setVisibility(View.INVISIBLE);
         nestedRepliesIndicator.setVisibility(View.INVISIBLE);

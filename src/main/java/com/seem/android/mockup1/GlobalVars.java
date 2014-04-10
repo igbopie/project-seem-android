@@ -22,6 +22,7 @@ public class GlobalVars {
     public static final String EXTRA_ITEM_ID = "replyId";
     public static final String EXTRA_DEPTH = "depth";
     public static final String EXTRA_PHOTO_SOURCE = "photoSource";
+    public static final String EXTRA_USERNAME= "username";
 
     public static final String EXTRA_CURRENT_ITEM_ID = "currentItemId";
     public static final String EXTRA_PARENT_ITEM_ID = "parentItemId";
