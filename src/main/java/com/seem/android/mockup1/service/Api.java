@@ -66,6 +66,8 @@ public class Api {
     public static final String ENDPOINT_FOLLOW = "api/follow";
     public static final String ENDPOINT_UNFOLLOW = "api/unfollow";
     public static final String ENDPOINT_FEED = "api/feed";
+    public static final String ENDPOINT_ADD_GCM_TOKEN = "api/user/addgcmtoken";
+
 
 
 
@@ -191,6 +193,27 @@ public class Api {
         } catch (Exception e) {
             Utils.debug(Api.class,"API error:",e);
             return null;
+        }
+    }
+
+    public static boolean addGcmToken(String gcmToken,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("gcmtoken",gcmToken);
+            params.put("token",token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_ADD_GCM_TOKEN,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false;
         }
     }
     public static boolean follow(String username,String token){

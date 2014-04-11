@@ -137,6 +137,12 @@ public class LoginFragment extends Fragment {
                 //TODO store in account manager
                 String token = Api.login(username,password);
                 Utils.debug(getClass(),"Auth:"+token);
+
+                if(token != null && MyApplication.getGcmToken()!= null && !MyApplication.getGcmToken().isEmpty()){
+                    if(Api.addGcmToken(MyApplication.getGcmToken(),token)) {
+                        Utils.debug(getClass(), "Token registered on the server: " + MyApplication.getGcmToken());
+                    }
+                }
                 return token;
 
             } catch (Exception e) {

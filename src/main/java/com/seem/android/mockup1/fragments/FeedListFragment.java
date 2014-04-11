@@ -199,18 +199,22 @@ public class FeedListFragment extends ListFragment {
         @Override
         protected void onPostExecute(List<Feed> result) {
             super.onPostExecute(result);
-            for(Feed feed:result){
-                if(!feedList.contains(feed)){
-                    feedList.add(feed);
-                }
-            }
-            if(result.size() == 0){
-                moreItems = false;
-            }
-            waiting= false;
-            adapter.notifyDataSetChanged();
 
             dialog.dismiss();
+            if(result != null) {
+                for (Feed feed : result) {
+                    if (!feedList.contains(feed)) {
+                        feedList.add(feed);
+                    }
+                }
+                if (result.size() == 0) {
+                    moreItems = false;
+                }
+                waiting = false;
+                adapter.notifyDataSetChanged();
+            }else{
+                Utils.dialog("Conection problems?","Try again",getActivity());
+            }
 
             /*
             refreshItem.getActionView().clearAnimation();

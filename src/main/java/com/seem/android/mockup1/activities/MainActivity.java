@@ -31,6 +31,7 @@ import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
 import com.seem.android.mockup1.fragments.SignUpFragment;
 import com.seem.android.mockup1.fragments.UserProfileFragment;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.uimodel.NavDrawerItem;
 import com.seem.android.mockup1.uimodel.NavDrawerListAdapter;
 import com.seem.android.mockup1.util.Utils;
@@ -351,6 +352,7 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         new AsyncTask<Void,Void,String>() {
             @Override
             protected String doInBackground(Void... params) {
+
                 String msg = "";
                 try {
                     if (gcm == null) {
@@ -358,21 +360,15 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
                     }
                     regid = gcm.register(GlobalVars.GCM_SENDER_ID);
                     msg = "Device registered, registration ID=" + regid;
-
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
-                    //sendRegistrationIdToBackend();
-                    Utils.debug(getClass(),"GCMTOKEN: "+regid);
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
-
-                    // Persist the regID - no need to register again.
                     MyApplication.storeGcmToken(regid);
-                } catch (IOException ex) {
+
+                    if (MyApplication.isLoggedIn()) {
+                         if(Api.addGcmToken(regid, MyApplication.getToken())) {
+                            Utils.debug(getClass(), "Token registered on the server: " + regid);
+                        }
+
+                    }
+                }catch(IOException ex){
                     msg = "Error :" + ex.getMessage();
                     // If there is an error, don't just keep trying to register.
                     // Require the user to click a button again, or perform

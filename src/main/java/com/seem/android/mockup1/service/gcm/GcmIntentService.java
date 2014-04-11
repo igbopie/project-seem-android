@@ -62,7 +62,7 @@ public class GcmIntentService extends IntentService {
                 }
                 Utils.debug(getClass(), "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
-                sendNotification("Received: " + extras.toString());
+                sendNotification(extras.getString("collapse_key"));
                 Utils.debug(getClass(), "Received: " + extras.toString());
             }
         }
@@ -83,7 +83,7 @@ public class GcmIntentService extends IntentService {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.seem_logo)
-                        .setContentTitle("GCM Notification")
+                        .setContentTitle("Seem")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);
