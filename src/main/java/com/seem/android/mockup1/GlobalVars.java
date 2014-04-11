@@ -38,6 +38,15 @@ public class GlobalVars {
     public static final String SHARED_PREF_PASSWORD = "password";
     public static final String SHARED_PREF_TOKEN = "token";
     public static final String SHARED_PREF_AUTHENTICATED = "authenticated";
+    public static final String SHARED_PREF_GCM_TOKEN = "gcmToken";
+    public static final String SHARED_PREF_LAST_APP_VERSION = "lastAppVersion";
+
+    /**
+     * Substitute you own sender ID here. This is the project number you got
+     * from the API Console, as described in "Getting Started."
+     * https://console.developers.google.com/project/apps~seem-test
+     */
+    public static final String GCM_SENDER_ID = "648403873330";
 
 
     public static final String APP_NAME = "SeemMockup1";

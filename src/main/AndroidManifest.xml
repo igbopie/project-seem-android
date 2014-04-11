@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:name="com.seem.android.mockup1.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.seem.android.mockup1.permission.C2D_MESSAGE" />
 
     <uses-sdk android:minSdkVersion="14" />
 
@@ -14,6 +20,20 @@
         android:icon="@drawable/seem_logo"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+
+        <receiver
+            android:name=".service.gcm.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.seem.android" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".service.gcm.GcmIntentService" />
+
+
         <activity
             android:name="com.seem.android.mockup1.activities.MainActivity"
             android:label="@string/app_name"

@@ -3,7 +3,12 @@ package com.seem.android.mockup1.activities;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -15,6 +20,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
@@ -27,6 +35,7 @@ import com.seem.android.mockup1.uimodel.NavDrawerItem;
 import com.seem.android.mockup1.uimodel.NavDrawerListAdapter;
 import com.seem.android.mockup1.util.Utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -34,7 +43,13 @@ import java.util.ArrayList;
  */
 public class MainActivity extends Activity implements LoginFragment.OnLoggedInInteractionListener,UserProfileFragment.UserProfileInteractionListener,SignUpFragment.SignUpInteractionListener {
 
+    //GCM
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private GoogleCloudMessaging gcm;
+    private String regid;
 
+
+    //
     private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
     private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
     private NavDrawerItem drawerItemSeemList = new NavDrawerItem("Seem List", R.drawable.home);
@@ -62,6 +77,11 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         BugSenseHandler.initAndStartSession(this, "71b1dd17");
 
         setContentView(R.layout.activity_main);
+
+
+        // If this check succeeds, proceed with normal processing.
+        // Otherwise, prompt user to get valid Play Services APK.
+
 
         findViewById(R.id.drawer_layout).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -112,7 +132,18 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
 
         if (savedInstanceState == null) {
             // on first time display view for first nav item
-            displayView(0,drawerItemHome);
+            displayView(0, drawerItemHome);
+        }
+        // Check device for Play Services APK.
+        if (checkPlayServices()) {
+            gcm = GoogleCloudMessaging.getInstance(this);
+            regid = getRegistrationId();
+
+            if (regid.isEmpty()) {
+                registerInBackground();
+            }
+        }else{
+            Utils.debug(getClass(),"No google apis");
         }
     }
 
@@ -238,7 +269,12 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         buildDrawerMenu();
         displayView(0,drawerItemHome);
     }
-
+    // You need to do the Play Services APK check here too.
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkPlayServices();
+    }
 
 
 
@@ -248,5 +284,103 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
                 // display view for selected nav drawer item
                 displayView(position,(NavDrawerItem) adapter.getItem(position));
         }
+    }
+
+    /**
+     * -------------------------------------------------------------------------------
+     *
+     * NOTIFICATION STUFF
+     *
+     */
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Utils.debug(getClass(),"Device not supported");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Gets the current registration ID for application on GCM service.
+     * <p>
+     * If result is empty, the app needs to register.
+     *
+     * @return registration ID, or empty string if there is no existing
+     *         registration ID.
+     */
+    private String getRegistrationId() {
+        String gcmToken = MyApplication.getGcmToken();
+        if (gcmToken.isEmpty()) {
+            Utils.debug(getClass(), "Registration not found.");
+            return "";
+        }
+        // Check if app was updated; if so, it must clear the registration ID
+        // since the existing regID is not guaranteed to work with the new
+        // app version.
+
+        if (MyApplication.getLastAppVersion() != MyApplication.getAppVersion()) {
+            Utils.debug(getClass(), "App version changed.");
+            return "";
+        }
+        return gcmToken;
+    }
+
+
+
+    /**
+     * Registers the application with GCM servers asynchronously.
+     * <p>
+     * Stores the registration ID and app versionCode in the application's
+     * shared preferences.
+     */
+    private void registerInBackground() {
+        new AsyncTask<Void,Void,String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+                    }
+                    regid = gcm.register(GlobalVars.GCM_SENDER_ID);
+                    msg = "Device registered, registration ID=" + regid;
+
+                    // You should send the registration ID to your server over HTTP,
+                    // so it can use GCM/HTTP or CCS to send messages to your app.
+                    // The request to your server should be authenticated if your app
+                    // is using accounts.
+                    //sendRegistrationIdToBackend();
+                    Utils.debug(getClass(),"GCMTOKEN: "+regid);
+
+                    // For this demo: we don't need to send it because the device
+                    // will send upstream messages to a server that echo back the
+                    // message using the 'from' address in the message.
+
+                    // Persist the regID - no need to register again.
+                    MyApplication.storeGcmToken(regid);
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+                    // If there is an error, don't just keep trying to register.
+                    // Require the user to click a button again, or perform
+                    // exponential back-off.
+                }
+                return msg;
+            }
+
+        }.execute();
     }
 }
