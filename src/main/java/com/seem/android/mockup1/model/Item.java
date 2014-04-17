@@ -27,19 +27,6 @@ public class Item {
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
 
-    private Media media;
-
-    public Media getMedia() {
-        if(media == null){
-            media = new Media(this.getMediaId());
-        }
-        return media;
-    }
-
-    public void setMedia(Media media) {
-        this.media = media;
-    }
-
     public String getId() {
         return id;
     }

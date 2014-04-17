@@ -50,9 +50,26 @@ public class Utils {
         Matrix matrix = new Matrix();
         matrix.postRotate(rotate);
         BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+        bmpFactoryOptions.inJustDecodeBounds = true;
         Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
+        int ratio = 0;
+        boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
+        if(width) {
+            ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 1000);
+        } else {
+            ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 1000);
+        }
+        bmpFactoryOptions.inSampleSize = ratio;
+        bmpFactoryOptions.inJustDecodeBounds = false;
+        bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
         Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
-        return new BitmapDrawable(MyApplication.getAppContext().getResources(),croppedBmp);
+        BitmapDrawable br =  new BitmapDrawable(MyApplication.getAppContext().getResources(),croppedBmp);
+        bitmap = null;
+        croppedBmp = null;
+        bmpFactoryOptions = null;
+        matrix = null;
+        System.gc();
+        return br;
     }
     public static Bitmap shrinkBitmap(String file){
         try {

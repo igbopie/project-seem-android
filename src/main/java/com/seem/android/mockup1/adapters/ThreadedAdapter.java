@@ -1,7 +1,6 @@
 package com.seem.android.mockup1.adapters;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 import com.seem.android.mockup1.R;
-import com.seem.android.mockup1.model.Seem;
 
 import com.seem.android.mockup1.model.Item;
 
@@ -59,13 +58,14 @@ public class ThreadedAdapter extends ArrayAdapter<Item> {
 
         Item c = itemList.get(position);
         ImageView imageView = (ImageView) v.findViewById(R.id.threadImageView);
-        imageView.setImageDrawable(c.getMedia().getImageThumb());
 
         TextView depthTextView = (TextView) v.findViewById(R.id.depthTextView);
         depthTextView.setText(c.getDepth()+"");
 
         TextView captionTextView = (TextView) v.findViewById(R.id.captionTextView);
         captionTextView.setText(c.getCaption());
+
+        new DownloadAsyncTask(c,imageView,true).execute();
 
         return v;
 

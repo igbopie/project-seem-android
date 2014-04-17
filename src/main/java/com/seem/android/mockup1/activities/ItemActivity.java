@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,6 +21,7 @@ import android.widget.RelativeLayout;
 
 import com.jess.ui.TwoWayAdapterView;
 import com.jess.ui.TwoWayGridView;
+import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
@@ -30,7 +30,6 @@ import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
 import com.seem.android.mockup1.service.ItemService;
-import com.seem.android.mockup1.service.MediaService;
 import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
@@ -132,7 +131,9 @@ public class ItemActivity extends Activity {
             image.setLoading(false);
         }
 
-        image.getImageView().setImageDrawable(item.getMedia().getImageThumb());
+
+        new DownloadAsyncTask(item,image.getImageView(),true).execute();
+
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -288,7 +289,6 @@ public class ItemActivity extends Activity {
         @Override
         protected Item doInBackground(String... id) {
             item = ItemService.getInstance().findItemById(id[0],refresh);
-            MediaService.getInstance().getThumb(item.getMedia());
             Utils.debug(this.getClass(),"This is the item:" + item);
             return item;
         }
@@ -297,6 +297,8 @@ public class ItemActivity extends Activity {
         protected void onPostExecute(Item result) {
             super.onPostExecute(result);
             paintReply();
+
+
         }
     }
 
@@ -334,7 +336,6 @@ public class ItemActivity extends Activity {
 
     class ZoomUtil {
         View thumbView;
-        Drawable imageResId;
         ImageView expandedImageView;
         Rect startBounds = new Rect();
         Rect finalBounds = new Rect();
@@ -345,7 +346,6 @@ public class ItemActivity extends Activity {
 
         ZoomUtil(Item item,View thumbView) {
             this.thumbView = thumbView;
-            this.imageResId = item.getMedia().getImageThumb();
             this.item = item;
         }
 
@@ -399,7 +399,7 @@ public class ItemActivity extends Activity {
             // Load the high-resolution "zoomed-in" image.
             expandedImageView = (ImageView) findViewById(
                     R.id.expandedImage);
-            expandedImageView.setImageDrawable(imageResId);
+            expandedImageView.setImageBitmap(thumbView.getDrawingCache());
 
             // Calculate the starting and ending bounds for the zoomed-in image.
             // This step involves lots of math. Yay, math.

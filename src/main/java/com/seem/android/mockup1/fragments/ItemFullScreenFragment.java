@@ -1,7 +1,6 @@
 package com.seem.android.mockup1.fragments;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,16 +16,15 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.ItemService;
-import com.seem.android.mockup1.service.MediaService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
-import java.io.IOException;
 import java.util.TimerTask;
 
 /**
@@ -212,7 +210,6 @@ public class ItemFullScreenFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             item = ItemService.getInstance().findItemById(getItemId());
-            MediaService.getInstance().getThumb(item.getMedia());
             return null;
         }
 
@@ -243,36 +240,29 @@ public class ItemFullScreenFragment extends Fragment {
             }
             if (item != null)
             {
-                image.setImageDrawable(item.getMedia().getImageThumb());
+                new DownloadAsyncTask(item,image,true).execute();
             }
             if (item != null)
             {
                 captionTextView.setText(item.getCaption());
             }
-            new DownloadLargeImage().execute();
+
+            new DownloadAsyncTask(item,image,false){
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+                @Override
+                protected void onPostExecute(Void result) {
+                    super.onPostExecute(result);
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+            }.execute();
         }
     }
 
-    private class DownloadLargeImage extends AsyncTask<Void,Void,Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            MediaService.getInstance().getLarge(item.getMedia());
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            image.setImageDrawable(item.getMedia().getImageLarge());
-            progressBar.setVisibility(View.INVISIBLE);
-        }
-    }
 
     class HideActionBar extends TimerTask {
         public void run() {
@@ -291,6 +281,8 @@ public class ItemFullScreenFragment extends Fragment {
 
         }
     }
+
+
 
 
 }

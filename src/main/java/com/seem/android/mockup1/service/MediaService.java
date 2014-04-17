@@ -40,6 +40,7 @@ public class MediaService {
     }
 
     public void getThumb(Media media){
+
         //check in the internal filesystem
         File file = new File(context.getCacheDir(), media.getId()+"_thumb.jpg");
         if(!file.exists()){
@@ -64,6 +65,7 @@ public class MediaService {
     }
 
     public void getLarge(Media media){
+
         //check in the internal filesystem
         File file = new File(context.getCacheDir(), media.getId()+"_large.jpg");
         if(!file.exists()){
@@ -86,6 +88,7 @@ public class MediaService {
         }catch(IOException ex){
             Utils.debug(this.getClass(),ex.getMessage());
         }
+
 
     }
 

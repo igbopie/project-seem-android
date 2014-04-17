@@ -8,21 +8,15 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.seem.android.mockup1.GlobalVars;
-import com.seem.android.mockup1.adapters.SeemAdapter;
 import com.seem.android.mockup1.adapters.ThreadedAdapter;
-import com.seem.android.mockup1.model.Seem;
 
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.ItemService;
-import com.seem.android.mockup1.service.MediaService;
-import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Created by igbopie on 28/03/14.
@@ -69,12 +63,11 @@ public class ThreadedViewActivity extends ListActivity {
 
             List<Item> stack = new ArrayList<Item>();
             Item next = ItemService.getInstance().findItemById(bottomItemId);
-            MediaService.getInstance().getThumb(next.getMedia());
+
             stack.add(0, next);
 
             while(next.getReplyTo() != null){
                 next = ItemService.getInstance().findItemById(next.getReplyTo());
-                MediaService.getInstance().getThumb(next.getMedia());
                 stack.add(0, next);
             }
 

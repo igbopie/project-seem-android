@@ -12,6 +12,7 @@ import com.seem.android.mockup1.executor.MyAsyncTask;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.model.Media;
 import com.seem.android.mockup1.service.MediaService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.ItemSelectedListener;
@@ -122,16 +123,18 @@ public class ThumbnailAdapter extends BaseAdapter {
     private class FetchThumbs extends MyAsyncTask {
         private SpinnerImageView imageView;
         private Item item;
+        private Media media;
 
         public FetchThumbs(SpinnerImageView imageView,Item item){
             this.imageView = imageView;
             this.item = item;
+            this.media = new Media(item.getMediaId());
 
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            MediaService.getInstance().getThumb(item.getMedia());
+            MediaService.getInstance().getThumb(this.media);
             return null;
         }
 
@@ -141,7 +144,7 @@ public class ThumbnailAdapter extends BaseAdapter {
             if(this.isCancelled()){
                 //well... do not paint...
             }else if(item != null) {
-                imageView.getImageView().setImageDrawable(item.getMedia().getImageThumb());
+                imageView.getImageView().setImageDrawable(this.media.getImageThumb());
                 imageView.setRepliesNumber(item.getReplyCount());
                 if(item.getReplyCount() > 0) {
                     imageView.setViewRepliesOnClick(new View.OnClickListener() {

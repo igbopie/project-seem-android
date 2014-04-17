@@ -187,6 +187,8 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
                 imageView.getImageView().setVisibility(View.VISIBLE);
                 imageView.setLoading(false);
             }
+            imageView = null;
+            media = null;
         }
     }
 
