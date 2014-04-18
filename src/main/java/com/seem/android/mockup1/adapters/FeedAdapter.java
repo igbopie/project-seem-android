@@ -103,8 +103,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         SpinnerImageView mainImageView = (SpinnerImageView) convertView.findViewById(R.id.mainImageView);
 
         agentTextView.setText("@"+feed.getUsername());
-        long epoch = feed.getCreated().getTime();
-        dateTextView.setText(DateUtils.getRelativeTimeSpanString(epoch,System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+        dateTextView.setText(Utils.getRelativeTime(feed.getCreated()));
 
         Media media = new Media(feed.getItemMediaId());
         mainImageView.setText(feed.getItemCaption());

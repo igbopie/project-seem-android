@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.seem.android.mockup1.GlobalVars;
@@ -22,6 +23,7 @@ import com.seem.android.mockup1.MyApplication;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by igbopie on 13/03/14.
@@ -205,5 +207,9 @@ public class Utils {
         alertDialog.show();
     }
 
+    public static CharSequence getRelativeTime(Date date) {
+        long epoch = date.getTime();
+        return DateUtils.getRelativeTimeSpanString(epoch, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+    }
 
 }

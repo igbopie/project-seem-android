@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -25,6 +27,7 @@ import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
+import java.util.Timer;
 import java.util.TimerTask;
 
 /**
@@ -44,7 +47,17 @@ public class ItemFullScreenFragment extends Fragment {
         return f;
     }
 
-    //Timer myTimer = new Timer();
+    //Bars
+    View topBar;
+    View userBar;
+    View captionBar;
+    boolean showingBars = true;
+    Timer myTimer = new Timer();
+    final int HIDE_TIMEOUT = 3000;
+
+
+
+    //
     ImageView image;
     ProgressBar progressBar;
     TextView captionTextView;
@@ -58,11 +71,11 @@ public class ItemFullScreenFragment extends Fragment {
     TextView userTextView;
     TextView closeText;
     ImageView closeIcon;
+    TextView datePostedTextView;
 
     GetItem getItemTask;
     DownloadAsyncTask downloadAsyncTask;
 
-    //final int HIDE_TIMEOUT = 3000;
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
     @Override
@@ -82,17 +95,17 @@ public class ItemFullScreenFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         getView().setSystemUiVisibility(mSystemUiVisibility);
 
-        /*getView().setOnClickListener(new View.OnClickListener() {
+        getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!getActivity().getActionBar().isShowing()){
-                    getActivity().getActionBar().show();
+                if (!showingBars){
+                    showBars();
                     myTimer.cancel();
                     myTimer = new Timer();
                     myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
                 }
             }
-        });*/
+        });
 
         Utils.debug(this.getClass(),"OnActivityCreated");
         if (getActivity() != null &&
@@ -111,6 +124,12 @@ public class ItemFullScreenFragment extends Fragment {
         depthNumber = (TextView) getView().findViewById(R.id.depthNumber);
         userIconImageView = (ImageView) getView().findViewById(R.id.userIconImageView);
         userTextView = (TextView) getView().findViewById(R.id.userTextView);
+        datePostedTextView = (TextView) getView().findViewById(R.id.datePostedTextView);
+
+
+        topBar = getView().findViewById(R.id.topBar);
+        captionBar = getView().findViewById(R.id.captionBar);
+        userBar = getView().findViewById(R.id.userBar);
 
         closeText =(TextView) getView().findViewById(R.id.closeText);
         closeIcon =(ImageView) getView().findViewById(R.id.closeImageView);
@@ -185,7 +204,7 @@ public class ItemFullScreenFragment extends Fragment {
             replyButton.setVisibility(View.INVISIBLE);
         }
 
-        //myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
+        myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
         getItemTask = new GetItem();
         getItemTask.execute();
         super.onActivityCreated(savedInstanceState);
@@ -264,6 +283,7 @@ public class ItemFullScreenFragment extends Fragment {
                 captionTextView.setText(item.getCaption());
             }
 
+            datePostedTextView.setText(Utils.getRelativeTime(item.getCreated()));
             getItemTask = null;
             downloadAsyncTask  = new DownloadAsyncTask(item,image,false){
                 @Override
@@ -282,7 +302,30 @@ public class ItemFullScreenFragment extends Fragment {
         }
     }
 
+    private void hideBars(){
+        if(showingBars) {
+            showingBars = false;
 
+            Animation fadeoutAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.abc_fade_out);
+
+            topBar.setVisibility(View.INVISIBLE);
+            userBar.setVisibility(View.INVISIBLE);
+            captionBar.setVisibility(View.INVISIBLE);
+
+            topBar.startAnimation(fadeoutAnim);
+            userBar.startAnimation(fadeoutAnim);
+            captionBar.startAnimation(fadeoutAnim);
+
+        }
+
+    }
+
+    private void showBars(){
+        showingBars = true;
+        topBar.setVisibility(View.VISIBLE);
+        userBar.setVisibility(View.VISIBLE);
+        captionBar.setVisibility(View.VISIBLE);
+    }
 
     class HideActionBar extends TimerTask {
         public void run() {
@@ -290,11 +333,8 @@ public class ItemFullScreenFragment extends Fragment {
 
                 public void run() {
 
-                    if (getActivity() != null &&
-                        getActivity().getActionBar() != null  &&
-                        getActivity().getActionBar().isShowing()){
-
-                        getActivity().getActionBar().hide();
+                    if (getActivity() != null){
+                        hideBars();
                     }
                 }
             });
