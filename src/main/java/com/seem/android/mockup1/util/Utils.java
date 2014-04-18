@@ -29,6 +29,7 @@ import java.util.Calendar;
 public class Utils {
 
     public static Drawable fromFile(String file) throws IOException {
+        System.gc();
         ExifInterface exif  = new ExifInterface(file);;
         int rotate = 0;
 
@@ -68,10 +69,10 @@ public class Utils {
         croppedBmp = null;
         bmpFactoryOptions = null;
         matrix = null;
-        System.gc();
         return br;
     }
     public static Bitmap shrinkBitmap(String file){
+        System.gc();
         try {
             ExifInterface exif  = new ExifInterface(file);;
             int rotate = 0;

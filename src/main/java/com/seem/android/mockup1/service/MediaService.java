@@ -22,7 +22,7 @@ import java.util.Comparator;
 public class MediaService {
 
 
-    private static final long MAX_SIZE = 5242880L; // 5MB
+    private static final long MAX_SIZE = 10L * 1024L * 1024L; // 5MB
 
     private static MediaService singleton = null;
 

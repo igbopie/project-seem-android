@@ -59,6 +59,9 @@ public class ItemFullScreenFragment extends Fragment {
     TextView closeText;
     ImageView closeIcon;
 
+    GetItem getItemTask;
+    DownloadAsyncTask downloadAsyncTask;
+
     //final int HIDE_TIMEOUT = 3000;
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
@@ -183,7 +186,8 @@ public class ItemFullScreenFragment extends Fragment {
         }
 
         //myTimer.schedule(new HideActionBar(), HIDE_TIMEOUT);
-        new GetItem().execute();
+        getItemTask = new GetItem();
+        getItemTask.execute();
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -205,6 +209,19 @@ public class ItemFullScreenFragment extends Fragment {
             Utils.debug(this.getClass(),"ItemFullScreen - Pic taken");
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Utils.debug(getClass(),"OnDestroy");
+        if(getItemTask != null){
+            getItemTask.cancel(true);
+        }
+        if(downloadAsyncTask != null) {
+            downloadAsyncTask.cancel(true);
+        }
+    }
+
     private class GetItem extends AsyncTask<Void,Void,Void> {
 
         @Override
@@ -247,7 +264,8 @@ public class ItemFullScreenFragment extends Fragment {
                 captionTextView.setText(item.getCaption());
             }
 
-            new DownloadAsyncTask(item,image,false){
+            getItemTask = null;
+            downloadAsyncTask  = new DownloadAsyncTask(item,image,false){
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
@@ -257,8 +275,10 @@ public class ItemFullScreenFragment extends Fragment {
                 protected void onPostExecute(Void result) {
                     super.onPostExecute(result);
                     progressBar.setVisibility(View.INVISIBLE);
+                    downloadAsyncTask = null;
                 }
-            }.execute();
+            };
+            downloadAsyncTask.execute();
         }
     }
 

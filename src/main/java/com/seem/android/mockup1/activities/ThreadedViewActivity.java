@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.seem.android.mockup1.GlobalVars;
+import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.ThreadedAdapter;
 
 import com.seem.android.mockup1.model.Item;
@@ -29,10 +30,12 @@ public class ThreadedViewActivity extends ListActivity {
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        setContentView(R.layout.activity_thread_list);
         adapter = new ThreadedAdapter(new ArrayList<Item>(),this);
         setListAdapter(adapter);
         bottomItemId = this.getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
         new GetThreadsView(false).execute();
+
     }
 
     @Override
