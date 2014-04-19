@@ -288,7 +288,7 @@ public class ItemActivity extends Activity {
 
         @Override
         protected Item doInBackground(String... id) {
-            item = ItemService.getInstance().findItemById(id[0],refresh);
+            item = ItemService.getInstance().findItemById(id[0],refresh,false);
             Utils.debug(this.getClass(),"This is the item:" + item);
             return item;
         }

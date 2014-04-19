@@ -67,7 +67,8 @@ public class Api {
     public static final String ENDPOINT_UNFOLLOW = "api/unfollow";
     public static final String ENDPOINT_FEED = "api/feed";
     public static final String ENDPOINT_ADD_GCM_TOKEN = "api/user/addgcmtoken";
-
+    public static final String ENDPOINT_FAVOURITE = "api/seem/item/favourite";
+    public static final String ENDPOINT_UNFAVOURITE = "api/seem/item/unfavourite";
 
 
 
@@ -101,6 +102,8 @@ public class Api {
     public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
     public static final String JSON_TAG_ITEM_USERNAME = "username";
     public static final String JSON_TAG_ITEM_USER_ID = "userId";
+    public static final String JSON_TAG_ITEM_FAVOURITE_COUNT = "favouriteCount";
+    public static final String JSON_TAG_ITEM_FAVOURITED = "favourited";
 
 
     //USERPROFILE
@@ -157,10 +160,16 @@ public class Api {
         }
     }
 
-    public static Item getItem(String id){
+    public static Item getItem(String id) {
+        return getItem(id,null);
+    }
+    public static Item getItem(String id,String token){
         try {
             HashMap<String,String>params = new HashMap<String, String>();
             params.put("itemId",id);
+            if(token != null){
+                params.put("token",token);
+            }
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_ITEM,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
@@ -245,6 +254,48 @@ public class Api {
             params.put("username",username);
             Utils.debug(Api.class,"Username:"+username);
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFOLLOW,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false ;
+        }
+    }
+
+    public static boolean favourite(String itemId,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            params.put("token", token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FAVOURITE,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false ;
+        }
+    }
+
+    public static boolean unfavourite(String itemId,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            params.put("token",token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFAVOURITE,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
                 Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
@@ -622,6 +673,14 @@ public class Api {
         if(itemJson.has(JSON_TAG_ITEM_USER_ID)) {
             item.setUserId(itemJson.getString(JSON_TAG_ITEM_USER_ID));
             item.setUsername(itemJson.getString(JSON_TAG_ITEM_USERNAME));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_FAVOURITE_COUNT)) {
+            item.setFavouriteCount(itemJson.getInt(JSON_TAG_ITEM_FAVOURITE_COUNT));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_FAVOURITED)) {
+            item.setFavourited(itemJson.getBoolean(JSON_TAG_ITEM_FAVOURITED));
         }
         return item;
     }

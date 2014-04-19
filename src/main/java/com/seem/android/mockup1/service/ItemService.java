@@ -50,7 +50,10 @@ public class ItemService {
             MySQLiteHelper.COLUMN_ITEMS_CREATED,
             MySQLiteHelper.COLUMN_ITEMS_MEDIA_ID,
             MySQLiteHelper.COLUMN_ITEMS_USER_ID,
-            MySQLiteHelper.COLUMN_ITEMS_USERNAME};
+            MySQLiteHelper.COLUMN_ITEMS_USERNAME,
+            MySQLiteHelper.COLUMN_ITEMS_FAVOURITE_COUNT,
+            MySQLiteHelper.COLUMN_ITEMS_FAVOURITED
+    };
 
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
@@ -74,13 +77,17 @@ public class ItemService {
         item.setMediaId(cursor.getString(7));
         item.setUserId(cursor.getString(8));
         item.setUsername(cursor.getString(9));
+        item.setFavouriteCount(cursor.getInt(10));
+
+        item.setFavourited(cursor.getInt(10) == 1);
+
         return item;
     }
 
     public Item findItemById(String id) {
-        return findItemById(id,false);
+        return findItemById(id,false,false);
     }
-    public Item findItemById(String id,boolean refresh){
+    public Item findItemById(String id,boolean refresh,boolean useToken){
         Item item = null;
         if(!refresh){
             open();
@@ -96,7 +103,11 @@ public class ItemService {
 
         if(item == null || refresh){
             Utils.debug(this.getClass(),"Cache miss item: "+id);
-            item = Api.getItem(id);
+            if(useToken && MyApplication.isLoggedIn()){
+                item = Api.getItem(id,MyApplication.getToken());
+            }else {
+                item = Api.getItem(id);
+            }
             if(item == null){
                 return null;
             }
@@ -115,7 +126,7 @@ public class ItemService {
     }
     public List<Item> findItemReplies(String parentItemId, int page,boolean refresh){
 
-        Item parentItem = findItemById(parentItemId,refresh);
+        Item parentItem = findItemById(parentItemId,refresh,false);
         if(parentItem == null){
             Utils.debug(this.getClass(),"Parent not found");
             return null;
@@ -228,6 +239,10 @@ public class ItemService {
         values.put(MySQLiteHelper.COLUMN_ITEMS_SEEM_ID, item.getSeemId());
         values.put(MySQLiteHelper.COLUMN_ITEMS_USER_ID, item.getUserId());
         values.put(MySQLiteHelper.COLUMN_ITEMS_USERNAME, item.getUsername());
+        values.put(MySQLiteHelper.COLUMN_ITEMS_FAVOURITE_COUNT, item.getFavouriteCount());
+        if(item.isFavourited() != null){
+            values.put(MySQLiteHelper.COLUMN_ITEMS_FAVOURITED, item.isFavourited()?1:0);
+        }
         database.replace(MySQLiteHelper.TABLE_ITEMS, null, values);
 
     }

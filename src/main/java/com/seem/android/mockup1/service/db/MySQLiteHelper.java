@@ -24,6 +24,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ITEMS_REPLY_COUNT = "replyCount";
     public static final String COLUMN_ITEMS_USER_ID = "userId";
     public static final String COLUMN_ITEMS_USERNAME = "username";
+    public static final String COLUMN_ITEMS_FAVOURITE_COUNT = "favouriteCount";
+    public static final String COLUMN_ITEMS_FAVOURITED = "favourited";
 
 
     public static final String TABLE_SEEMS = "seems";
@@ -36,7 +38,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME = "seem.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 7;
 
     // Database creation sql statement
     private static final String CREATE_ITEMS_TABLE = "CREATE TABLE "
@@ -50,7 +52,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_ITEMS_USER_ID + " TEXT null, "
             + COLUMN_ITEMS_USERNAME + " TEXT null, "
             + COLUMN_ITEMS_DEPTH + " INTEGER null, "
-            + COLUMN_ITEMS_REPLY_COUNT + " INTEGER null);";
+            + COLUMN_ITEMS_REPLY_COUNT + " INTEGER null, "
+            + COLUMN_ITEMS_FAVOURITE_COUNT + " INTEGER null, "
+            + COLUMN_ITEMS_FAVOURITED + " INTEGER null);";
 
     // Database creation sql statement
     private static final String CREATE_SEEMS_TABLE = "CREATE TABLE "

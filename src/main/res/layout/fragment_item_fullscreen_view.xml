@@ -61,20 +61,20 @@
                 android:layout_width="@dimen/fullscreen_topbar_icon"
                 android:layout_height="fill_parent"
                 android:src="@drawable/star_o"
-                android:id="@+id/favIconView"
+                android:id="@+id/favActionImageView"
                 android:layout_marginRight="10dp"/>
 
             <ImageView
                 android:layout_width="@dimen/fullscreen_topbar_icon"
                 android:layout_height="fill_parent"
-                android:src="@drawable/thumbs_up"
+                android:src="@drawable/thumbs_o_up"
                 android:id="@+id/thumbUpIconView"
                 android:layout_marginRight="10dp"/>
 
             <ImageView
                 android:layout_width="@dimen/fullscreen_topbar_icon"
                 android:layout_height="fill_parent"
-                android:src="@drawable/thumbs_down"
+                android:src="@drawable/thumbs_o_down"
                 android:id="@+id/thumbDownIconView"
                 android:layout_marginRight="10dp"/>
 

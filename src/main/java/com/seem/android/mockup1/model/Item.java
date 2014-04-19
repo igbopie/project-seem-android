@@ -19,10 +19,12 @@ public class Item {
     private Date created;
     private String replyTo;
     private String seemId;
-    private int depth;
-    private int replyCount;
+    private int depth = 0;
+    private int replyCount = 0;
     private String username;
     private String userId;
+    private int favouriteCount = 0;
+    private Boolean favourited;
 
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
@@ -108,6 +110,22 @@ public class Item {
         this.userId = userId;
     }
 
+    public int getFavouriteCount() {
+        return favouriteCount;
+    }
+
+    public void setFavouriteCount(int favouriteCount) {
+        this.favouriteCount = favouriteCount;
+    }
+
+    public Boolean isFavourited() {
+        return favourited;
+    }
+
+    public void setFavourited(Boolean favourited) {
+        this.favourited = favourited;
+    }
+
     public Uri getTempLocalFile() {
         return tempLocalFile;
     }
@@ -115,6 +133,7 @@ public class Item {
     public void setTempLocalFile(Uri tempLocalFile) {
         this.tempLocalFile = tempLocalFile;
     }
+
 
 
     public Bitmap getTempLocalBitmap() {
@@ -139,11 +158,18 @@ public class Item {
     @Override
     public String toString() {
         return "Item{" +
-                "created=" + created +
-                ", mediaId='" + mediaId + '\'' +
-                ", caption='" + caption + '\'' +
+                "favourited=" + favourited +
                 ", id='" + id + '\'' +
+                ", caption='" + caption + '\'' +
+                ", mediaId='" + mediaId + '\'' +
+                ", created=" + created +
+                ", replyTo='" + replyTo + '\'' +
+                ", seemId='" + seemId + '\'' +
+                ", depth=" + depth +
                 ", replyCount=" + replyCount +
+                ", username='" + username + '\'' +
+                ", userId='" + userId + '\'' +
+                ", favouriteCount=" + favouriteCount +
                 '}';
     }
 }

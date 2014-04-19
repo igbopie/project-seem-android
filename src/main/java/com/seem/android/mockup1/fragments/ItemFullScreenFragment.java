@@ -1,6 +1,7 @@
 package com.seem.android.mockup1.fragments;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.customviews.IconTextView;
 import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
@@ -68,6 +70,8 @@ public class ItemFullScreenFragment extends Fragment {
     ImageView replyButton;
     Item item;
 
+
+    IconTextView favouritesIconTextView;
     IconTextView replyIconTextView;
     IconTextView depthIconTextView;
 
@@ -77,6 +81,9 @@ public class ItemFullScreenFragment extends Fragment {
 
     GetItem getItemTask;
     DownloadAsyncTask downloadAsyncTask;
+
+    //Actions
+    ImageView favActionImageView;
 
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
@@ -120,17 +127,31 @@ public class ItemFullScreenFragment extends Fragment {
         image = (ImageView) getView().findViewById(R.id.imageView);
         progressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
         captionTextView = (TextView) getView().findViewById(R.id.captionTextView);
-        replyIconTextView = (IconTextView) getView().findViewById(R.id.replyIconTextView);
 
+        favouritesIconTextView = (IconTextView) getView().findViewById(R.id.favouritesIconTextView);
+        replyIconTextView = (IconTextView) getView().findViewById(R.id.replyIconTextView);
         depthIconTextView = (IconTextView) getView().findViewById(R.id.depthIconTextView);
         userIconTextView = (IconTextView) getView().findViewById(R.id.userIconTextView);
         datePostedTextView = (TextView) getView().findViewById(R.id.datePostedTextView);
         closeIconTextView =(IconTextView) getView().findViewById(R.id.closeIconTextView);
 
+        favActionImageView = (ImageView) getView().findViewById(R.id.favActionImageView);
+
 
         topBar = getView().findViewById(R.id.topBar);
         captionBar = getView().findViewById(R.id.captionBar);
         userBar = getView().findViewById(R.id.userBar);
+
+        favActionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(item.isFavourited() != null && item.isFavourited()) {
+                    new UnfavouriteTask().execute();
+                }else{
+                    new FavouriteTask().execute();
+                }
+            }
+        });
 
 
         closeIconTextView.setOnClickListener(new View.OnClickListener() {
@@ -226,7 +247,8 @@ public class ItemFullScreenFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            item = ItemService.getInstance().findItemById(getItemId());
+            //For now lets ask for the real thing
+            item = ItemService.getInstance().findItemById(getItemId(),true,true);
             return null;
         }
 
@@ -234,7 +256,10 @@ public class ItemFullScreenFragment extends Fragment {
         protected void onPostExecute(Void result) {
             if (item != null)
             {
+                favouritesIconTextView.setText(item.getFavouriteCount() + "");
+
                 replyIconTextView.setText(item.getReplyCount() + "");
+
                 depthIconTextView.setText(item.getDepth()+"");
                 if(item.getDepth() > 0){
                     depthIconTextView.setOnClickListener(new View.OnClickListener() {
@@ -254,6 +279,13 @@ public class ItemFullScreenFragment extends Fragment {
                 datePostedTextView.setText(Utils.getRelativeTime(item.getCreated()));
 
                 progressBar.setVisibility(View.VISIBLE);
+
+                if(item.isFavourited() != null && item.isFavourited()){
+                    favActionImageView.setImageResource(R.drawable.star);
+                } else {
+                    favActionImageView.setImageResource(R.drawable.star_o);
+                }
+
                 //First Thumb
                 downloadAsyncTask = new DownloadAsyncTask(item,image,true){
                     @Override
@@ -317,6 +349,83 @@ public class ItemFullScreenFragment extends Fragment {
             });
 
         }
+    }
+
+    class FavouriteTask extends AsyncTask<Void,Void,Boolean>{
+
+
+        private final ProgressDialog dialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+            dialog.dismiss();
+            if(!success){
+                Utils.dialog("Error","Action could not be completed, check connection and try again later.",getActivity());
+            }else{
+                getItemTask = new GetItem(){
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+                        dialog.dismiss();
+                    }
+                };
+                getItemTask.execute();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Loading...");
+            dialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return Api.favourite(item.getId(),MyApplication.getToken());
+        }
+
+
+    }
+
+    class UnfavouriteTask extends AsyncTask<Void,Void,Boolean>{
+
+
+        private final ProgressDialog dialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+
+            if(!success){
+                dialog.dismiss();
+                Utils.dialog("Error","Action could not be completed, check connection and try again later.",getActivity());
+            }else{
+                getItemTask = new GetItem(){
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+                        dialog.dismiss();
+                    }
+                };
+                getItemTask.execute();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Loading...");
+            dialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return Api.unfavourite(item.getId(),MyApplication.getToken());
+        }
+
+
     }
 
 
