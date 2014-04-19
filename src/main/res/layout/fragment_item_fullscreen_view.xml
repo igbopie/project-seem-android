@@ -3,7 +3,8 @@
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#000">
+    android:background="#000"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <ImageView
@@ -31,97 +32,73 @@
         android:id="@+id/topBar"
     >
 
-        <ImageView
+
+        <com.seem.android.mockup1.customviews.IconTextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="Close"
             android:src="@drawable/timescircleobig"
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/closeImageView"
+            android:id="@+id/closeIconTextView"
             android:layout_centerVertical="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginLeft="10dp"/>
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:id="@+id/closeText"
-            android:text="Close"
-            android:gravity="center"
-            android:textAlignment="center"
-            android:textSize="13sp"
-            android:textColor="#fff"
-            android:textIsSelectable="false"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/closeImageView" />
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="fill_parent"
-            android:id="@+id/depthIconView"
-            android:src="@drawable/folderopenbig"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/closeText"
-            android:layout_marginLeft="10dp"
             />
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:id="@+id/depthNumber"
-            android:text="0"
-            android:gravity="center"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:textColor="#fff"
-            android:textIsSelectable="false"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/depthIconView" />
+            android:orientation="horizontal"
 
-
-
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="fill_parent"
-            android:id="@+id/repliesIndicator"
-            android:src="@drawable/folderbig"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/cameraButton"
-
-            android:layout_marginRight="10dp"/>
-
-
-
-
-        <TextView
-            android:layout_width="30dp"
-            android:layout_height="fill_parent"
-            android:id="@+id/repliesIndicatorNumber"
-            android:text="0"
-            android:gravity="center"
-            android:textColor="#000"
-            android:paddingTop="3dp"
-            android:textSize="15sp"
-            android:textAlignment="center"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/cameraButton"
-
-            android:layout_marginRight="10dp"
-            />
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="fill_parent"
-            android:id="@+id/cameraButton"
             android:layout_marginTop="0dp"
             android:layout_alignTop="@+id/componentImageView"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/replybig"/>
+            >
+
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="fill_parent"
+                android:src="@drawable/star_o"
+                android:id="@+id/favIconView"
+                android:layout_marginRight="10dp"/>
+
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="fill_parent"
+                android:src="@drawable/thumbs_up"
+                android:id="@+id/thumbUpIconView"
+                android:layout_marginRight="10dp"/>
+
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="fill_parent"
+                android:src="@drawable/thumbs_down"
+                android:id="@+id/thumbDownIconView"
+                android:layout_marginRight="10dp"/>
+
+
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="fill_parent"
+                android:id="@+id/cameraButton"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/replybig"/>
+
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="fill_parent"
+                android:id="@+id/shareButton"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/share"/>
+
+        </LinearLayout>
+
+
+
+
+
 
 
     </RelativeLayout>
@@ -137,25 +114,70 @@
         android:id="@+id/userBar"
 
         >
-
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="fill_parent"
-            android:src="@drawable/userbig"
-            android:id="@+id/userIconImageView"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"/>
-
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:gravity="center"
-            android:text="igbopie"
-            android:id="@+id/userTextView"
-            android:textColor="#fff"
-            android:textSize="12sp"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/userIconImageView"/>
+            android:orientation="horizontal">
+
+            <com.seem.android.mockup1.customviews.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="igbopie"
+                android:src="@drawable/userbig"
+                android:id="@+id/userIconTextView"
+                android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
+                />
+
+            <com.seem.android.mockup1.customviews.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="0"
+                android:src="@drawable/folderopenbig"
+                android:id="@+id/depthIconTextView"
+                android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
+                />
+
+            <com.seem.android.mockup1.customviews.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="0"
+                android:src="@drawable/replybig"
+                android:id="@+id/replyIconTextView"
+                android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
+                />
+
+            <com.seem.android.mockup1.customviews.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="0"
+                android:src="@drawable/star"
+                android:id="@+id/favouritesIconTextView"
+                android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
+                />
+
+            <com.seem.android.mockup1.customviews.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="0"
+                android:src="@drawable/thumbs_up"
+                android:id="@+id/thumbsUpIconTextView"
+                android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
+                />
+            <com.seem.android.mockup1.customviews.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="0"
+                android:src="@drawable/thumbs_down"
+                android:id="@+id/thumbsDownIconTextView"
+                android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
+                />
+
+
+
+
+
+            </LinearLayout>
+
 
 
         <TextView
@@ -202,3 +224,11 @@
 
 
 </RelativeLayout>
+
+
+
+
+
+
+
+

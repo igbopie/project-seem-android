@@ -22,6 +22,7 @@ import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.customviews.IconTextView;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
@@ -60,18 +61,19 @@ public class ItemFullScreenFragment extends Fragment {
     //
     ImageView image;
     ProgressBar progressBar;
+
     TextView captionTextView;
-    ImageView nestedRepliesIndicator;
-    TextView nestedRepliesIndicatorText;
-    TextView depthNumber;
-    ImageView depthIcon;
+    TextView datePostedTextView;
+
     ImageView replyButton;
     Item item;
-    ImageView userIconImageView;
-    TextView userTextView;
-    TextView closeText;
-    ImageView closeIcon;
-    TextView datePostedTextView;
+
+    IconTextView replyIconTextView;
+    IconTextView depthIconTextView;
+
+    IconTextView userIconTextView;
+    IconTextView closeIconTextView;
+
 
     GetItem getItemTask;
     DownloadAsyncTask downloadAsyncTask;
@@ -118,29 +120,20 @@ public class ItemFullScreenFragment extends Fragment {
         image = (ImageView) getView().findViewById(R.id.imageView);
         progressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
         captionTextView = (TextView) getView().findViewById(R.id.captionTextView);
-        nestedRepliesIndicator = (ImageView) getView().findViewById(R.id.repliesIndicator);
-        nestedRepliesIndicatorText = (TextView) getView().findViewById(R.id.repliesIndicatorNumber);
-        depthIcon = (ImageView) getView().findViewById(R.id.depthIconView);
-        depthNumber = (TextView) getView().findViewById(R.id.depthNumber);
-        userIconImageView = (ImageView) getView().findViewById(R.id.userIconImageView);
-        userTextView = (TextView) getView().findViewById(R.id.userTextView);
+        replyIconTextView = (IconTextView) getView().findViewById(R.id.replyIconTextView);
+
+        depthIconTextView = (IconTextView) getView().findViewById(R.id.depthIconTextView);
+        userIconTextView = (IconTextView) getView().findViewById(R.id.userIconTextView);
         datePostedTextView = (TextView) getView().findViewById(R.id.datePostedTextView);
+        closeIconTextView =(IconTextView) getView().findViewById(R.id.closeIconTextView);
 
 
         topBar = getView().findViewById(R.id.topBar);
         captionBar = getView().findViewById(R.id.captionBar);
         userBar = getView().findViewById(R.id.userBar);
 
-        closeText =(TextView) getView().findViewById(R.id.closeText);
-        closeIcon =(ImageView) getView().findViewById(R.id.closeImageView);
 
-        closeText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityFactory.finishActivity(getActivity(),Activity.RESULT_OK);
-            }
-        });
-        closeIcon.setOnClickListener(new View.OnClickListener() {
+        closeIconTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityFactory.finishActivity(getActivity(),Activity.RESULT_OK);
@@ -148,26 +141,14 @@ public class ItemFullScreenFragment extends Fragment {
         });
 
 
-        userIconImageView.setVisibility(View.INVISIBLE);
-        userIconImageView.setOnClickListener(new View.OnClickListener() {
+        userIconTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userTextView.callOnClick();
-            }
-        });
-        userTextView.setVisibility(View.INVISIBLE);
-        userTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityFactory.startUserProfileActivity(ItemFullScreenFragment.this,userTextView.getText().toString());
+                ActivityFactory.startUserProfileActivity(ItemFullScreenFragment.this,userIconTextView.getText().toString());
             }
         });
 
-        nestedRepliesIndicatorText.setVisibility(View.INVISIBLE);
-        nestedRepliesIndicator.setVisibility(View.INVISIBLE);
-        depthIcon.setVisibility(View.INVISIBLE);
-        depthNumber.setVisibility(View.INVISIBLE);
-        nestedRepliesIndicator.setOnClickListener(new View.OnClickListener() {
+        replyIconTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityFactory.startItemActivity(ItemFullScreenFragment.this.getActivity(), getSeemId(), getItemId());
@@ -251,54 +232,50 @@ public class ItemFullScreenFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void result) {
-            if (item.getReplyCount() > 0 && !isMainItem())
+            if (item != null)
             {
-                nestedRepliesIndicator.setVisibility(View.VISIBLE);
-                nestedRepliesIndicatorText.setVisibility(View.VISIBLE);
-                nestedRepliesIndicatorText.setText(item.getReplyCount() + "");
-            }
+                replyIconTextView.setText(item.getReplyCount() + "");
+                depthIconTextView.setText(item.getDepth()+"");
+                if(item.getDepth() > 0){
+                    depthIconTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityFactory.startThreadedActivity(getActivity(),item.getId());
+                        }
+                    });
+                }
 
-            if(item.getDepth() > 0){
-                depthNumber.setText(item.getDepth()+"");
-                depthNumber.setVisibility(View.VISIBLE);
-                depthIcon.setVisibility(View.VISIBLE);
-                depthIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ActivityFactory.startThreadedActivity(getActivity(),item.getId());
-                    }
-                });
-            }
-            if(item.getUsername() != null){
-                userIconImageView.setVisibility(View.VISIBLE);
-                userTextView.setVisibility(View.VISIBLE);
-                userTextView.setText(item.getUsername());
-            }
-            if (item != null)
-            {
-                new DownloadAsyncTask(item,image,true).execute();
-            }
-            if (item != null)
-            {
+                if(item.getUsername() != null){
+                    userIconTextView.setText(item.getUsername());
+                }else{
+                    userIconTextView.setText("Anonymous");
+                }
                 captionTextView.setText(item.getCaption());
-            }
+                datePostedTextView.setText(Utils.getRelativeTime(item.getCreated()));
 
-            datePostedTextView.setText(Utils.getRelativeTime(item.getCreated()));
+                progressBar.setVisibility(View.VISIBLE);
+                //First Thumb
+                downloadAsyncTask = new DownloadAsyncTask(item,image,true){
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+                        if(!this.isCancelled()) {
+                            //Then large
+                            downloadAsyncTask = new DownloadAsyncTask(item, image, false) {
+                                @Override
+                                protected void onPostExecute(Void result) {
+                                    super.onPostExecute(result);
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                    downloadAsyncTask = null;
+                                }
+                            };
+                            downloadAsyncTask.execute();
+                        }
+                    }
+                };
+                downloadAsyncTask.execute();
+            }
             getItemTask = null;
-            downloadAsyncTask  = new DownloadAsyncTask(item,image,false){
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-                @Override
-                protected void onPostExecute(Void result) {
-                    super.onPostExecute(result);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    downloadAsyncTask = null;
-                }
-            };
-            downloadAsyncTask.execute();
         }
     }
 
