@@ -52,7 +52,12 @@ public class ItemService {
             MySQLiteHelper.COLUMN_ITEMS_USER_ID,
             MySQLiteHelper.COLUMN_ITEMS_USERNAME,
             MySQLiteHelper.COLUMN_ITEMS_FAVOURITE_COUNT,
-            MySQLiteHelper.COLUMN_ITEMS_FAVOURITED
+            MySQLiteHelper.COLUMN_ITEMS_FAVOURITED,
+            MySQLiteHelper.COLUMN_ITEMS_THUMB_DOWN_COUNT,
+            MySQLiteHelper.COLUMN_ITEMS_THUMB_UP_COUNT,
+            MySQLiteHelper.COLUMN_ITEMS_THUMB_SCORE_COUNT,
+            MySQLiteHelper.COLUMN_ITEMS_THUMBED_DOWN,
+            MySQLiteHelper.COLUMN_ITEMS_THUMBED_UP,
     };
 
     public void open() throws SQLException {
@@ -78,8 +83,12 @@ public class ItemService {
         item.setUserId(cursor.getString(8));
         item.setUsername(cursor.getString(9));
         item.setFavouriteCount(cursor.getInt(10));
-
-        item.setFavourited(cursor.getInt(10) == 1);
+        item.setFavourited(cursor.getInt(11) == 1);
+        item.setThumbDownCount(cursor.getInt(12));
+        item.setThumbUpCount(cursor.getInt(13));
+        item.setThumbScoreCount(cursor.getInt(14));
+        item.setThumbedDown(cursor.getInt(15) == 1);
+        item.setThumbedUp(cursor.getInt(16) == 1);
 
         return item;
     }
@@ -243,6 +252,16 @@ public class ItemService {
         if(item.isFavourited() != null){
             values.put(MySQLiteHelper.COLUMN_ITEMS_FAVOURITED, item.isFavourited()?1:0);
         }
+        if(item.getThumbedUp() != null){
+            values.put(MySQLiteHelper.COLUMN_ITEMS_THUMBED_UP, item.getThumbedUp()?1:0);
+        }
+        if(item.getThumbedDown() != null){
+            values.put(MySQLiteHelper.COLUMN_ITEMS_THUMBED_DOWN, item.getThumbedDown()?1:0);
+        }
+        values.put(MySQLiteHelper.COLUMN_ITEMS_THUMB_DOWN_COUNT, item.getThumbDownCount());
+        values.put(MySQLiteHelper.COLUMN_ITEMS_THUMB_UP_COUNT, item.getThumbUpCount());
+        values.put(MySQLiteHelper.COLUMN_ITEMS_THUMB_SCORE_COUNT, item.getThumbScoreCount());
+
         database.replace(MySQLiteHelper.TABLE_ITEMS, null, values);
 
     }

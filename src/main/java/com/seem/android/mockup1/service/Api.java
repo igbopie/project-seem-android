@@ -69,6 +69,9 @@ public class Api {
     public static final String ENDPOINT_ADD_GCM_TOKEN = "api/user/addgcmtoken";
     public static final String ENDPOINT_FAVOURITE = "api/seem/item/favourite";
     public static final String ENDPOINT_UNFAVOURITE = "api/seem/item/unfavourite";
+    public static final String ENDPOINT_THUMB_UP = "api/seem/item/thumbup";
+    public static final String ENDPOINT_THUMB_DOWN = "api/seem/item/thumbdown";
+    public static final String ENDPOINT_THUMB_CLEAR = "api/seem/item/thumbclear";
 
 
 
@@ -104,6 +107,11 @@ public class Api {
     public static final String JSON_TAG_ITEM_USER_ID = "userId";
     public static final String JSON_TAG_ITEM_FAVOURITE_COUNT = "favouriteCount";
     public static final String JSON_TAG_ITEM_FAVOURITED = "favourited";
+    public static final String JSON_TAG_ITEM_THUMB_UP_COUNT = "thumbUpCount";
+    public static final String JSON_TAG_ITEM_THUMB_DOWN_COUNT = "thumbDownCount";
+    public static final String JSON_TAG_ITEM_THUMB_SCORE_COUNT = "thumbScoreCount";
+    public static final String JSON_TAG_ITEM_THUMBED_UP = "thumbedUp";
+    public static final String JSON_TAG_ITEM_THUMBED_DOWN = "thumbedDown";
 
 
     //USERPROFILE
@@ -254,6 +262,69 @@ public class Api {
             params.put("username",username);
             Utils.debug(Api.class,"Username:"+username);
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFOLLOW,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false ;
+        }
+    }
+
+    public static boolean thumbUp(String itemId,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            params.put("token", token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_UP,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false ;
+        }
+    }
+
+    public static boolean thumbDown(String itemId,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            params.put("token", token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_DOWN,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                return true;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false ;
+        }
+    }
+
+    public static boolean thumbClear(String itemId,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            params.put("token", token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_CLEAR,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
                 Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
@@ -682,6 +753,27 @@ public class Api {
         if(itemJson.has(JSON_TAG_ITEM_FAVOURITED)) {
             item.setFavourited(itemJson.getBoolean(JSON_TAG_ITEM_FAVOURITED));
         }
+
+        if(itemJson.has(JSON_TAG_ITEM_THUMB_DOWN_COUNT)) {
+            item.setThumbDownCount(itemJson.getInt(JSON_TAG_ITEM_THUMB_DOWN_COUNT));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_THUMB_UP_COUNT)) {
+            item.setThumbUpCount(itemJson.getInt(JSON_TAG_ITEM_THUMB_UP_COUNT));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_THUMB_SCORE_COUNT)) {
+            item.setThumbScoreCount(itemJson.getInt(JSON_TAG_ITEM_THUMB_SCORE_COUNT));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_THUMBED_UP)) {
+            item.setThumbedUp(itemJson.getBoolean(JSON_TAG_ITEM_THUMBED_UP));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_THUMBED_DOWN)) {
+            item.setThumbedDown(itemJson.getBoolean(JSON_TAG_ITEM_THUMBED_DOWN));
+        }
+
         return item;
     }
 

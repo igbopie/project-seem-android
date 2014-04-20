@@ -26,6 +26,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ITEMS_USERNAME = "username";
     public static final String COLUMN_ITEMS_FAVOURITE_COUNT = "favouriteCount";
     public static final String COLUMN_ITEMS_FAVOURITED = "favourited";
+    public static final String COLUMN_ITEMS_THUMB_UP_COUNT = "thumbUpCount";
+    public static final String COLUMN_ITEMS_THUMB_DOWN_COUNT = "thumbDownCount";
+    public static final String COLUMN_ITEMS_THUMB_SCORE_COUNT = "thumbScoreCount";
+    public static final String COLUMN_ITEMS_THUMBED_UP = "thumbedUp";
+    public static final String COLUMN_ITEMS_THUMBED_DOWN = "thumbedDown";
 
 
     public static final String TABLE_SEEMS = "seems";
@@ -38,7 +43,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
 
     private static final String DATABASE_NAME = "seem.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     // Database creation sql statement
     private static final String CREATE_ITEMS_TABLE = "CREATE TABLE "
@@ -54,7 +59,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_ITEMS_DEPTH + " INTEGER null, "
             + COLUMN_ITEMS_REPLY_COUNT + " INTEGER null, "
             + COLUMN_ITEMS_FAVOURITE_COUNT + " INTEGER null, "
-            + COLUMN_ITEMS_FAVOURITED + " INTEGER null);";
+            + COLUMN_ITEMS_FAVOURITED + " INTEGER null, "
+            + COLUMN_ITEMS_THUMB_UP_COUNT + " INTEGER null, "
+            + COLUMN_ITEMS_THUMB_DOWN_COUNT + " INTEGER null, "
+            + COLUMN_ITEMS_THUMB_SCORE_COUNT + " INTEGER null, "
+            + COLUMN_ITEMS_THUMBED_UP + " INTEGER null, "
+            + COLUMN_ITEMS_THUMBED_DOWN + " INTEGER null "
+            +");";
 
     // Database creation sql statement
     private static final String CREATE_SEEMS_TABLE = "CREATE TABLE "

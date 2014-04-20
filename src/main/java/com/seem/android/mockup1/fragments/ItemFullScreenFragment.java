@@ -71,6 +71,8 @@ public class ItemFullScreenFragment extends Fragment {
     Item item;
 
 
+    IconTextView thumbUpIconTextView;
+    IconTextView thumbDownIconTextView;
     IconTextView favouritesIconTextView;
     IconTextView replyIconTextView;
     IconTextView depthIconTextView;
@@ -84,6 +86,8 @@ public class ItemFullScreenFragment extends Fragment {
 
     //Actions
     ImageView favActionImageView;
+    ImageView thumbUpActionImageView;
+    ImageView thumbDownActionImageView;
 
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
@@ -134,8 +138,12 @@ public class ItemFullScreenFragment extends Fragment {
         userIconTextView = (IconTextView) getView().findViewById(R.id.userIconTextView);
         datePostedTextView = (TextView) getView().findViewById(R.id.datePostedTextView);
         closeIconTextView =(IconTextView) getView().findViewById(R.id.closeIconTextView);
+        thumbDownIconTextView =(IconTextView) getView().findViewById(R.id.thumbsDownIconTextView);
+        thumbUpIconTextView =(IconTextView) getView().findViewById(R.id.thumbsUpIconTextView);
 
         favActionImageView = (ImageView) getView().findViewById(R.id.favActionImageView);
+        thumbUpActionImageView = (ImageView) getView().findViewById(R.id.thumbUpIconView);
+        thumbDownActionImageView = (ImageView) getView().findViewById(R.id.thumbDownIconView);
 
 
         topBar = getView().findViewById(R.id.topBar);
@@ -149,6 +157,28 @@ public class ItemFullScreenFragment extends Fragment {
                     new UnfavouriteTask().execute();
                 }else{
                     new FavouriteTask().execute();
+                }
+            }
+        });
+
+        thumbUpActionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(item.getThumbedUp() != null && item.getThumbedUp()) {
+                    new ThumbClearTask().execute();
+                }else{
+                    new ThumbUpTask().execute();
+                }
+            }
+        });
+
+        thumbDownActionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(item.getThumbedDown() != null && item.getThumbedDown()) {
+                    new ThumbClearTask().execute();
+                }else{
+                    new ThumbDownTask().execute();
                 }
             }
         });
@@ -256,6 +286,8 @@ public class ItemFullScreenFragment extends Fragment {
         protected void onPostExecute(Void result) {
             if (item != null)
             {
+                thumbDownIconTextView.setText(item.getThumbDownCount() + "");
+                thumbUpIconTextView.setText(item.getThumbUpCount() + "");
                 favouritesIconTextView.setText(item.getFavouriteCount() + "");
 
                 replyIconTextView.setText(item.getReplyCount() + "");
@@ -284,6 +316,18 @@ public class ItemFullScreenFragment extends Fragment {
                     favActionImageView.setImageResource(R.drawable.star);
                 } else {
                     favActionImageView.setImageResource(R.drawable.star_o);
+                }
+
+                if(item.getThumbedUp() != null && item.getThumbedUp()){
+                    thumbUpActionImageView.setImageResource(R.drawable.thumbs_up);
+                } else {
+                    thumbUpActionImageView.setImageResource(R.drawable.thumbs_o_up);
+                }
+
+                if(item.getThumbedDown() != null && item.getThumbedDown()){
+                    thumbDownActionImageView.setImageResource(R.drawable.thumbs_down);
+                } else {
+                    thumbDownActionImageView.setImageResource(R.drawable.thumbs_o_down);
                 }
 
                 //First Thumb
@@ -351,45 +395,50 @@ public class ItemFullScreenFragment extends Fragment {
         }
     }
 
-    class FavouriteTask extends AsyncTask<Void,Void,Boolean>{
 
-
-        private final ProgressDialog dialog = new ProgressDialog(getActivity());
-
+    class FavouriteTask extends ActionTask{
         @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
-            dialog.dismiss();
-            if(!success){
-                Utils.dialog("Error","Action could not be completed, check connection and try again later.",getActivity());
-            }else{
-                getItemTask = new GetItem(){
-                    @Override
-                    protected void onPostExecute(Void result) {
-                        super.onPostExecute(result);
-                        dialog.dismiss();
-                    }
-                };
-                getItemTask.execute();
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog.setMessage("Loading...");
-            dialog.show();
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected Boolean doAction() {
             return Api.favourite(item.getId(),MyApplication.getToken());
         }
 
 
     }
 
-    class UnfavouriteTask extends AsyncTask<Void,Void,Boolean>{
+    class UnfavouriteTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.unfavourite(item.getId(),MyApplication.getToken());
+        }
+
+    }
+    class ThumbUpTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.thumbUp(item.getId(),MyApplication.getToken());
+        }
+
+    }
+    class ThumbDownTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.thumbDown(item.getId(),MyApplication.getToken());
+        }
+
+    }
+    class ThumbClearTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.thumbClear(item.getId(),MyApplication.getToken());
+        }
+
+    }
+
+    abstract class ActionTask extends AsyncTask<Void,Void,Boolean>{
 
 
         private final ProgressDialog dialog = new ProgressDialog(getActivity());
@@ -422,12 +471,13 @@ public class ItemFullScreenFragment extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            return Api.unfavourite(item.getId(),MyApplication.getToken());
+            return doAction();
         }
+
+        abstract protected Boolean doAction();
 
 
     }
-
 
 
 

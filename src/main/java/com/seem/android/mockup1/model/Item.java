@@ -25,6 +25,11 @@ public class Item {
     private String userId;
     private int favouriteCount = 0;
     private Boolean favourited;
+    private int thumbUpCount = 0;
+    private int thumbDownCount = 0;
+    private int thumbScoreCount = 0;
+    private Boolean thumbedUp;
+    private Boolean thumbedDown;
 
     private Uri tempLocalFile;
     private Bitmap tempLocalBitmap;
@@ -126,6 +131,46 @@ public class Item {
         this.favourited = favourited;
     }
 
+    public Boolean getThumbedDown() {
+        return thumbedDown;
+    }
+
+    public void setThumbedDown(Boolean thumbedDown) {
+        this.thumbedDown = thumbedDown;
+    }
+
+    public Boolean getThumbedUp() {
+        return thumbedUp;
+    }
+
+    public void setThumbedUp(Boolean thumbedUp) {
+        this.thumbedUp = thumbedUp;
+    }
+
+    public int getThumbScoreCount() {
+        return thumbScoreCount;
+    }
+
+    public void setThumbScoreCount(int thumbScoreCount) {
+        this.thumbScoreCount = thumbScoreCount;
+    }
+
+    public int getThumbDownCount() {
+        return thumbDownCount;
+    }
+
+    public void setThumbDownCount(int thumbDownCount) {
+        this.thumbDownCount = thumbDownCount;
+    }
+
+    public int getThumbUpCount() {
+        return thumbUpCount;
+    }
+
+    public void setThumbUpCount(int thumbUpCount) {
+        this.thumbUpCount = thumbUpCount;
+    }
+
     public Uri getTempLocalFile() {
         return tempLocalFile;
     }
@@ -158,7 +203,7 @@ public class Item {
     @Override
     public String toString() {
         return "Item{" +
-                "favourited=" + favourited +
+                "thumbedDown=" + thumbedDown +
                 ", id='" + id + '\'' +
                 ", caption='" + caption + '\'' +
                 ", mediaId='" + mediaId + '\'' +
@@ -170,6 +215,11 @@ public class Item {
                 ", username='" + username + '\'' +
                 ", userId='" + userId + '\'' +
                 ", favouriteCount=" + favouriteCount +
+                ", favourited=" + favourited +
+                ", thumbUpCount=" + thumbUpCount +
+                ", thumbDownCount=" + thumbDownCount +
+                ", thumbScoreCount=" + thumbScoreCount +
+                ", thumbedUp=" + thumbedUp +
                 '}';
     }
 }
