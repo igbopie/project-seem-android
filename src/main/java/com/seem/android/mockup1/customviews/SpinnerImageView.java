@@ -17,7 +17,7 @@ import com.seem.android.mockup1.R;
  * Created by igbopie on 20/03/14.
  */
 public class SpinnerImageView extends LinearLayout {
-    SquareImageView imageView;
+
     ProgressBar progressBar;
     TextView textView;
     ImageView repliesIndicator;
@@ -36,8 +36,8 @@ public class SpinnerImageView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.component_square_image, this, true);
-        imageView = (SquareImageView) findViewById(R.id.componentImageView);
-        imageView.setBackgroundColor(Color.LTGRAY);
+
+        getImageView().setBackgroundColor(Color.LTGRAY);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         textView = (TextView) findViewById(R.id.textView);
         textView.setVisibility(INVISIBLE);
@@ -59,7 +59,7 @@ public class SpinnerImageView extends LinearLayout {
         }
     }
     public ImageView getImageView(){
-        return imageView;
+        return (SquareImageView) findViewById(R.id.componentImageView);
     }
 
     @Override

@@ -63,7 +63,6 @@ public class ItemFullScreenFragment extends Fragment {
 
 
     //
-    ImageView image;
     ProgressBar progressBar;
 
     TextView captionTextView;
@@ -131,7 +130,6 @@ public class ItemFullScreenFragment extends Fragment {
             getActivity().getActionBar().hide();
         }
 
-        image = (ImageView) getView().findViewById(R.id.imageView);
         progressBar = (ProgressBar) getView().findViewById(R.id.progressBar);
         captionTextView = (TextView) getView().findViewById(R.id.captionTextView);
 
@@ -299,6 +297,9 @@ public class ItemFullScreenFragment extends Fragment {
         }
     }
 
+    private ImageView getImageView(){
+        return (ImageView) getView().findViewById(R.id.imageView);
+    }
     private class GetItem extends AsyncTask<Void,Void,Void> {
 
         @Override
@@ -357,13 +358,13 @@ public class ItemFullScreenFragment extends Fragment {
                 }
 
                 //First Thumb
-                downloadAsyncTask = new DownloadAsyncTask(item,image,true){
+                downloadAsyncTask = new DownloadAsyncTask(item,getImageView(),true){
                     @Override
                     protected void onPostExecute(Void result) {
                         super.onPostExecute(result);
                         if(!this.isCancelled()) {
                             //Then large
-                            downloadAsyncTask = new DownloadAsyncTask(item, image, false) {
+                            downloadAsyncTask = new DownloadAsyncTask(item, getImageView(), false) {
                                 @Override
                                 protected void onPostExecute(Void result) {
                                     super.onPostExecute(result);
