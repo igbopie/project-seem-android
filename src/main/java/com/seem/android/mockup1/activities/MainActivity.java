@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -34,10 +35,12 @@ import com.seem.android.mockup1.fragments.UserProfileFragment;
 import com.seem.android.mockup1.service.Api;
 import com.seem.android.mockup1.uimodel.NavDrawerItem;
 import com.seem.android.mockup1.uimodel.NavDrawerListAdapter;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by igbopie on 03/04/14.
@@ -145,6 +148,26 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
             }
         }else{
             Utils.debug(getClass(),"No google apis");
+        }
+
+
+        //TODO URI check
+        Uri data = getIntent().getData();
+        if(data != null) {
+            String scheme = data.getScheme(); // "seem"
+            String host = data.getHost(); // "itemId"
+            List<String> params = data.getPathSegments(); //535441ad8346070200e96e2d
+
+            Utils.debug(getClass(), "" + scheme + " " + host + " " + params);
+            if(host.equals("itemId")) {
+                ActivityFactory.startThreadedActivity(this, params.get(0));
+            }else{
+                Utils.debug(getClass(),"Unknown action");
+            }
+
+
+        }else{
+            Utils.debug(getClass(), "No data");
         }
     }
 

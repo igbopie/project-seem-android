@@ -2,6 +2,8 @@ package com.seem.android.mockup1.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -67,7 +69,6 @@ public class ItemFullScreenFragment extends Fragment {
     TextView captionTextView;
     TextView datePostedTextView;
 
-    ImageView replyButton;
     Item item;
 
 
@@ -85,9 +86,11 @@ public class ItemFullScreenFragment extends Fragment {
     DownloadAsyncTask downloadAsyncTask;
 
     //Actions
+    ImageView replyButton;
     ImageView favActionImageView;
     ImageView thumbUpActionImageView;
     ImageView thumbDownActionImageView;
+    ImageView shareActionImageView;
 
     private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
@@ -144,7 +147,8 @@ public class ItemFullScreenFragment extends Fragment {
         favActionImageView = (ImageView) getView().findViewById(R.id.favActionImageView);
         thumbUpActionImageView = (ImageView) getView().findViewById(R.id.thumbUpIconView);
         thumbDownActionImageView = (ImageView) getView().findViewById(R.id.thumbDownIconView);
-
+        shareActionImageView= (ImageView) getView().findViewById(R.id.shareActionImageView);
+        replyButton = (ImageView) getView().findViewById(R.id.cameraButton);
 
         topBar = getView().findViewById(R.id.topBar);
         captionBar = getView().findViewById(R.id.captionBar);
@@ -205,11 +209,9 @@ public class ItemFullScreenFragment extends Fragment {
                 ActivityFactory.startItemActivity(ItemFullScreenFragment.this.getActivity(), getSeemId(), getItemId());
             }
         });
-        replyButton = (ImageView) getView().findViewById(R.id.cameraButton);
         replyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Utils.debug(this.getClass(),"Action camera!");
                 PopupMenu popup = new PopupMenu(ItemFullScreenFragment.this.getActivity(), view);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
@@ -218,11 +220,9 @@ public class ItemFullScreenFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.actionPopupCamera:
-                                Utils.debug(this.getClass(), "NEW SEEM!");
                                 ActivityFactory.startReplyItemActivity(ItemFullScreenFragment.this,item.getId(), GlobalVars.PhotoSource.CAMERA);
                                 return true;
                             case R.id.actionPopupGallery:
-                                Utils.debug(this.getClass(), "NEW SEEM!");
                                 ActivityFactory.startReplyItemActivity(ItemFullScreenFragment.this,item.getId(), GlobalVars.PhotoSource.GALLERY);
                                 return true;
                         }
@@ -232,6 +232,32 @@ public class ItemFullScreenFragment extends Fragment {
                 popup.show();
             }
         });
+        shareActionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(ItemFullScreenFragment.this.getActivity(), view);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.share_popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.actionCopyLink:
+                                String link = "http://seem-test.herokuapp.com/item/"+item.getId();
+
+                                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+                                clipboard.setPrimaryClip(clip);
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
+            }
+        });
+
+
         if(!MyApplication.isLoggedIn()){
             replyButton.setVisibility(View.INVISIBLE);
         }

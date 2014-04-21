@@ -89,7 +89,7 @@
             <ImageView
                 android:layout_width="@dimen/fullscreen_topbar_icon"
                 android:layout_height="fill_parent"
-                android:id="@+id/shareButton"
+                android:id="@+id/shareActionImageView"
                 android:layout_marginRight="10dp"
                 android:src="@drawable/share"/>
 
