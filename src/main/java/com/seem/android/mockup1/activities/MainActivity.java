@@ -3,6 +3,7 @@ package com.seem.android.mockup1.activities;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -240,13 +241,13 @@ public class MainActivity extends Activity implements
      * */
 
     public void displayView(Fragment fragment){
-        displayView(-1,null,fragment);
+        displayView(-1,null,fragment,true);
     }
 
     private void displayView(int position, NavDrawerItem navDrawerItem) {
-        displayView(position,navDrawerItem,null);
+        displayView(position,navDrawerItem,null,false);
     }
-    private void displayView(int position, NavDrawerItem navDrawerItem,Fragment fragment) {
+    private void displayView(int position, NavDrawerItem navDrawerItem,Fragment fragment,boolean addToBack) {
         // update the main content by replacing fragments
         String menuTitle ="";
         if(fragment == null) {
@@ -268,8 +269,13 @@ public class MainActivity extends Activity implements
 
         if (fragment != null) {
             FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.frame_container, fragment).commit();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.frame_container, fragment);
+            if(addToBack) {
+                // Add to backstack
+                transaction.addToBackStack(null);
+            }
+            transaction.commit();
 
             // update selected item and title, then close the drawer
             mDrawerList.setItemChecked(position, true);
