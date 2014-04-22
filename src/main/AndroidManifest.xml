@@ -49,11 +49,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.seem.android.mockup1.activities.ItemActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name="com.seem.android.mockup1.activities.ReplyFlowActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >

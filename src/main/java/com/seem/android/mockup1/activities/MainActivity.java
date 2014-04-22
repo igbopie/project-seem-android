@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -28,6 +29,7 @@ import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.fragments.FeedListFragment;
+import com.seem.android.mockup1.fragments.ItemFragment;
 import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
 import com.seem.android.mockup1.fragments.SignUpFragment;
@@ -40,12 +42,20 @@ import com.seem.android.mockup1.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by igbopie on 03/04/14.
  */
-public class MainActivity extends Activity implements LoginFragment.OnLoggedInInteractionListener,UserProfileFragment.UserProfileInteractionListener,SignUpFragment.SignUpInteractionListener {
+public class MainActivity extends Activity implements
+                                            LoginFragment.OnLoggedInInteractionListener,
+                                            UserProfileFragment.UserProfileInteractionListener,
+                                            SignUpFragment.SignUpInteractionListener,
+                                            ItemFragment.OnItemClickListener,
+                                            FeedListFragment.OnItemClickListener,
+                                            SeemListFragment.OnItemClickListener {
 
     //GCM
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -134,6 +144,9 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+
+
+
         if (savedInstanceState == null) {
             // on first time display view for first nav item
             displayView(0, drawerItemHome);
@@ -169,6 +182,7 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         }else{
             Utils.debug(getClass(), "No data");
         }
+
     }
 
     private void buildDrawerMenu(){
@@ -224,20 +238,32 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
     /**
      * Diplaying fragment view for selected nav drawer list item
      * */
+
+    public void displayView(Fragment fragment){
+        displayView(-1,null,fragment);
+    }
+
     private void displayView(int position, NavDrawerItem navDrawerItem) {
+        displayView(position,navDrawerItem,null);
+    }
+    private void displayView(int position, NavDrawerItem navDrawerItem,Fragment fragment) {
         // update the main content by replacing fragments
-        Fragment fragment = null;
-        String menuTitle =navDrawerItem.getTitle();
-        if(navDrawerItem == drawerItemHome){
-            fragment = new FeedListFragment();
-        } else if(navDrawerItem == drawerItemSeemList){
-            fragment = new SeemListFragment();
-        } else if(navDrawerItem == drawerItemLogin){
-            fragment = LoginFragment.newInstance();
-        } else if(navDrawerItem == drawerItemSignUp){
-            fragment = SignUpFragment.newInstance();
-        }  else if(navDrawerItem == drawerItemUserProfile){
-            fragment = UserProfileFragment.newInstance();
+        String menuTitle ="";
+        if(fragment == null) {
+            menuTitle = navDrawerItem.getTitle();
+            if (navDrawerItem == drawerItemHome) {
+                fragment = new FeedListFragment();
+            } else if (navDrawerItem == drawerItemSeemList) {
+                fragment = new SeemListFragment();
+            } else if (navDrawerItem == drawerItemLogin) {
+                fragment = LoginFragment.newInstance();
+            } else if (navDrawerItem == drawerItemSignUp) {
+                fragment = SignUpFragment.newInstance();
+            } else if (navDrawerItem == drawerItemUserProfile) {
+                fragment = UserProfileFragment.newInstance();
+            }
+        } else {
+            position = -1;
         }
 
         if (fragment != null) {
@@ -253,6 +279,10 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
         } else {
             // error in creating fragment
             Utils.debug(getClass(), "Error in creating fragment");
+        }
+
+        if (!getActionBar().isShowing()){
+            getActionBar().show();
         }
     }
 
@@ -301,7 +331,27 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
     }
 
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Utils.debug(this.getClass(),"On Activity Result "+requestCode+ " "+resultCode);
+        if (requestCode == GlobalVars.RETURN_CODE_THREADED_VIEW && resultCode == Activity.RESULT_OK) {
+            Utils.debug(this.getClass(),"Threaded View finished");
+            android.app.Fragment fragment = ItemFragment.newInstance(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
+            displayView(fragment);
+        }
 
+        if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN && resultCode == Activity.RESULT_OK && data.getStringExtra(GlobalVars.EXTRA_SEEM_ID) != null ) {
+            android.app.Fragment fragment = ItemFragment.newInstance(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
+            displayView(fragment);
+        }
+    }
+
+    @Override
+    public void onClick( String seemId,String itemId) {
+        android.app.Fragment fragment = ItemFragment.newInstance(seemId,itemId);
+        displayView(fragment);
+    }
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -402,4 +452,7 @@ public class MainActivity extends Activity implements LoginFragment.OnLoggedInIn
 
         }.execute();
     }
+
+
+
 }

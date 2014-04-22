@@ -17,6 +17,7 @@ import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,7 +44,13 @@ public class ThreadedViewActivity extends ListActivity {
         // Do something when a list item is clicked
         Item item = adapter.getItem(position);
         Utils.debug(this.getClass(),"Item Clicked! seem "+item);
-        ActivityFactory.startItemActivity(this,item.getSeemId(), item.getId());
+
+        HashMap<String,String>map=new HashMap<String, String>();
+        map.put(GlobalVars.EXTRA_ITEM_ID, item.getId());
+        map.put(GlobalVars.EXTRA_SEEM_ID, item.getSeemId());
+
+
+        ActivityFactory.finishActivityWithData(this, map, RESULT_OK);
     }
 
     private class GetThreadsView extends AsyncTask<Void,Void,List<Item>> {

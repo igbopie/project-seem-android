@@ -67,7 +67,7 @@ public class SeemListFragment extends ListFragment {
         // Do something when a list item is clicked
         Seem seem = adapter.getItem(position);
         Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
-        ActivityFactory.startItemActivity(this.getActivity(), seem.getId(), seem.getItemId());
+        onItemClickListener.onClick(seem.getId(), seem.getItemId());
     }
 
     @Override
@@ -162,4 +162,28 @@ public class SeemListFragment extends ListFragment {
             dialog.dismiss();
         }
     }
+
+
+    private OnItemClickListener onItemClickListener;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            onItemClickListener = (OnItemClickListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement UserProfileInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        onItemClickListener = null;
+    }
+
+    public interface OnItemClickListener {
+        public void onClick(String seemId,String itemId);
+    }
+
 }

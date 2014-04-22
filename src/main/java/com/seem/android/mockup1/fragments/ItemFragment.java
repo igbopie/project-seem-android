@@ -1,19 +1,23 @@
-package com.seem.android.mockup1.activities;
+package com.seem.android.mockup1.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -21,11 +25,11 @@ import android.widget.RelativeLayout;
 
 import com.jess.ui.TwoWayAdapterView;
 import com.jess.ui.TwoWayGridView;
-import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.adapters.ThumbnailAdapter;
+import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 import com.seem.android.mockup1.customviews.SpinnerImageView;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.model.Seem;
@@ -39,7 +43,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ItemActivity extends Activity {
+public class ItemFragment extends Fragment {
+
+    public static ItemFragment newInstance(String seemId,String itemId) {
+        ItemFragment f = new ItemFragment();
+        Bundle args = new Bundle();
+        args.putString(GlobalVars.EXTRA_ITEM_ID, itemId);
+        args.putString(GlobalVars.EXTRA_SEEM_ID, seemId);
+        f.setArguments(args);
+        return f;
+    }
 
 
     private boolean refresh = false;
@@ -62,37 +75,49 @@ public class ItemActivity extends Activity {
     ThumbnailAdapter thumbnailAdapter;
     Seem seem = null;
 
-    /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    public View findViewById(int id){
+        return getActivity().findViewById(id);
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_seem_view, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         this.recoverFromSavedState(savedInstanceState);
 
         Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
-        setContentView(R.layout.activity_seem_view);
 
         image = (SpinnerImageView) findViewById(R.id.itemMainImage);
         image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE, GlobalVars.GRID_SIZE));
-        if (!getActionBar().isShowing()){
-            getActionBar().show();
-        }
+
         new GetItemAndPaintTask().execute(getItemId());
 
         twoWayGridView = (TwoWayGridView) findViewById(R.id.gridview);
         twoWayGridView.setColumnWidth(GlobalVars.GRID_SIZE);
         twoWayGridView.setRowHeight(GlobalVars.GRID_SIZE);
-        thumbnailAdapter = new ThumbnailAdapter(this,
+        thumbnailAdapter = new ThumbnailAdapter(getActivity(),
                 new ItemSelectedListener() {
                     @Override
                     public void itemSelected(Item item) {
-                        ActivityFactory.startItemActivity(ItemActivity.this, getSeemId(), item.getId());
+                        onItemClickListener.onClick(getSeemId(), item.getId());
                     }
                 },
                 new ItemSelectedListener() {
                     @Override
                     public void itemSelected(Item item) {
-                        ActivityFactory.startThreadedActivity(ItemActivity.this,item.getId());
+                        ActivityFactory.startThreadedActivity(getActivity(),item.getId());
                     }
                 }
         );
@@ -107,8 +132,6 @@ public class ItemActivity extends Activity {
             }
         });
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
 
     public void paintReply(){
@@ -120,7 +143,7 @@ public class ItemActivity extends Activity {
             image.setViewThreadOnClick(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ActivityFactory.startThreadedActivity(ItemActivity.this, item.getId());
+                    ActivityFactory.startThreadedActivity(getActivity(), item.getId());
                 }
             });
         }
@@ -150,7 +173,7 @@ public class ItemActivity extends Activity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Utils.debug(this.getClass(),"ItemActivity - onSaveInstanceState");
         outState.putString(GlobalVars.EXTRA_SEEM_ID, getSeemId());
@@ -159,8 +182,8 @@ public class ItemActivity extends Activity {
 
     protected void recoverFromSavedState(Bundle savedInstanceState) {
         if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.EXTRA_SEEM_ID)){
-            getIntent().putExtra(GlobalVars.EXTRA_SEEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_SEEM_ID));
-            getIntent().putExtra(GlobalVars.EXTRA_ITEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_ITEM_ID));
+            getArguments().putString(GlobalVars.EXTRA_SEEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_SEEM_ID));
+            getArguments().putString(GlobalVars.EXTRA_ITEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_ITEM_ID));
         }
     }
 
@@ -172,19 +195,17 @@ public class ItemActivity extends Activity {
             Utils.debug(this.getClass(),"Pic taken");
             new GetItemAndPaintTask().execute(getItemId());
         }
+
     }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.seem_view, menu);
         MenuItem menuItem = menu.findItem(R.id.action_camera);
         if(!MyApplication.isLoggedIn()){
             menuItem.setVisible(false);
         }
-
-        return true;
     }
 
 
@@ -193,7 +214,7 @@ public class ItemActivity extends Activity {
         int id = menuItem.getItemId();
         if(id == R.id.action_camera && item != null){
             Utils.debug(this.getClass(),"Action camera!");
-            PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_camera));
+            PopupMenu popup = new PopupMenu(getActivity(), findViewById(R.id.action_camera));
             MenuInflater inflater = popup.getMenuInflater();
             inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -202,11 +223,11 @@ public class ItemActivity extends Activity {
                     switch (menuItem.getItemId()) {
                         case R.id.actionPopupCamera:
                             Utils.debug(this.getClass(), "NEW SEEM!");
-                            ActivityFactory.startReplyItemActivity(ItemActivity.this,item.getId(), GlobalVars.PhotoSource.CAMERA);
+                            ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.CAMERA);
                             return true;
                         case R.id.actionPopupGallery:
                             Utils.debug(this.getClass(), "NEW SEEM!");
-                            ActivityFactory.startReplyItemActivity(ItemActivity.this,item.getId(), GlobalVars.PhotoSource.GALLERY);
+                            ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.GALLERY);
                             return true;
                     }
                     return false;
@@ -222,16 +243,7 @@ public class ItemActivity extends Activity {
             new GetItemAndPaintTask().execute(getItemId());
             return true;
         }
-        if(id == android.R.id.home) {
-            //NavUtils.navigateUpFromSameTask(this.getActivity());
-            if(this.item.getReplyTo() != null){
-                ActivityFactory.startItemActivity(this,this.item.getSeemId(),this.item.getReplyTo());
-            } else {
-                ActivityFactory.startMainActivity(this);
-            }
 
-            return true;
-        }
         return super.onOptionsItemSelected(menuItem);
     }
 
@@ -254,11 +266,11 @@ public class ItemActivity extends Activity {
 
 
     public String getSeemId(){
-        String seemId = getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);
+        String seemId = getArguments().getString(GlobalVars.EXTRA_SEEM_ID);
         return  seemId;
     }
     public String getItemId(){
-        String itemId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
+        String itemId =getArguments().getString(GlobalVars.EXTRA_ITEM_ID);
         return  itemId;
     }
 
@@ -273,7 +285,7 @@ public class ItemActivity extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            ItemActivity.this.setTitle(seem.getTitle());
+            getActivity().setTitle(seem.getTitle());
         }
     }
 
@@ -470,8 +482,8 @@ public class ItemActivity extends Activity {
                 public void onAnimationEnd(Animator animation) {
                     mCurrentAnimator = null;
 
-                    Item parentItem = ItemActivity.this.item;
-                    ActivityFactory.startItemFullscreenActivity(ItemActivity.this, getSeemId(), parentItem.getId(), item.getId());
+                    Item parentItem = ItemFragment.this.item;
+                    ActivityFactory.startItemFullscreenActivity(getActivity(), getSeemId(), parentItem.getId(), item.getId());
                 }
 
                 @Override
@@ -488,6 +500,28 @@ public class ItemActivity extends Activity {
             startScaleFinal = startScale;
 
         }
+    }
+
+    private OnItemClickListener onItemClickListener;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            onItemClickListener = (OnItemClickListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement UserProfileInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        onItemClickListener = null;
+    }
+
+    public interface OnItemClickListener {
+        public void onClick(String seemId,String itemId);
     }
 
 }

@@ -8,14 +8,14 @@ import android.provider.MediaStore;
 
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.activities.CreateSeemFlowActivity;
-import com.seem.android.mockup1.activities.ItemActivity;
 import com.seem.android.mockup1.activities.ItemsFullScreenActivity;
 import com.seem.android.mockup1.activities.MainActivity;
 import com.seem.android.mockup1.activities.ReplyFlowActivity;
 import com.seem.android.mockup1.activities.ThreadedViewActivity;
 import com.seem.android.mockup1.activities.UserProfileActivity;
-import com.seem.android.mockup1.adapters.ThreadedAdapter;
-import com.seem.android.mockup1.model.Item;
+import com.seem.android.mockup1.fragments.ItemFragment;
+
+import java.util.Map;
 
 /**
  * Created by igbopie on 25/03/14.
@@ -54,16 +54,10 @@ public class ActivityFactory {
         intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemId);
         intent.putExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID,currentItem);
         intent.putExtra(GlobalVars.EXTRA_PARENT_ITEM_ID,parentItem);
-        context.startActivity(intent);
+        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_ITEM_FULLSCREEN);
 
     }
 
-    public static void startItemActivity(Activity activity, String seemId, String itemId){
-        Intent intent = new Intent(activity, ItemActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemId);
-        intent.putExtra(GlobalVars.EXTRA_ITEM_ID,itemId);
-        activity.startActivity(intent);
-    }
 
     public static void startCamera(Activity activity,Uri returnPhoto){
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -83,7 +77,7 @@ public class ActivityFactory {
     public static void startThreadedActivity(Activity activity,String itemId){
         Intent intent = new Intent(activity, ThreadedViewActivity.class);
         intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, GlobalVars.RETURN_CODE_THREADED_VIEW);
     }
     public static void startMainActivity(Activity activity) {
         Intent intent = new Intent(activity, MainActivity.class);
@@ -92,6 +86,21 @@ public class ActivityFactory {
 
     public static void finishActivity(Activity activity,int result){
         Intent data = new Intent();
+        activity.setResult(result, data);
+        //android:noHistory = "true"
+        /*if (activity.getParent() == null) {
+            activity.setResult(result, data);
+        } else {
+            activity.getParent().setResult(result, data);
+        }*/
+        activity.finish();
+    }
+
+    public static void finishActivityWithData(Activity activity,Map<String,String> mapData,int result){
+        Intent data = new Intent();
+        for(Map.Entry<String,String> entry:mapData.entrySet()) {
+            data.putExtra(entry.getKey(),entry.getValue());
+        }
         activity.setResult(result, data);
         //android:noHistory = "true"
         /*if (activity.getParent() == null) {

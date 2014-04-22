@@ -92,7 +92,7 @@ public class FeedListFragment extends ListFragment {
         // Do something when a list item is clicked
         Feed feed = adapter.getItem(position);
         if(feed.getAction() == Feed.FeedAction.CREATE_SEEM){
-            ActivityFactory.startItemActivity(FeedListFragment.this.getActivity(), feed.getSeemId(), feed.getItemId());
+            onItemClickListener.onClick(feed.getSeemId(), feed.getItemId());
         }else {
             ActivityFactory.startThreadedActivity(FeedListFragment.this.getActivity(), feed.getItemId());
         }
@@ -224,4 +224,28 @@ public class FeedListFragment extends ListFragment {
 
         }
     }
+
+
+    private OnItemClickListener onItemClickListener;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            onItemClickListener = (OnItemClickListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement UserProfileInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        onItemClickListener = null;
+    }
+
+    public interface OnItemClickListener {
+        public void onClick(String seemId,String itemId);
+    }
+
 }

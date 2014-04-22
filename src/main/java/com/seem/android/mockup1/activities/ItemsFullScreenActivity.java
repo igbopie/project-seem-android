@@ -1,5 +1,7 @@
 package com.seem.android.mockup1.activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,10 +15,13 @@ import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.fragments.ItemFullScreenFragment;
 import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.ItemService;
+import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by igbopie on 23/03/14.
@@ -105,6 +110,21 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         public CharSequence getPageTitle(int position) {
             return "Image "+position;
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Utils.debug(this.getClass(),"ItemFullScreen - onActivityResult");
+
+        if (requestCode == GlobalVars.RETURN_CODE_THREADED_VIEW && resultCode == Activity.RESULT_OK) {
+
+            Map<String,String> dataMap = new HashMap<String, String>();
+            dataMap.put(GlobalVars.EXTRA_SEEM_ID,data.getStringExtra(GlobalVars.EXTRA_SEEM_ID));
+            dataMap.put(GlobalVars.EXTRA_ITEM_ID,data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
+            ActivityFactory.finishActivityWithData(this, dataMap, Activity.RESULT_OK);
+        }
+
     }
 
     public class InitAsyncTask extends AsyncTask<Void,Void,List<Item>>{

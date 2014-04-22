@@ -32,6 +32,8 @@ import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -204,7 +206,10 @@ public class ItemFullScreenFragment extends Fragment {
         replyIconTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivityFactory.startItemActivity(ItemFullScreenFragment.this.getActivity(), getSeemId(), getItemId());
+                Map<String,String>data = new HashMap<String, String>();
+                data.put(GlobalVars.EXTRA_SEEM_ID,getSeemId());
+                data.put(GlobalVars.EXTRA_ITEM_ID,getItemId());
+                ActivityFactory.finishActivityWithData(getActivity(),data,Activity.RESULT_OK);
             }
         });
         replyButton.setOnClickListener(new View.OnClickListener() {
@@ -283,6 +288,10 @@ public class ItemFullScreenFragment extends Fragment {
         if (requestCode == GlobalVars.RETURN_CODE_REPLY_TO_ITEM && resultCode == Activity.RESULT_OK) {
             Utils.debug(this.getClass(),"ItemFullScreen - Pic taken");
         }
+
+
+
+
     }
 
     @Override
