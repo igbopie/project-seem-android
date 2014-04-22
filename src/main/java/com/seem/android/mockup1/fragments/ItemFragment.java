@@ -169,7 +169,7 @@ public class ItemFragment extends Fragment {
 
 
         image.setText(item.getCaption());
-
+        getActivity().setTitle(item.getCaption());
     }
 
     @Override
@@ -341,6 +341,7 @@ public class ItemFragment extends Fragment {
                 addToGrid(item);
             }
             image.setLoading(false);
+
         }
     }
 
