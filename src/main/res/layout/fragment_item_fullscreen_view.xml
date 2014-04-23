@@ -123,7 +123,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="igbopie"
-                android:src="@drawable/userbig"
+                android:src="@drawable/user"
                 android:id="@+id/userIconTextView"
                 android:layout_marginRight="@dimen/fullscreen_bottonbar_icon_margin"
                 />

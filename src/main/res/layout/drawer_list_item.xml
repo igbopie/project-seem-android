@@ -7,14 +7,15 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="25dp"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:contentDescription="@string/desc_list_item_icon"
         android:src="@drawable/abc_ic_go"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/title"

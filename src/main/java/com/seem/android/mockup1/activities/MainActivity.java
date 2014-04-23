@@ -35,7 +35,10 @@ import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
 import com.seem.android.mockup1.fragments.SignUpFragment;
 import com.seem.android.mockup1.fragments.UserProfileFragment;
+import com.seem.android.mockup1.model.Item;
 import com.seem.android.mockup1.service.Api;
+import com.seem.android.mockup1.service.ItemService;
+import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.uimodel.NavDrawerItem;
 import com.seem.android.mockup1.uimodel.NavDrawerListAdapter;
 import com.seem.android.mockup1.util.ActivityFactory;
@@ -240,7 +243,7 @@ public class MainActivity extends Activity implements
      * Diplaying fragment view for selected nav drawer list item
      * */
 
-    public void displayView(Fragment fragment){
+    private void displayView(Fragment fragment){
         displayView(-1,null,fragment,true);
     }
 
@@ -262,7 +265,10 @@ public class MainActivity extends Activity implements
                 fragment = SignUpFragment.newInstance();
             } else if (navDrawerItem == drawerItemUserProfile) {
                 fragment = UserProfileFragment.newInstance();
+            } else if(navDrawerItem.getItem() != null){
+                onClick(navDrawerItem.getItem().getSeemId(),navDrawerItem.getItem().getId());
             }
+
         } else {
             position = -1;
         }
@@ -342,14 +348,11 @@ public class MainActivity extends Activity implements
         super.onActivityResult(requestCode, resultCode, data);
         Utils.debug(this.getClass(),"On Activity Result "+requestCode+ " "+resultCode);
         if (requestCode == GlobalVars.RETURN_CODE_THREADED_VIEW && resultCode == Activity.RESULT_OK) {
-            Utils.debug(this.getClass(),"Threaded View finished");
-            android.app.Fragment fragment = ItemFragment.newInstance(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
-            displayView(fragment);
+            onClick(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
         }
 
         if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN && resultCode == Activity.RESULT_OK && data.getStringExtra(GlobalVars.EXTRA_SEEM_ID) != null ) {
-            android.app.Fragment fragment = ItemFragment.newInstance(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
-            displayView(fragment);
+            onClick(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
         }
     }
 
@@ -357,7 +360,49 @@ public class MainActivity extends Activity implements
     public void onClick( String seemId,String itemId) {
         android.app.Fragment fragment = ItemFragment.newInstance(seemId,itemId);
         displayView(fragment);
+        new PaintDrawerThreadView(itemId).execute();
     }
+
+    public class PaintDrawerThreadView extends AsyncTask<Void,Void,Void>{
+        private String itemId;
+        private List<Item>items = new ArrayList<Item>();
+
+        public PaintDrawerThreadView(String itemId) {
+            this.itemId = itemId;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Item item = ItemService.getInstance().findItemById(itemId);
+            items.add(item);
+            while(item != null){
+                if(item.getReplyTo() != null){
+                    item = ItemService.getInstance().findItemById(item.getReplyTo());
+                    items.add(0,item);
+                }else{
+                    item = null;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Utils.debug(getClass(),"BUH!");
+            buildDrawerMenu();
+            NavDrawerItem navDrawerItem = new NavDrawerItem("Thread View",true);
+            navDrawerItems.add(navDrawerItem);
+            for(Item item:items) {
+                NavDrawerItem dItem = new NavDrawerItem(item);
+                navDrawerItems.add(dItem);
+            }
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+
+
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

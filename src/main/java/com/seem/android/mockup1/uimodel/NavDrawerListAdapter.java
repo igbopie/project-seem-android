@@ -2,6 +2,7 @@ package com.seem.android.mockup1.uimodel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
+import com.seem.android.mockup1.asynctask.DownloadAsyncTask;
 
 import java.util.ArrayList;
 
@@ -49,12 +52,30 @@ public class NavDrawerListAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.drawer_list_item, null);
         }
 
+
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.icon);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
         TextView txtCount = (TextView) convertView.findViewById(R.id.counter);
 
-        imgIcon.setImageResource(navDrawerItems.get(position).getIcon());
-        txtTitle.setText(navDrawerItems.get(position).getTitle());
+        NavDrawerItem dItem = navDrawerItems.get(position);
+
+        if(dItem.getItem() != null){
+            txtTitle.setText(dItem.getItem().getCaption());
+            new DownloadAsyncTask(dItem.getItem(),imgIcon,true).execute();
+        }else {
+            if(dItem.isSectionTitle()) {
+                imgIcon.setVisibility(View.INVISIBLE);
+            }else{
+                imgIcon.setImageResource(dItem.getIcon());
+            }
+            txtTitle.setText(dItem.getTitle());
+        }
+
+        if(dItem.isSectionTitle()){
+            convertView.setBackgroundColor(MyApplication.getAppContext().getResources().getColor(R.color.SeemDarkBlue));
+            txtTitle.setGravity(Gravity.CENTER);
+        }
+
 
         // displaying count
         // check whether it set visible or not
@@ -66,6 +87,16 @@ public class NavDrawerListAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    @Override
+    public boolean areAllItemsEnabled () {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return !navDrawerItems.get(position).isSectionTitle();
     }
 
 }

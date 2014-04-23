@@ -1,5 +1,7 @@
 package com.seem.android.mockup1.uimodel;
 
+import com.seem.android.mockup1.model.Item;
+
 /**
  * Created by igbopie on 03/04/14.
  */
@@ -10,9 +12,18 @@ public class NavDrawerItem {
     private String count = "0";
     // boolean to set visiblity of the counter
     private boolean isCounterVisible = false;
+    private boolean isSectionTitle;
+    private Item item;
 
     public NavDrawerItem(){}
 
+    public NavDrawerItem(Item item){
+        this.item = item;
+    }
+    public NavDrawerItem(String title,boolean isSectionTitle){
+        this.title = title;
+        this.isSectionTitle = isSectionTitle;
+    }
     public NavDrawerItem(String title, int icon){
         this.title = title;
         this.icon = icon;
@@ -55,5 +66,21 @@ public class NavDrawerItem {
 
     public void setCounterVisibility(boolean isCounterVisible){
         this.isCounterVisible = isCounterVisible;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public boolean isSectionTitle() {
+        return isSectionTitle;
+    }
+
+    public void setSectionTitle(boolean isSectionTitle) {
+        this.isSectionTitle = isSectionTitle;
     }
 }
