@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 
 import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.R;
@@ -26,7 +25,7 @@ import java.util.Map;
 /**
  * Created by igbopie on 23/03/14.
  */
-public class ItemsFullScreenActivity extends ActionBarActivity {
+public class ItemsFullScreenActivity extends Activity {
 
     List<Item> itemList = new ArrayList<Item>();
     ViewPager mViewPager;
@@ -48,7 +47,7 @@ public class ItemsFullScreenActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_item_fullscreen_view);
-        mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
+        mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getFragmentManager());
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.

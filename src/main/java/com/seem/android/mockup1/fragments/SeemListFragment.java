@@ -72,6 +72,7 @@ public class SeemListFragment extends ListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.seem_view, menu);
         MenuItem menuItem = menu.findItem(R.id.action_camera);
         if(!MyApplication.isLoggedIn()){

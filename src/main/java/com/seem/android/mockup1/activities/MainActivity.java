@@ -30,6 +30,7 @@ import com.seem.android.mockup1.GlobalVars;
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.R;
 import com.seem.android.mockup1.fragments.FeedListFragment;
+import com.seem.android.mockup1.fragments.HomeFragment;
 import com.seem.android.mockup1.fragments.ItemFragment;
 import com.seem.android.mockup1.fragments.LoginFragment;
 import com.seem.android.mockup1.fragments.SeemListFragment;
@@ -70,7 +71,6 @@ public class MainActivity extends Activity implements
     //
     private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
     private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
-    private NavDrawerItem drawerItemSeemList = new NavDrawerItem("Seem List", R.drawable.home);
     private NavDrawerItem drawerItemLogin = new NavDrawerItem("Login", R.drawable.sign_in);
     private NavDrawerItem drawerItemSignUp = new NavDrawerItem("Sign Up", R.drawable.plus_square);
     private NavDrawerItem drawerItemUserProfile = new NavDrawerItem("User Profile", R.drawable.user);
@@ -196,10 +196,9 @@ public class MainActivity extends Activity implements
 
         if(MyApplication.isLoggedIn()) {
             navDrawerItems.add(drawerItemHome);
-            navDrawerItems.add(drawerItemSeemList);
             navDrawerItems.add(drawerItemUserProfile);
         }else{
-            navDrawerItems.add(drawerItemSeemList);
+            navDrawerItems.add(drawerItemHome);
             navDrawerItems.add(drawerItemLogin);
             navDrawerItems.add(drawerItemSignUp);
         }
@@ -254,11 +253,10 @@ public class MainActivity extends Activity implements
         // update the main content by replacing fragments
         String menuTitle ="";
         if(fragment == null) {
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
             menuTitle = navDrawerItem.getTitle();
             if (navDrawerItem == drawerItemHome) {
-                fragment = new FeedListFragment();
-            } else if (navDrawerItem == drawerItemSeemList) {
-                fragment = new SeemListFragment();
+                fragment = new HomeFragment();
             } else if (navDrawerItem == drawerItemLogin) {
                 fragment = LoginFragment.newInstance();
             } else if (navDrawerItem == drawerItemSignUp) {
@@ -270,6 +268,7 @@ public class MainActivity extends Activity implements
             }
 
         } else {
+            mDrawerToggle.setDrawerIndicatorEnabled(false);
             position = -1;
         }
 
@@ -279,7 +278,7 @@ public class MainActivity extends Activity implements
             transaction.replace(R.id.frame_container, fragment);
             if(addToBack) {
                 // Add to backstack
-                transaction.addToBackStack(null);
+                //transaction.addToBackStack(null);
             }
             transaction.commit();
 
@@ -354,6 +353,14 @@ public class MainActivity extends Activity implements
         if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN && resultCode == Activity.RESULT_OK && data.getStringExtra(GlobalVars.EXTRA_SEEM_ID) != null ) {
             onClick(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
         }
+    }
+
+
+
+    @Override
+    public void onFinish() {
+        this.displayView(0,drawerItemHome);
+
     }
 
     @Override

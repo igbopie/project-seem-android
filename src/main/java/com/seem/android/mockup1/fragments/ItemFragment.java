@@ -59,7 +59,7 @@ public class ItemFragment extends Fragment {
     private SpinnerImageView image;
     private Item item;
     private ZoomUtil zoom;
-    private MenuItem upButton;
+    //private MenuItem upButton;
 
     private List<Item> replies = new ArrayList<Item>();
 
@@ -80,6 +80,7 @@ public class ItemFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
@@ -126,14 +127,13 @@ public class ItemFragment extends Fragment {
         twoWayGridView.setAdapter(thumbnailAdapter);
         twoWayGridView.setOnItemClickListener(new TwoWayAdapterView.OnItemClickListener() {
             public void onItemClick(TwoWayAdapterView parent, View v, int position, long id) {
-                Utils.debug(this.getClass(),"ItemClicked:"+position);
-                Item item = (Item)thumbnailAdapter.getItem(position);
-                Utils.debug(this.getClass(),"Item:"+item.getId());
-                zoom = new ZoomUtil(item,((SpinnerImageView)v).getImageView());
+                Utils.debug(this.getClass(), "ItemClicked:" + position);
+                Item item = (Item) thumbnailAdapter.getItem(position);
+                Utils.debug(this.getClass(), "Item:" + item.getId());
+                zoom = new ZoomUtil(item, ((SpinnerImageView) v).getImageView());
                 zoom.startZoom();
             }
         });
-
     }
 
     public void paintReply(){
@@ -174,7 +174,7 @@ public class ItemFragment extends Fragment {
         getActivity().setTitle(item.getCaption());
 
         if(item.getDepth() > 0){
-            upButton.setVisible(true);
+            //upButton.setVisible(true);
         }
     }
 
@@ -207,12 +207,13 @@ public class ItemFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.seem_view, menu);
         MenuItem menuItem = menu.findItem(R.id.action_camera);
         if(!MyApplication.isLoggedIn()){
             menuItem.setVisible(false);
         }
-        upButton = menu.findItem(R.id.action_up);
+        //upButton = menu.findItem(R.id.action_up);
     }
 
 
@@ -251,10 +252,14 @@ public class ItemFragment extends Fragment {
             return true;
         }
 
-        if(id == R.id.action_up) {
+        if(id == R.id.action_up || id == android.R.id.home) {
             //newGame();
             Utils.debug(this.getClass(),"Action up");
-            this.onItemClickListener.onClick(item.getSeemId(),item.getReplyTo());
+            if(item.getReplyTo() != null) {
+                this.onItemClickListener.onClick(item.getSeemId(), item.getReplyTo());
+            } else {
+                this.onItemClickListener.onFinish();
+            }
             return true;
         }
 
@@ -537,6 +542,8 @@ public class ItemFragment extends Fragment {
 
     public interface OnItemClickListener {
         public void onClick(String seemId,String itemId);
+
+        public void onFinish();
     }
 
 }
