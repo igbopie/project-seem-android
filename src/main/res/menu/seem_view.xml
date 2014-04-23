@@ -3,8 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.seem.android.mockup1.activities.ItemActivity" >
 
+    <item android:id="@+id/action_up"
+        android:icon="@drawable/arrow_up"
+        android:title="Up"
+        app:showAsAction="always"
+        android:showAsAction="always"
+        android:visible="false"
+
+        />
+
+
     <item android:id="@+id/action_refresh"
-        android:icon="@drawable/ic_action_refresh"
+        android:icon="@drawable/refresh"
         android:title="Refresh"
         app:showAsAction="always"
         android:showAsAction="always"
@@ -13,7 +23,7 @@
         />
 
     <item android:id="@+id/action_camera"
-        android:icon="@drawable/ic_action_camera"
+        android:icon="@drawable/camera"
         android:title="Camera"
         app:showAsAction="always"
         android:showAsAction="always"

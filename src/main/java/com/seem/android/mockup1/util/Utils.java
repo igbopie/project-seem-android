@@ -164,8 +164,12 @@ public class Utils {
 
     }
 
-
-    //UPDATED!
+    /**
+     * TODO will not work with dropbox and others apps
+     * @param activity
+     * @param uri
+     * @return
+     */
     public static String getRealPathFromGalleryUri(Activity activity,Uri uri) {
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);

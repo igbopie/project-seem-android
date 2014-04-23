@@ -59,6 +59,7 @@ public class ItemFragment extends Fragment {
     private SpinnerImageView image;
     private Item item;
     private ZoomUtil zoom;
+    private MenuItem upButton;
 
     private List<Item> replies = new ArrayList<Item>();
 
@@ -171,6 +172,10 @@ public class ItemFragment extends Fragment {
 
         image.setText(item.getCaption());
         getActivity().setTitle(item.getCaption());
+
+        if(item.getDepth() > 0){
+            upButton.setVisible(true);
+        }
     }
 
     @Override
@@ -207,6 +212,7 @@ public class ItemFragment extends Fragment {
         if(!MyApplication.isLoggedIn()){
             menuItem.setVisible(false);
         }
+        upButton = menu.findItem(R.id.action_up);
     }
 
 
@@ -242,6 +248,13 @@ public class ItemFragment extends Fragment {
             Utils.debug(this.getClass(),"Refresh Main Item and Replies");
             this.refresh = true;
             new GetItemAndPaintTask().execute(getItemId());
+            return true;
+        }
+
+        if(id == R.id.action_up) {
+            //newGame();
+            Utils.debug(this.getClass(),"Action up");
+            this.onItemClickListener.onClick(item.getSeemId(),item.getReplyTo());
             return true;
         }
 
