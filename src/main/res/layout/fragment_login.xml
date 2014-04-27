@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.seem.android.mockup1.fragments.LoginFragment" android:background="#54b4d0">
+    tools:context="com.seem.android.fragments.LoginFragment" android:background="#54b4d0">
 
     <!-- TODO: Update blank fragment layout -->
 

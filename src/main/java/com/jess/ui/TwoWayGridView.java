@@ -49,7 +49,7 @@ import android.view.ViewGroup;
 import android.view.animation.GridLayoutAnimationController;
 import android.widget.ListAdapter;
 
-import com.seem.android.mockup1.R;
+import com.seem.android.R;
 
 
 /**

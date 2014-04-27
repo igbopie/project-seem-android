@@ -6,7 +6,7 @@
     android:paddingTop="0dp"
     android:paddingBottom="0dp" android:background="#eeffffff">
 
-    <com.seem.android.mockup1.customviews.SquareImageView
+    <com.seem.android.customviews.SquareImageView
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:id="@+id/threadImageView"

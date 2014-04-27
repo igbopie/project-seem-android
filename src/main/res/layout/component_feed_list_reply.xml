@@ -16,12 +16,12 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="15dp">
-        <com.seem.android.mockup1.customviews.SpinnerImageView
+        <com.seem.android.customviews.SpinnerImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:id="@+id/originalPost"
             />
-        <com.seem.android.mockup1.customviews.SpinnerImageView
+        <com.seem.android.customviews.SpinnerImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:id="@+id/mainImageView" />

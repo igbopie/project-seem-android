@@ -23,7 +23,7 @@
         android:padding="0dp"
         />
 
-    <com.seem.android.mockup1.customviews.SpinnerImageView
+    <com.seem.android.customviews.SpinnerImageView
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:id="@+id/itemMainImage"

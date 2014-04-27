@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.seem.android.mockup1" >
+    package="com.seem.android">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -9,13 +9,13 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:name="com.seem.android.mockup1.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-    <uses-permission android:name="com.seem.android.mockup1.permission.C2D_MESSAGE" />
+    <permission android:name="com.seem.android.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.seem.android.permission.C2D_MESSAGE" />
 
     <uses-sdk android:minSdkVersion="14" />
 
     <application
-        android:name="com.seem.android.mockup1.MyApplication"
+        android:name="com.seem.android.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/seem_launcher"
         android:label="@string/app_name"
@@ -24,18 +24,18 @@
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
         <receiver
-            android:name=".service.gcm.GcmBroadcastReceiver"
+            android:name="com.seem.android.service.gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="com.seem.android" />
             </intent-filter>
         </receiver>
-        <service android:name=".service.gcm.GcmIntentService" />
+        <service android:name="com.seem.android.service.gcm.GcmIntentService" />
 
 
         <activity
-            android:name="com.seem.android.mockup1.activities.MainActivity"
+            android:name="com.seem.android.activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -52,27 +52,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.seem.android.mockup1.activities.ReplyFlowActivity"
+            android:name="com.seem.android.activities.ReplyFlowActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.seem.android.mockup1.activities.CreateSeemFlowActivity"
+            android:name="com.seem.android.activities.CreateSeemFlowActivity"
             android:label="Create Seem"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.seem.android.mockup1.activities.ItemsFullScreenActivity"
+            android:name="com.seem.android.activities.ItemsFullScreenActivity"
             android:label="FullScreen" >
         </activity>
         <activity
-            android:name="com.seem.android.mockup1.activities.ThreadedViewActivity"
+            android:name="com.seem.android.activities.ThreadedViewActivity"
             android:label="Thread View"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent">
         </activity>
         <activity
-            android:name=".activities.UserProfileActivity"
+            android:name="com.seem.android.activities.UserProfileActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_user_profile" >
         </activity>

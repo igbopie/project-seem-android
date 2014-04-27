@@ -6,7 +6,7 @@
     android:padding="1dp"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <com.seem.android.mockup1.customviews.SquareImageView
+    <com.seem.android.customviews.SquareImageView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/componentImageView"
