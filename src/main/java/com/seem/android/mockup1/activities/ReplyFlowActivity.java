@@ -125,10 +125,11 @@ public class ReplyFlowActivity extends Activity {
         }  else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
             //localTempFile = ;
             try {
-                //TODO SHRINK IT!
                 itemInProgress.setTempLocalFile(data.getData());
-                InputStream stream = getContentResolver().openInputStream(data.getData());
-                imageView.setImageBitmap(BitmapFactory.decodeStream(stream));
+                imageView.setImageBitmap(
+                        Utils.shrinkBitmapFromStream(
+                                    getContentResolver().openInputStream(data.getData()),
+                                    getContentResolver().openInputStream(data.getData()) ));
             }catch(Exception e){
                 Utils.debug(getClass(),"Error "+e);
             }

@@ -23,6 +23,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -432,15 +433,14 @@ public class Api {
 
     public static String createMedia(InputStream streamPhoto){
         try {
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            copyStream(streamPhoto,outStream);
-            //image.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+            //Utils.shrinkBitmapFromStream(stream);
+            //ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            //copyStream(streamPhoto,outStream);
+            //image.compress(Bitmap.CompressFormat.JPEG, 50, streamPhoto);
             String fileName = String.format("file_%d.png", new Date().getTime());
 
-            ByteArrayBody bab = new ByteArrayBody(outStream.toByteArray(),"image/jpeg", fileName);
-
             MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-            reqEntity.addPart("file", bab);
+            reqEntity.addPart("file", new InputStreamBody(streamPhoto,"image/jpeg", fileName));
 
             HttpPost httpPost = new HttpPost(ENDPOINT+ENDPOINT_CREATE_MEDIA);
             httpPost.setEntity(reqEntity);
@@ -455,6 +455,7 @@ public class Api {
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpResponse response = httpClient.execute(httpPost);
+
             if(response.getStatusLine().getStatusCode() != RESPONSE_CODE_OK){
                 return null;
             }

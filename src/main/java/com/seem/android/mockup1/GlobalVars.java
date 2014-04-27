@@ -44,6 +44,8 @@ public class GlobalVars {
     public static final String SHARED_PREF_GCM_TOKEN = "gcmToken";
     public static final String SHARED_PREF_LAST_APP_VERSION = "lastAppVersion";
 
+    public static final int MAX_WIDTH = 1920;
+
     /**
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."

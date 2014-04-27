@@ -113,8 +113,10 @@ public class CreateSeemFlowActivity extends Activity {
             //localTempFile = ;
 
             try {
-                InputStream stream = getContentResolver().openInputStream(data.getData());
-                imageView.setImageBitmap(BitmapFactory.decodeStream(stream));
+                imageView.setImageBitmap(
+                        Utils.shrinkBitmapFromStream(
+                                getContentResolver().openInputStream(data.getData()),
+                                getContentResolver().openInputStream(data.getData()) ));
             } catch (FileNotFoundException e) {
                 Utils.debug(getClass(),"Error "+e);
             }

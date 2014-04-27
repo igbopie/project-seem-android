@@ -22,6 +22,7 @@ import com.seem.android.mockup1.MyApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -58,9 +59,9 @@ public class Utils {
         int ratio = 0;
         boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
         if(width) {
-            ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 1000);
+            ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) GlobalVars.MAX_WIDTH);
         } else {
-            ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 1000);
+            ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) GlobalVars.MAX_WIDTH);
         }
         bmpFactoryOptions.inSampleSize = ratio;
         bmpFactoryOptions.inJustDecodeBounds = false;
@@ -73,6 +74,48 @@ public class Utils {
         matrix = null;
         return br;
     }
+
+    /**
+     * We need it twice. One for check the size, and the other one to really read it.
+     * @param stream
+     * @param clonStream
+     * @return
+     */
+    public static Bitmap shrinkBitmapFromStream(InputStream stream,InputStream clonStream){
+        System.gc();
+        try {
+            //500x500
+            BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+            bmpFactoryOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(stream, null, bmpFactoryOptions);
+            boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
+            int ratio = 0;
+            if(width) {
+                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) GlobalVars.MAX_WIDTH);
+            } else {
+                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) GlobalVars.MAX_WIDTH);
+            }
+            Utils.debug(Utils.class,"Bitmap size "+bmpFactoryOptions.outWidth +"x"+ bmpFactoryOptions.outHeight+" Ratio:"+ratio);
+            bmpFactoryOptions.inSampleSize = ratio;
+
+            bmpFactoryOptions.inJustDecodeBounds = false;
+
+            //stream.reset();
+
+            Bitmap bitmap =  BitmapFactory.decodeStream(clonStream, null, bmpFactoryOptions);
+            if(bitmap == null){
+                Utils.debug(Utils.class,"ERROR bitmap is null!! wrong file or what?");
+            }
+            Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),new Matrix(),true);
+
+            return croppedBmp;
+        } catch (Exception e) {
+            Utils.debug(Utils.class,"Error shrinking the photo :",e);
+        }
+        return null;
+    }
+
+
     public static Bitmap shrinkBitmap(String file){
         System.gc();
         try {
@@ -102,9 +145,9 @@ public class Utils {
             boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
             int ratio = 0;
             if(width) {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) 1000);
+                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) GlobalVars.MAX_WIDTH);
             } else {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) 1000);
+                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) GlobalVars.MAX_WIDTH);
             }
             bmpFactoryOptions.inSampleSize = ratio;
 
