@@ -3,6 +3,7 @@ package com.seem.android.mockup1.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.seem.android.mockup1.service.ItemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
 
+import java.io.InputStream;
 import java.util.Calendar;
 
 /**
@@ -114,8 +116,7 @@ public class ReplyFlowActivity extends Activity {
         if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             Utils.debug(this.getClass(),"Reply Flow Activity - Pic taken");
             try {
-                itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
-                imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
+                imageView.setImageBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
             }catch(Exception e){
                 Utils.debug(this.getClass(),"ERROR trying to save the image",e);
                 //
@@ -123,8 +124,14 @@ public class ReplyFlowActivity extends Activity {
             }
         }  else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
             //localTempFile = ;
-            itemInProgress.setTempLocalBitmap(Utils.shrinkBitmap(Utils.getRealPathFromGalleryUri(this,data.getData())));
-            imageView.setImageBitmap(itemInProgress.getTempLocalBitmap());
+            try {
+                //TODO SHRINK IT!
+                itemInProgress.setTempLocalFile(data.getData());
+                InputStream stream = getContentResolver().openInputStream(data.getData());
+                imageView.setImageBitmap(BitmapFactory.decodeStream(stream));
+            }catch(Exception e){
+                Utils.debug(getClass(),"Error "+e);
+            }
         } else {
             Utils.debug(this.getClass(),"Reply Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
@@ -146,7 +153,7 @@ public class ReplyFlowActivity extends Activity {
         protected Item doInBackground(Item... items) {
 
             try {
-                String mediaId = Api.createMedia(items[0].getTempLocalBitmap());
+                String mediaId = Api.createMedia(getContentResolver().openInputStream(items[0].getTempLocalFile()));
                 if(mediaId != null){
                     items[0].setMediaId(mediaId);
                     items[0].setReplyTo(replyId);

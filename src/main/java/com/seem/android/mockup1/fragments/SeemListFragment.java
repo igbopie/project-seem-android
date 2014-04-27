@@ -180,6 +180,19 @@ public class SeemListFragment extends ListFragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        Utils.debug(getClass(),"OnDetach");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Utils.debug(getClass(),"onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Utils.debug(getClass(),"onStop");
         onItemClickListener = null;
     }
 

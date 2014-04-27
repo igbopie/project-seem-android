@@ -32,7 +32,6 @@ public class Item {
     private Boolean thumbedDown;
 
     private Uri tempLocalFile;
-    private Bitmap tempLocalBitmap;
 
     public String getId() {
         return id;
@@ -179,15 +178,6 @@ public class Item {
         this.tempLocalFile = tempLocalFile;
     }
 
-
-
-    public Bitmap getTempLocalBitmap() {
-        return tempLocalBitmap;
-    }
-
-    public void setTempLocalBitmap(Bitmap tempLocalBitmap) {
-        this.tempLocalBitmap = tempLocalBitmap;
-    }
 
     @Override
     public boolean equals(Object o) {

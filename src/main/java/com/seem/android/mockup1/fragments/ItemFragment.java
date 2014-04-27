@@ -134,6 +134,8 @@ public class ItemFragment extends Fragment {
                 zoom.startZoom();
             }
         });
+
+
     }
 
     public void paintReply(){
@@ -176,6 +178,8 @@ public class ItemFragment extends Fragment {
         if(item.getDepth() > 0){
             //upButton.setVisible(true);
         }
+
+
     }
 
     @Override
@@ -187,6 +191,8 @@ public class ItemFragment extends Fragment {
     }
 
     protected void recoverFromSavedState(Bundle savedInstanceState) {
+
+        Utils.debug(this.getClass(),"ItemActivity - recoverFromSavedState");
         if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.EXTRA_SEEM_ID)){
             getArguments().putString(GlobalVars.EXTRA_SEEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_SEEM_ID));
             getArguments().putString(GlobalVars.EXTRA_ITEM_ID,savedInstanceState.getString(GlobalVars.EXTRA_ITEM_ID));
@@ -276,6 +282,8 @@ public class ItemFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Utils.debug(this.getClass(),"Item Fragment - On resume");
+
+        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         if(zoom != null) {
             zoom.endZoom();
             zoom = null;

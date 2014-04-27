@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +25,9 @@ import com.seem.android.mockup1.model.Seem;
 import com.seem.android.mockup1.service.SeemService;
 import com.seem.android.mockup1.util.ActivityFactory;
 import com.seem.android.mockup1.util.Utils;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * Created by igbopie on 21/03/14.
@@ -107,8 +111,13 @@ public class CreateSeemFlowActivity extends Activity {
             imageView.setImageBitmap(localBitmap);
         } else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
             //localTempFile = ;
-            localBitmap = Utils.shrinkBitmap(Utils.getRealPathFromGalleryUri(this,data.getData()));
-            imageView.setImageBitmap(localBitmap);
+
+            try {
+                InputStream stream = getContentResolver().openInputStream(data.getData());
+                imageView.setImageBitmap(BitmapFactory.decodeStream(stream));
+            } catch (FileNotFoundException e) {
+                Utils.debug(getClass(),"Error "+e);
+            }
         } else {
             Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
@@ -142,9 +151,9 @@ public class CreateSeemFlowActivity extends Activity {
         protected Seem doInBackground(Void... items) {
 
             try {
-                String mediaId = Api.createMedia(localBitmap);
+                String mediaId = Api.createMedia(getContentResolver().openInputStream(localTempFile));
                 if(mediaId != null){
-                    return SeemService.getInstance().save(title,caption,mediaId);
+                    return SeemService.getInstance().save(title, caption, mediaId);
                 }else {
                     Utils.debug(this.getClass(),"Error uploading");
                 }

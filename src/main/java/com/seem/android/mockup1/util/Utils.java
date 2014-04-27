@@ -171,6 +171,8 @@ public class Utils {
      * @return
      */
     public static String getRealPathFromGalleryUri(Activity activity,Uri uri) {
+
+        Utils.debug(Utils.class,"From gallery URI: "+uri);
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
         if(cursor!=null)

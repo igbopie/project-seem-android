@@ -43,7 +43,6 @@ public class FeedListFragment extends ListFragment {
     private int page = 0;
     private boolean waiting = false;
     private boolean moreItems = true;
-    private MenuItem refreshItem;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,7 +107,6 @@ public class FeedListFragment extends ListFragment {
         if(!MyApplication.isLoggedIn()){
             menuItem.setVisible(false);
         }
-        refreshItem = menu.findItem(R.id.action_refresh);
 
         super.onCreateOptionsMenu(menu,inflater);
 

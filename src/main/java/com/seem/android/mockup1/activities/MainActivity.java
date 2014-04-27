@@ -62,6 +62,8 @@ public class MainActivity extends Activity implements
                                             FeedListFragment.OnItemClickListener,
                                             SeemListFragment.OnItemClickListener {
 
+    private boolean lastDrawerStatus = true;
+
     //GCM
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private GoogleCloudMessaging gcm;
@@ -187,6 +189,11 @@ public class MainActivity extends Activity implements
             Utils.debug(getClass(), "No data");
         }
 
+        if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.EXTRA_DRAWER_STATUS)){
+            lastDrawerStatus = savedInstanceState.getBoolean(GlobalVars.EXTRA_DRAWER_STATUS);
+            mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
+        }
+
     }
 
     private void buildDrawerMenu(){
@@ -253,7 +260,8 @@ public class MainActivity extends Activity implements
         // update the main content by replacing fragments
         String menuTitle ="";
         if(fragment == null) {
-            mDrawerToggle.setDrawerIndicatorEnabled(true);
+            lastDrawerStatus = true;
+            mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
             menuTitle = navDrawerItem.getTitle();
             if (navDrawerItem == drawerItemHome) {
                 fragment = new HomeFragment();
@@ -268,7 +276,8 @@ public class MainActivity extends Activity implements
             }
 
         } else {
-            mDrawerToggle.setDrawerIndicatorEnabled(false);
+            lastDrawerStatus = false;
+            mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
             position = -1;
         }
 
@@ -278,7 +287,7 @@ public class MainActivity extends Activity implements
             transaction.replace(R.id.frame_container, fragment);
             if(addToBack) {
                 // Add to backstack
-                //transaction.addToBackStack(null);
+                transaction.addToBackStack(null);
             }
             transaction.commit();
 
@@ -324,6 +333,13 @@ public class MainActivity extends Activity implements
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Utils.debug(getClass(),"onSaveInstanceState");
+        outState.putBoolean(GlobalVars.EXTRA_DRAWER_STATUS,lastDrawerStatus);
+    }
+
+    @Override
     public void hasLoggedIn() {
         buildDrawerMenu();
         displayView(0,drawerItemHome);
@@ -337,7 +353,9 @@ public class MainActivity extends Activity implements
     // You need to do the Play Services APK check here too.
     @Override
     protected void onResume() {
+        mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
         super.onResume();
+        Utils.debug(getClass(), "onResume: " + lastDrawerStatus);
         checkPlayServices();
     }
 
@@ -353,6 +371,8 @@ public class MainActivity extends Activity implements
         if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN && resultCode == Activity.RESULT_OK && data.getStringExtra(GlobalVars.EXTRA_SEEM_ID) != null ) {
             onClick(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
         }
+
+        mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
     }
 
 
@@ -367,46 +387,8 @@ public class MainActivity extends Activity implements
     public void onClick( String seemId,String itemId) {
         android.app.Fragment fragment = ItemFragment.newInstance(seemId,itemId);
         displayView(fragment);
-        new PaintDrawerThreadView(itemId).execute();
     }
 
-    public class PaintDrawerThreadView extends AsyncTask<Void,Void,Void>{
-        private String itemId;
-        private List<Item>items = new ArrayList<Item>();
-
-        public PaintDrawerThreadView(String itemId) {
-            this.itemId = itemId;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Item item = ItemService.getInstance().findItemById(itemId);
-            items.add(item);
-            while(item != null){
-                if(item.getReplyTo() != null){
-                    item = ItemService.getInstance().findItemById(item.getReplyTo());
-                    items.add(0,item);
-                }else{
-                    item = null;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            Utils.debug(getClass(),"BUH!");
-            buildDrawerMenu();
-            NavDrawerItem navDrawerItem = new NavDrawerItem("Thread View",true);
-            navDrawerItems.add(navDrawerItem);
-            for(Item item:items) {
-                NavDrawerItem dItem = new NavDrawerItem(item);
-                navDrawerItems.add(dItem);
-            }
-            adapter.notifyDataSetChanged();
-        }
-    }
 
 
 

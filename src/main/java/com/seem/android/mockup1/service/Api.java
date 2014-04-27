@@ -2,6 +2,7 @@ package com.seem.android.mockup1.service;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 
 import com.seem.android.mockup1.MyApplication;
 import com.seem.android.mockup1.exceptions.EmailAlreadyExistsException;
@@ -35,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -417,13 +419,25 @@ public class Api {
         }
     }
 
-    public static String createMedia(Bitmap image){
+    public static void copyStream(InputStream input, OutputStream output)
+            throws IOException
+    {
+        byte[] buffer = new byte[1024]; // Adjust if you want
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1)
+        {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
+
+    public static String createMedia(InputStream streamPhoto){
         try {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            copyStream(streamPhoto,outStream);
+            //image.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             String fileName = String.format("file_%d.png", new Date().getTime());
 
-            ByteArrayBody bab = new ByteArrayBody(stream.toByteArray(),"image/jpeg", fileName);
+            ByteArrayBody bab = new ByteArrayBody(outStream.toByteArray(),"image/jpeg", fileName);
 
             MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
             reqEntity.addPart("file", bab);
