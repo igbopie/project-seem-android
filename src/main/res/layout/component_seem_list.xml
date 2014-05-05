@@ -3,17 +3,33 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="20dp"
-    android:paddingBottom="5dp">
+    android:padding="0dp"
+
+ >
+
+    <com.seem.android.customviews.SpinnerImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+
+        android:layout_alignParentTop="true"
+        android:id="@+id/mainImageView"
+    />
+
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="A seem text"
         android:id="@+id/text_view"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"/>
+        android:layout_below="@+id/updatedText"
+        android:layout_toRightOf="@+id/mainImageView"
+        android:textIsSelectable="false"
+        android:paddingTop="15dp"
+        android:paddingLeft="10dp"
+
+        android:textStyle="bold"
+        android:textSize="15sp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -21,12 +37,18 @@
         android:text="0"
         android:id="@+id/seemItemCount"
 
-        android:layout_marginRight="10dp"
-        android:layout_alignBottom="@+id/text_view"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:paddingLeft="10dp"
+        android:layout_below="@+id/text_view"
+        android:layout_toRightOf="@+id/mainImageView" />
 
-        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="replies"
+
+        android:paddingLeft="5dp"
+        android:layout_alignTop="@+id/seemItemCount"
+        android:layout_toRightOf="@+id/seemItemCount" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,8 +56,52 @@
         android:text="3 hours ago"
         android:id="@+id/updatedText"
         android:textColor="#888"
-        android:layout_marginRight="10dp"
-        android:layout_below="@+id/seemItemCount"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingRight="10dp" />
+
+
+
+
+    <com.seem.android.customviews.SpinnerImageView
+        android:layout_width="@dimen/component_seem_list_thumbs"
+        android:layout_height="@dimen/component_seem_list_thumbs"
+
+        android:id="@+id/miniView1"
+        android:layout_alignBottom="@+id/mainImageView"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <com.seem.android.customviews.SpinnerImageView
+        android:layout_width="@dimen/component_seem_list_thumbs"
+        android:layout_height="@dimen/component_seem_list_thumbs"
+
+        android:id="@+id/miniView2"
+        android:layout_alignTop="@+id/miniView1"
+        android:layout_toLeftOf="@+id/miniView1" />
+
+    <com.seem.android.customviews.SpinnerImageView
+        android:layout_width="@dimen/component_seem_list_thumbs"
+        android:layout_height="@dimen/component_seem_list_thumbs"
+
+        android:id="@+id/miniView3"
+        android:layout_alignTop="@+id/miniView2"
+        android:layout_toLeftOf="@+id/miniView2" />
+
+    <com.seem.android.customviews.SpinnerImageView
+        android:layout_width="@dimen/component_seem_list_thumbs"
+        android:layout_height="@dimen/component_seem_list_thumbs"
+
+        android:id="@+id/miniView4"
+        android:layout_alignTop="@+id/miniView3"
+        android:layout_toLeftOf="@+id/miniView3" />
+
+    <com.seem.android.customviews.SpinnerImageView
+        android:layout_width="@dimen/component_seem_list_thumbs"
+        android:layout_height="@dimen/component_seem_list_thumbs"
+
+        android:id="@+id/miniView5"
+        android:layout_alignTop="@+id/miniView4"
+        android:layout_toLeftOf="@+id/miniView4"/>
 </RelativeLayout>

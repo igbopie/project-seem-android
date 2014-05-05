@@ -13,14 +13,18 @@ import com.seem.android.service.MediaService;
 public class DownloadAsyncTask extends AsyncTask<Void,Void,Void> {
 
     Media media;
-    Item item;
     ImageView imageView;
     boolean thumb;
 
 
     public DownloadAsyncTask(Item item, ImageView imageView,boolean thumb) {
         this.media = new Media(item.getMediaId());
-        this.item = item;
+        this.imageView = imageView;
+        this.thumb=thumb;
+    }
+
+    public DownloadAsyncTask(String mediaId, ImageView imageView,boolean thumb) {
+        this.media = new Media(mediaId);
         this.imageView = imageView;
         this.thumb=thumb;
     }
@@ -40,7 +44,8 @@ public class DownloadAsyncTask extends AsyncTask<Void,Void,Void> {
         super.onPostExecute(v);
         if (this.isCancelled()) {
             //well... do not paint...
-        } else if (item != null) {
+            imageView.setImageDrawable(null);
+        } else if (media != null) {
             if(thumb){
                 imageView.setImageDrawable(this.media.getImageThumb());
             }else{
@@ -49,7 +54,6 @@ public class DownloadAsyncTask extends AsyncTask<Void,Void,Void> {
 
         }
 
-        this.item = null;
         this.media = null;
         this.imageView = null;
 

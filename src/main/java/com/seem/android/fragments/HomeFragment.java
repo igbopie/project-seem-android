@@ -2,6 +2,7 @@ package com.seem.android.fragments;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -12,24 +13,33 @@ import android.view.ViewGroup;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.seem.android.R;
+import com.seem.android.model.Topic;
+import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by igbopie on 23/04/14.
  */
 public class HomeFragment extends Fragment {
+
+    private int nStaticQueries = 4;
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     private TabsPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
+    private PagerSlidingTabStrip tabs;
+    private List<Topic> topics = new ArrayList<Topic>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        new FetchTopics().execute();
     }
 
     @Override
@@ -49,9 +59,10 @@ public class HomeFragment extends Fragment {
         mViewPager.setAdapter(mPagerAdapter);
 
         // Bind the tabs to the ViewPager
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity().findViewById(R.id.tabs);
+        tabs = (PagerSlidingTabStrip) getActivity().findViewById(R.id.tabs);
         tabs.setViewPager(mViewPager);
         tabs.setIndicatorColorResource(R.color.SeemYellow);
+
 
 
     }
@@ -80,9 +91,16 @@ public class HomeFragment extends Fragment {
                 return fragment;
             }
             if(i == 0){
-                fragment = new FeedListFragment();
+                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.UPDATED);
+                //fragment = new FeedListFragment();
+            } else if (i==1){
+                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.CREATED);
+            } else if (i==2){
+                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.HOTNESS);
+            } else if (i==3){
+                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.VIRAL);
             } else {
-                fragment = new SeemListFragment();
+                fragment = SeemListFragment.newInstance(topics.get(i-nStaticQueries).getId());
             }
 
             mPageReferenceMap.put(i, fragment);
@@ -92,16 +110,22 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 2;
+            return nStaticQueries + topics.size();
         }
 
 
         @Override
         public CharSequence getPageTitle(int position) {
             if(position == 0){
-                return "Timeline";
-            }else{
-                return "Recent Seems";
+                return "Updated";
+            }else if (position == 1){
+                return "Created";
+            }else if (position == 2){
+                return "Hot";
+            }else if (position == 3){
+                return "Viral";
+            }else {
+                return topics.get(position-nStaticQueries).getName();
             }
 
         }
@@ -145,6 +169,23 @@ public class HomeFragment extends Fragment {
     }
 
 
+    public class FetchTopics extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            topics = Api.getTopics();
+
+            Utils.debug(getClass(),"Topics: "+topics);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mPagerAdapter.notifyDataSetChanged();
+            tabs.notifyDataSetChanged();
+        }
+    }
 
 }
 

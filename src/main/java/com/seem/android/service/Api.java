@@ -7,6 +7,7 @@ import com.seem.android.model.Feed;
 import com.seem.android.model.Item;
 import com.seem.android.model.Media;
 import com.seem.android.model.Seem;
+import com.seem.android.model.Topic;
 import com.seem.android.model.UserProfile;
 import com.seem.android.util.Iso8601;
 import com.seem.android.util.Utils;
@@ -67,6 +68,13 @@ public class Api {
     public static final String ENDPOINT_THUMB_DOWN = "api/seem/item/thumbdown";
     public static final String ENDPOINT_THUMB_CLEAR = "api/seem/item/thumbclear";
 
+    public static final String ENDPOINT_TOPICS = "api/seem/topics";
+    public static final String ENDPOINT_SEEM_BY_TOPIC = "api/seem/by/topic";
+    public static final String ENDPOINT_SEEM_BY_HOTNESS = "api/seem/by/hotness";
+    public static final String ENDPOINT_SEEM_BY_VIRAL = "api/seem/by/viral";
+    public static final String ENDPOINT_SEEM_BY_CREATED = "api/seem/by/created";
+    public static final String ENDPOINT_SEEM_BY_UPDATED = "api/seem/by/updated";
+
 
 
     public static final int RESPONSE_CODE_OK = 200;
@@ -86,6 +94,9 @@ public class Api {
     public static final String JSON_TAG_SEEM_ITEM_COUNT = "itemCount";
     public static final String JSON_TAG_SEEM_CREATED = "created";
     public static final String JSON_TAG_SEEM_UPDATED = "updated";
+    public static final String JSON_TAG_SEEM_ITEM_MEDIA_ID = "itemMediaId";
+    public static final String JSON_TAG_SEEM_ITEM_CAPTION = "itemCaption";
+    public static final String JSON_TAG_SEEM_LASTEST_ITEMS = "latestItems";
 
     //ITEM Model
 
@@ -136,6 +147,81 @@ public class Api {
     public static final String JSON_TAG_FEED_USER_ID = "userId";
     public static final String JSON_TAG_FEED_USERNAME = "username";
 
+    //TOPIC
+    public static final String JSON_TAG_TOPIC_ID = "_id";
+    public static final String JSON_TAG_TOPIC_CREATED = "created";
+    public static final String JSON_TAG_TOPIC_CODE = "code";
+    public static final String JSON_TAG_TOPIC_NAME = "name";
+
+
+    public static List<Seem> getSeemsByTopic(String topicId){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("topicId",topicId);
+
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_SEEM_BY_TOPIC,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+                JSONObject jsonObj = new JSONObject(output);
+
+                return fillSeems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return null;
+        }
+    }
+
+    public static List<Seem> getSeemsByHotness(){
+        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_HOTNESS);
+    }
+    public static List<Seem> getSeemsByViral(){
+        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_VIRAL);
+    }
+    public static List<Seem> getSeemsByCreated(){
+        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_CREATED);
+    }
+    public static List<Seem> getSeemsByUpdated(){
+        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_UPDATED);
+    }
+
+    private static List<Seem> getSeemBySomething(String endpoint){
+        try {
+            HttpResponse httpResponse = makeRequest(endpoint,new HashMap<String, String>());
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+                JSONObject jsonObj = new JSONObject(output);
+
+                return fillSeems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return null;
+        }
+    }
     public static List<Seem> getSeems(){
         try {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_SEEMS,new HashMap<String, String>());
@@ -649,6 +735,35 @@ public class Api {
         return null;
     }
 
+    public static List<Topic> getTopics() {
+        try {
+            HashMap<String, String> params = new HashMap<String, String>();
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT + ENDPOINT_TOPICS, params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if (responseCode == RESPONSE_CODE_OK) {
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+
+                JSONObject jsonObj = new JSONObject(output);
+                JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
+                List<Topic> topics = fillTopics(itemJson);
+
+                return topics;
+            }else{
+                Utils.debug(Api.class,"API return code: "+responseCode);
+            }
+        }  catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+
+        }
+        return null;
+    }
+
     private static List<Seem> fillSeems(JSONArray seemsArray) throws JSONException, ParseException {
         List<Seem> seemList = new ArrayList<Seem>();
         for (int i = 0; i < seemsArray.length(); i++) {
@@ -667,9 +782,25 @@ public class Api {
         seem.setItemCount(seemJson.getInt(JSON_TAG_SEEM_ITEM_COUNT));
 
         seem.setUpdated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_UPDATED)).getTime());
+
+        seem.setItemCaption(getStringJsonField(seemJson,JSON_TAG_SEEM_ITEM_CAPTION));
+        seem.setItemMediaId(getStringJsonField(seemJson,JSON_TAG_SEEM_ITEM_MEDIA_ID));
+
+        if(seemJson.has(JSON_TAG_SEEM_LASTEST_ITEMS)){
+            JSONArray array = seemJson.getJSONArray(JSON_TAG_SEEM_LASTEST_ITEMS);
+            seem.setLastestItems(fillItems(array));
+        }
+
         return seem;
     }
-
+    private static List<Topic> fillTopics(JSONArray feedsArray) throws JSONException, ParseException {
+        List<Topic> feedList = new ArrayList<Topic>();
+        for (int i = 0; i < feedsArray.length(); i++) {
+            JSONObject feedJson = feedsArray.getJSONObject(i);
+            feedList.add(fillTopic(feedJson));
+        }
+        return feedList;
+    }
     private static List<Feed> fillFeeds(JSONArray feedsArray) throws JSONException, ParseException {
         List<Feed> feedList = new ArrayList<Feed>();
         for (int i = 0; i < feedsArray.length(); i++) {
@@ -698,6 +829,17 @@ public class Api {
         feed.setUsername(getStringJsonField(feedJson, JSON_TAG_FEED_USERNAME));
         return feed;
 
+    }
+
+    private static Topic fillTopic(JSONObject feedJson) throws JSONException, ParseException {
+        Topic topic = new Topic();
+
+
+        topic.setId(getStringJsonField(feedJson, JSON_TAG_TOPIC_ID));
+        topic.setCode(getStringJsonField(feedJson, JSON_TAG_TOPIC_CODE));
+        topic.setName(getStringJsonField(feedJson, JSON_TAG_TOPIC_NAME));
+
+        return topic;
     }
 
     private static String getStringJsonField(JSONObject jsonObject, String property) throws JSONException {
@@ -741,9 +883,13 @@ public class Api {
         item.setCaption(itemJson.getString(JSON_TAG_ITEM_CAPTION));
         item.setMediaId(itemJson.getString(JSON_TAG_ITEM_MEDIA_ID));
         item.setCreated(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_CREATED)).getTime());
-        item.setReplyCount(itemJson.getInt(JSON_TAG_ITEM_REPLY_COUNT));
+        if(itemJson.has(JSON_TAG_ITEM_REPLY_COUNT)) {
+            item.setReplyCount(itemJson.getInt(JSON_TAG_ITEM_REPLY_COUNT));
+        }
         item.setDepth(itemJson.getInt(JSON_TAG_ITEM_DEPTH));
-        item.setSeemId(itemJson.getString(JSON_TAG_ITEM_SEEM_ID));
+        if(itemJson.has(JSON_TAG_ITEM_SEEM_ID)) {
+            item.setSeemId(itemJson.getString(JSON_TAG_ITEM_SEEM_ID));
+        }
         if(itemJson.has(JSON_TAG_ITEM_REPLY_TO)) {
             item.setReplyTo(itemJson.getString(JSON_TAG_ITEM_REPLY_TO));
         }

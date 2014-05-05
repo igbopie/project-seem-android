@@ -6,6 +6,7 @@
     <dimen name="component_icon_text_view_icon_size">20dp</dimen>
     <dimen name="fullscreen_bottonbar_icon">20dp</dimen>
     <dimen name="fullscreen_bottonbar_icon_margin">10dp</dimen>
+    <dimen name="component_seem_list_thumbs">40dp</dimen>
 
 
     </resources>
