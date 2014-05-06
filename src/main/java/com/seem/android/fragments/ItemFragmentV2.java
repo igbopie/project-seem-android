@@ -1,39 +1,29 @@
 package com.seem.android.fragments;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.TypedValue;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
-import com.seem.android.adapters.ThumbnailAdapter;
 import com.seem.android.adapters.ThumbnailAdapterV2;
 import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
@@ -46,12 +36,10 @@ import com.seem.android.util.ItemSelectedListener;
 import com.seem.android.util.Utils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 
-public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestureListener{
+public class ItemFragmentV2 extends Fragment {
 
     public static ItemFragmentV2 newInstance(String seemId,String itemId) {
         ItemFragmentV2 f = new ItemFragmentV2();
@@ -67,8 +55,6 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
     private boolean refresh = false;
     private SpinnerImageView image;
     private Item item;
-    private GestureDetector mDetector;
-    //private MenuItem upButton;
 
     private List<Item> replies = new ArrayList<Item>();
 
@@ -77,14 +63,10 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
     Seem seem = null;
     boolean isMin = false;
     boolean isMax = true;
-    float originalY;
-    float originalSize;
-    float maxSize =-1;
-    float currentSize;
-    float minDimension = 100;
-
-    VelocityTracker velocityTracker;
-    boolean actionIsOnGrid = false;
+    int maxSize =-1;
+    int currentSize;
+    float minSize = 100;
+    View gridviewmask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,7 +75,6 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        mDetector = new GestureDetector(getActivity(),this);
 
     }
 
@@ -111,33 +92,16 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                actionIsOnGrid = false;
-                mDetector.onTouchEvent(motionEvent);
-                return true;
-            }
-        });
+
         image = (SpinnerImageView) findViewById(R.id.itemMainImage);
         image.setLayoutParams(new RelativeLayout.LayoutParams(GlobalVars.GRID_SIZE_V2*GlobalVars.GRID_NUMBER_OF_PHOTOS_V2, GlobalVars.GRID_SIZE_V2*GlobalVars.GRID_NUMBER_OF_PHOTOS_V2));
 
 
         gridView = (GridView) view.findViewById(R.id.gridview);
-        gridView.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View view, MotionEvent event)
-            {
-                actionIsOnGrid = true;
-                if(isMin){
-                    gridView.onTouchEvent(event);
-                }else {
-                    mDetector.onTouchEvent(event);
-                }
-                return true;
-            }
-        });
+        gridviewmask= view.findViewById(R.id.gridviewmask);
+
+
+
     }
 
     @Override
@@ -147,9 +111,89 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
         this.recoverFromSavedState(savedInstanceState);
 
         Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
-        minDimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
+        minSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics());
+        maxSize = GlobalVars.GRID_SIZE_V2*GlobalVars.GRID_NUMBER_OF_PHOTOS_V2;
+        image.setLayoutParams(new RelativeLayout.LayoutParams(maxSize, maxSize));
+        isMax = true;
+        isMin = false;
+        gridviewmask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isMax) {
+                    //restore image size
+                    animatorSet = new AnimatorSet();
+                    animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV2.this, "imageScroll",maxSize, minSize))
+                            .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 1, 0));
 
+                    animatorSet.setDuration((long) 500);
+                    animatorSet.setInterpolator(new DecelerateInterpolator());
+                    animatorSet.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationStart");
+                        }
 
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationEnd");
+                            gridviewmask.setVisibility(View.INVISIBLE);
+                            isMax = false;
+                            isMin = true;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationCancel");
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationRepeat");
+                        }
+                    });
+                    animatorSet.start();
+                }
+            }
+        });
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isMin) {
+                    gridviewmask.setVisibility(View.VISIBLE);
+                    //restore image size
+                    animatorSet = new AnimatorSet();
+                    animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV2.this, "imageScroll", minSize,maxSize))
+                            .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 0, 1));
+
+                    animatorSet.setDuration((long) 500);
+                    animatorSet.setInterpolator(new DecelerateInterpolator());
+                    animatorSet.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationStart");
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationEnd");
+                            isMax = true;
+                            isMin = false;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationCancel");
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+                            Utils.debug(getClass(),"onAnimationRepeat");
+                        }
+                    });
+                    animatorSet.start();
+                }
+            }
+        });
 
         new GetItemAndPaintTask().execute(getItemId());
 
@@ -450,22 +494,12 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
 
 
 
-    public void doScroll(MotionEvent motionEvent){
-        int action = motionEvent.getAction() & MotionEvent.ACTION_MASK;
-        float y = motionEvent.getRawY();
 
-
-                float movement = originalY - motionEvent.getRawY();
-                setImageScroll(originalSize - movement);
-                velocityTracker.addMovement(motionEvent);
-
-
-    }
     public void setImageScroll(float scroll){
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) image.getLayoutParams();
         params.height = (int) scroll;
-        if(params.height <= minDimension) {
-            params.height =(int) minDimension;
+        if(params.height < minSize) {
+            params.height =(int) minSize;
             isMin = true;
             if(animatorSet != null){
                 animatorSet.cancel();
@@ -473,7 +507,7 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
         }else{
             isMin = false;
         }
-        if(params.height >= maxSize){
+        if(params.height > maxSize){
             params.height = (int)maxSize;
             isMax = true;
             if(animatorSet != null){
@@ -490,83 +524,8 @@ public class ItemFragmentV2 extends Fragment implements GestureDetector.OnGestur
     }
 
 
-    /**
-     * ----
-     */
 
-    @Override
-    public boolean onDown(MotionEvent motionEvent) {
-        Utils.debug(getClass(),"onDown");
-        Utils.debug(getClass(),"STARTS");//motionEvent.getAction()+" "+motionEvent.getX()+" "+motionEvent.getY());
-        originalY = motionEvent.getRawY();
-        originalSize = image.getHeight();
-        if(maxSize == -1){
-            maxSize = image.getWidth();
-        }
-        if(velocityTracker == null) {
-            // Retrieve a new VelocityTracker object to watch the velocity of a motion.
-            velocityTracker = VelocityTracker.obtain();
-        }
-        else {
-            // Reset the velocity tracker back to its initial state.
-            velocityTracker.clear();
-        }
-        if(animatorSet != null){
-            animatorSet.cancel();
-        }
-        return false;
-    }
 
-    @Override
-    public void onShowPress(MotionEvent motionEvent) {
-        Utils.debug(getClass(),"onShowPress");
-    }
 
-    @Override
-    public boolean onSingleTapUp(MotionEvent motionEvent) {
-        Utils.debug(getClass(),"onSingleTapUp "+actionIsOnGrid);
-        if(!actionIsOnGrid){
-            //restore image size
-            animatorSet = new AnimatorSet();
-            animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV2.this,"imageScroll",currentSize,maxSize));
-            animatorSet.setDuration((long)100);
-            animatorSet.setInterpolator(new DecelerateInterpolator());
-            animatorSet.start();
-        }else {
-            gridView.onTouchEvent(motionEvent);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent2, float distanceX, float distanceY) {
-        Utils.debug(getClass(),"onScroll");
-        if(!isMin || !actionIsOnGrid){
-            doScroll(motionEvent2);
-        }
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent motionEvent) {
-        Utils.debug(getClass(),"onLongPress");
-    }
-
-    @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float distanceX, float distanceY) {
-        Utils.debug(getClass(),"onFling");
-        velocityTracker.computeCurrentVelocity(1000);
-        float vY = velocityTracker.getYVelocity();
-        animatorSet = new AnimatorSet();
-        float time = Math.abs(vY); // millis
-        float target = currentSize + vY *(time /1000); //seconds
-        animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV2.this,"imageScroll",currentSize,target));
-        animatorSet.setDuration((long)time);
-        animatorSet.setInterpolator(new DecelerateInterpolator());
-        animatorSet.start();
-        velocityTracker.recycle();
-        Utils.debug(getClass(),"END target:"+target);
-        return false;
-    }
 
 }
