@@ -74,6 +74,7 @@ public class Api {
     public static final String ENDPOINT_SEEM_BY_VIRAL = "api/seem/by/viral";
     public static final String ENDPOINT_SEEM_BY_CREATED = "api/seem/by/created";
     public static final String ENDPOINT_SEEM_BY_UPDATED = "api/seem/by/updated";
+    public static final String ENDPOINT_SEEM_ITEM_BY_FAVOURITED = "api/seem/item/by/favourited";
 
 
 
@@ -117,6 +118,7 @@ public class Api {
     public static final String JSON_TAG_ITEM_THUMB_SCORE_COUNT = "thumbScoreCount";
     public static final String JSON_TAG_ITEM_THUMBED_UP = "thumbedUp";
     public static final String JSON_TAG_ITEM_THUMBED_DOWN = "thumbedDown";
+    public static final String JSON_TAG_ITEM_FAVOURITED_DATE = "favouritedDate";
 
 
     //USERPROFILE
@@ -152,6 +154,36 @@ public class Api {
     public static final String JSON_TAG_TOPIC_CREATED = "created";
     public static final String JSON_TAG_TOPIC_CODE = "code";
     public static final String JSON_TAG_TOPIC_NAME = "name";
+
+    public static List<Item> getSeemItemsByFavourited(String username,int page){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("username",username);
+            params.put("page",page+"");
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_SEEM_ITEM_BY_FAVOURITED,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+                JSONObject jsonObj = new JSONObject(output);
+
+                return fillItems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return null;
+        }
+    }
 
 
     public static List<Seem> getSeemsByTopic(String topicId){
@@ -924,6 +956,10 @@ public class Api {
 
         if(itemJson.has(JSON_TAG_ITEM_THUMBED_DOWN)) {
             item.setThumbedDown(itemJson.getBoolean(JSON_TAG_ITEM_THUMBED_DOWN));
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_FAVOURITED_DATE)) {
+            item.setFavouritedDate(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_FAVOURITED_DATE)).getTime());
         }
 
         return item;

@@ -26,6 +26,7 @@ public class Item {
     private int thumbScoreCount = 0;
     private Boolean thumbedUp;
     private Boolean thumbedDown;
+    private Date favouritedDate;
 
     private Uri tempLocalFile;
 
@@ -174,6 +175,13 @@ public class Item {
         this.tempLocalFile = tempLocalFile;
     }
 
+    public Date getFavouritedDate() {
+        return favouritedDate;
+    }
+
+    public void setFavouritedDate(Date favouritedDate) {
+        this.favouritedDate = favouritedDate;
+    }
 
     @Override
     public boolean equals(Object o) {

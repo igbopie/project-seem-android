@@ -31,7 +31,7 @@ import java.util.Date;
 public class Utils {
 
     public static Drawable fromFile(String file) throws IOException {
-        System.gc();
+        //System.gc();
         ExifInterface exif  = new ExifInterface(file);;
         int rotate = 0;
 

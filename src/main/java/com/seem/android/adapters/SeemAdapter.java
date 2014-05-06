@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.seem.android.R;
 import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
+import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.model.Seem;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
     private List<Seem> itemList;
     private Context context;
     private Map<ImageView,DownloadAsyncTask> imageViewProcesses = new HashMap<ImageView, DownloadAsyncTask>();
+    private SeemListFragment.QueryType queryType;
 
     public SeemAdapter(List<Seem> itemList, Context ctx) {
         super(ctx, R.layout.component_seem_list, itemList);
@@ -135,25 +137,25 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
                 miniView4.setLoading(false);
                 miniTask = new DownloadAsyncTask(c.getLastestItems().get(3),miniView4.getImageView(),true);
                 miniTask.execute();
-                imageViewProcesses.put(miniView4.getImageView(),miniTask);
+                imageViewProcesses.put(miniView4.getImageView(), miniTask);
                 miniView4.setVisibility(View.VISIBLE);
             case 3:
                 miniView3.setLoading(false);
                 miniTask = new DownloadAsyncTask(c.getLastestItems().get(2),miniView3.getImageView(),true);
                 miniTask.execute();
-                imageViewProcesses.put(miniView3.getImageView(),miniTask);
+                imageViewProcesses.put(miniView3.getImageView(), miniTask);
                 miniView3.setVisibility(View.VISIBLE);
             case 2:
                 miniView2.setLoading(false);
                 miniTask = new DownloadAsyncTask(c.getLastestItems().get(1),miniView2.getImageView(),true);
                 miniTask.execute();
-                imageViewProcesses.put(miniView2.getImageView(),miniTask);
+                imageViewProcesses.put(miniView2.getImageView(), miniTask);
                 miniView2.setVisibility(View.VISIBLE);
             case 1:
                 miniView1.setLoading(false);
                 miniTask = new DownloadAsyncTask(c.getLastestItems().get(0),miniView1.getImageView(),true);
                 miniTask.execute();
-                imageViewProcesses.put(miniView1.getImageView(),miniTask);
+                imageViewProcesses.put(miniView1.getImageView(), miniTask);
                 miniView1.setVisibility(View.VISIBLE);
             case 0:
                 break;

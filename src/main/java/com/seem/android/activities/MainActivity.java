@@ -25,6 +25,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
+import com.seem.android.fragments.FavListFragment;
 import com.seem.android.fragments.FeedListFragment;
 import com.seem.android.fragments.HomeFragment;
 import com.seem.android.fragments.ItemFragment;
@@ -51,7 +52,9 @@ public class MainActivity extends Activity implements
                                             SignUpFragment.SignUpInteractionListener,
                                             ItemFragment.OnItemClickListener,
                                             FeedListFragment.OnItemClickListener,
-                                            SeemListFragment.OnItemClickListener {
+                                            SeemListFragment.OnItemClickListener,
+                                            FavListFragment.OnItemClickListener
+                                            {
 
     private boolean lastDrawerStatus = true;
 
@@ -64,6 +67,8 @@ public class MainActivity extends Activity implements
     //
     private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
     private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
+    private NavDrawerItem drawerItemFavs = new NavDrawerItem("Favs", R.drawable.star);
+    private NavDrawerItem drawerItemTimeline = new NavDrawerItem("Timeline", R.drawable.align_left);
     private NavDrawerItem drawerItemLogin = new NavDrawerItem("Login", R.drawable.sign_in);
     private NavDrawerItem drawerItemSignUp = new NavDrawerItem("Sign Up", R.drawable.plus_square);
     private NavDrawerItem drawerItemUserProfile = new NavDrawerItem("User Profile", R.drawable.user);
@@ -194,6 +199,8 @@ public class MainActivity extends Activity implements
 
         if(MyApplication.isLoggedIn()) {
             navDrawerItems.add(drawerItemHome);
+            navDrawerItems.add(drawerItemFavs);
+            navDrawerItems.add(drawerItemTimeline);
             navDrawerItems.add(drawerItemUserProfile);
         }else{
             navDrawerItems.add(drawerItemHome);
@@ -262,6 +269,10 @@ public class MainActivity extends Activity implements
                 fragment = SignUpFragment.newInstance();
             } else if (navDrawerItem == drawerItemUserProfile) {
                 fragment = UserProfileFragment.newInstance();
+            } else if (navDrawerItem == drawerItemTimeline) {
+                fragment = new FeedListFragment();
+            } else if (navDrawerItem == drawerItemFavs) {
+                fragment =new FavListFragment();
             } else if(navDrawerItem.getItem() != null){
                 onClick(navDrawerItem.getItem().getSeemId(),navDrawerItem.getItem().getId());
             }
