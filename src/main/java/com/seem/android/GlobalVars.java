@@ -63,5 +63,8 @@ public class GlobalVars {
 
     public static int GRID_SIZE;
 
+    public static int GRID_SIZE_V2;
+
     public static int GRID_NUMBER_OF_PHOTOS = 4;
+    public static int GRID_NUMBER_OF_PHOTOS_V2 = 3;
 }

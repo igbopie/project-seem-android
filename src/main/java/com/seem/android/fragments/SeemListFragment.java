@@ -111,7 +111,11 @@ public class SeemListFragment extends ListFragment {
         // Do something when a list item is clicked
         Seem seem = adapter.getItem(position);
         Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
-        onItemClickListener.onClick(seem.getId(), seem.getItemId());
+        if(seem != null) {
+            onItemClickListener.onClick(seem.getId(), seem.getItemId());
+        }else{
+            Utils.debug(getClass(),"Whot! seem is null");
+        }
     }
 
     @Override

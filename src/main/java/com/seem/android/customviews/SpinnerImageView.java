@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.seem.android.R;
@@ -15,7 +16,7 @@ import com.seem.android.R;
 /**
  * Created by igbopie on 20/03/14.
  */
-public class SpinnerImageView extends LinearLayout {
+public class SpinnerImageView extends RelativeLayout {
 
     ProgressBar progressBar;
     TextView textView;
@@ -58,7 +59,7 @@ public class SpinnerImageView extends LinearLayout {
         }
     }
     public ImageView getImageView(){
-        return (SquareImageView) findViewById(R.id.componentImageView);
+        return (ImageView) findViewById(R.id.componentImageView);
     }
 
     @Override
@@ -105,5 +106,7 @@ public class SpinnerImageView extends LinearLayout {
     public void setViewThreadOnClick(OnClickListener l){
         this.depthIcon.setOnClickListener(l);
     }
+
+
 
 }
