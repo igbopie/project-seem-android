@@ -109,6 +109,7 @@ public class CreateSeemFlowActivity extends Activity {
             //localTempFile = ;
 
             try {
+                localTempFile =data.getData();
                 imageView.setImageBitmap(
                         Utils.shrinkBitmapFromStream(
                                 getContentResolver().openInputStream(data.getData()),
