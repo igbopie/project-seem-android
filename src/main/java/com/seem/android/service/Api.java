@@ -621,12 +621,15 @@ public class Api {
         }
     }
 
-    public static Seem createSeem(String title,String caption,String mediaId){
+    public static Seem createSeem(String title,String caption,String topicId,String mediaId){
         try {
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("title", title);
             params.put("mediaId", mediaId);
             params.put("caption", caption);
+            if(topicId != null){
+                params.put("topicId",topicId);
+            }
             params.put("token", MyApplication.getToken());
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE_SEEM,params);
@@ -646,7 +649,7 @@ public class Api {
                 String token = login(MyApplication.getUsername(),MyApplication.getPassword());
                 if(token != null){
                     MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
-                    return createSeem(title,caption,mediaId);
+                    return createSeem(title,caption,topicId,mediaId);
                 }
             }
             return null;

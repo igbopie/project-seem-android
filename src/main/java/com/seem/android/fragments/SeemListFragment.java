@@ -251,6 +251,7 @@ public class SeemListFragment extends ListFragment {
     public void onDetach() {
         super.onDetach();
         Utils.debug(getClass(),"OnDetach");
+        onItemClickListener = null;
     }
 
     @Override
@@ -263,7 +264,6 @@ public class SeemListFragment extends ListFragment {
     public void onStop() {
         super.onStop();
         Utils.debug(getClass(),"onStop");
-        onItemClickListener = null;
     }
 
     public interface OnItemClickListener {

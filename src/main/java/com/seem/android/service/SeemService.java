@@ -128,8 +128,8 @@ public class SeemService {
         return dbCount;
     }
 
-    public Seem save(String title,String caption, String mediaId){
-        Seem seem = Api.createSeem(title,caption,mediaId);
+    public Seem save(String title,String caption,String topicId,String mediaId){
+        Seem seem = Api.createSeem(title,caption,topicId,mediaId);
         open();
         this.saveSeem(seem);
         close();
