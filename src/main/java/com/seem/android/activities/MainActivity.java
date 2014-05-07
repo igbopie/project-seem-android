@@ -292,7 +292,7 @@ public class MainActivity extends Activity implements
             transaction.replace(R.id.frame_container, fragment);
             if(addToBack) {
                 // Add to backstack
-                transaction.addToBackStack(null);
+                //transaction.addToBackStack(null);
             }
             transaction.commit();
 
@@ -386,6 +386,7 @@ public class MainActivity extends Activity implements
     public void onFinish() {
         this.displayView(0,drawerItemHome);
 
+        //getFragmentManager().popBackStack();
     }
 
     @Override

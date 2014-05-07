@@ -8,8 +8,6 @@ import android.widget.GridView;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.customviews.SpinnerImageView;
-import com.seem.android.executor.AsyncExecutor;
-import com.seem.android.executor.MyAsyncTask;
 import com.seem.android.model.Item;
 import com.seem.android.model.Media;
 import com.seem.android.service.MediaService;
@@ -28,8 +26,6 @@ public class ThumbnailAdapterV2 extends BaseAdapter {
 
     Context context;
     List<Item> items = new ArrayList<Item>();
-
-    Map<View,FetchThumbs> execViewMap = new HashMap<View, FetchThumbs>();
     ItemSelectedListener repliesListener;
     ItemSelectedListener threadViewListener;
     public ThumbnailAdapterV2(Context context, ItemSelectedListener repliesListener, ItemSelectedListener threadViewListener) {
@@ -54,19 +50,31 @@ public class ThumbnailAdapterV2 extends BaseAdapter {
                 view.getImageView().setVisibility(View.INVISIBLE);
                 view.setRepliesNumber(0);
             }
-            //If we are not redrawing the same thing
-
-            Item item = (Item) getItem(position);
+            final Item item = (Item) getItem(position);
 
             view.setText(item.getCaption());
-            addProcess(view, item);
+            view.setRepliesNumber(item.getReplyCount());
+            if(item.getReplyCount() > 0) {
+                view.setViewRepliesOnClick(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Utils.debug(this.getClass(),"View");
+                        repliesListener.itemSelected(item);
+                    }
+                });
+            }
+
+
+            view.getImageView().setVisibility(View.VISIBLE);
+            view.setLoading(false);
 
             view.setTag(Integer.valueOf( position));
+
+            Utils.loadBitmap(item.getMediaId(),view.getImageView(),true,context.getResources());
+
             return view;
         }
         return convertView;
-
-
 
     }
 
@@ -96,73 +104,4 @@ public class ThumbnailAdapterV2 extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-    private void addProcess(SpinnerImageView view,Item item){
-        //be careful with reusing views...
-
-        FetchThumbs ft = new FetchThumbs(view, item);
-        AsyncExecutor.getInstance().add(ft);
-
-
-        FetchThumbs oldExec = execViewMap.get(view);
-        execViewMap.put(view, ft);
-
-        if (oldExec != null) {
-            AsyncExecutor.getInstance().cancelTask(oldExec);
-        }
-
-    }
-
-
-
-    private class FetchThumbs extends MyAsyncTask {
-        private SpinnerImageView imageView;
-        private Item item;
-        private Media media;
-
-        public FetchThumbs(SpinnerImageView imageView,Item item){
-            this.imageView = imageView;
-            this.item = item;
-            this.media = new Media(item.getMediaId());
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            MediaService.getInstance().getThumb(this.media);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            if(this.isCancelled()){
-                //well... do not paint...
-            }else if(item != null) {
-                imageView.getImageView().setImageDrawable(this.media.getImageThumb());
-                imageView.setRepliesNumber(item.getReplyCount());
-                if(item.getReplyCount() > 0) {
-                    imageView.setViewRepliesOnClick(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Utils.debug(this.getClass(),"View");
-                            repliesListener.itemSelected(item);
-                        }
-                    });
-                }
-                /*
-                if(item.getDepth() > 0 ){
-                    imageView.setDepthNumber(item.getDepth());
-                    imageView.setViewThreadOnClick(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            threadViewListener.itemSelected(item);
-                        }
-                    });
-                }*/
-
-                imageView.getImageView().setVisibility(View.VISIBLE);
-                imageView.setLoading(false);
-            }
-        }
-    }
 }

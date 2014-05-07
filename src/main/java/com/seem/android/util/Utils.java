@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,9 +16,11 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
+import com.seem.android.asynctask.DownloadAsyncTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +33,47 @@ import java.util.Date;
  */
 public class Utils {
 
-    public static Drawable fromFile(String file) throws IOException {
+    private static DownloadAsyncTask getBitmapWorkerTask(ImageView imageView) {
+        if (imageView != null) {
+            final Drawable drawable = imageView.getDrawable();
+            if (drawable instanceof AsyncDrawable) {
+                final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
+                return asyncDrawable.getBitmapWorkerTask();
+            }
+        }
+        return null;
+    }
+
+    public static boolean cancelPotentialWork(String mediaId, ImageView imageView) {
+        final DownloadAsyncTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
+
+        if (bitmapWorkerTask != null) {
+            final String taskMediaId = bitmapWorkerTask.getMedia().getId();
+            // If bitmapData is not yet set or it differs from the new data
+            if (taskMediaId == null || !taskMediaId.equals(mediaId)) {
+                // Cancel previous task
+                bitmapWorkerTask.cancel(true);
+            } else {
+                // The same work is already in progress
+                return false;
+            }
+        }
+        // No task associated with the ImageView, or an existing task was cancelled
+        return true;
+    }
+
+    public static void loadBitmap(String mediaId,ImageView imageView,boolean thumb,Resources res) {
+        if (cancelPotentialWork(mediaId, imageView)) {
+            Bitmap mLoadingBitmap = null;
+            final DownloadAsyncTask task = new DownloadAsyncTask(mediaId,imageView,thumb);
+            final AsyncDrawable asyncDrawable =
+                    new AsyncDrawable(res,mLoadingBitmap, task);
+            imageView.setImageDrawable(asyncDrawable);
+            task.execute();
+        }
+    }
+
+    public static Bitmap fromFile(String file) throws IOException {
         //System.gc();
         ExifInterface exif  = new ExifInterface(file);;
         int rotate = 0;
@@ -71,7 +114,7 @@ public class Utils {
         croppedBmp = null;
         bmpFactoryOptions = null;
         matrix = null;
-        return br;
+        return br.getBitmap();
     }
 
     /**

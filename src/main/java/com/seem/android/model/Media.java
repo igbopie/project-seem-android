@@ -9,9 +9,6 @@ public class Media {
     private String id;
 
 
-    private Drawable imageLarge;
-    private Drawable imageThumb;
-
     public Media(String id) {
         this.id = id;
     }
@@ -24,19 +21,4 @@ public class Media {
         this.id = id;
     }
 
-    public Drawable getImageLarge() {
-        return imageLarge;
-    }
-
-    public void setImageLarge(Drawable imageLarge) {
-        this.imageLarge = imageLarge;
-    }
-
-    public Drawable getImageThumb() {
-        return imageThumb;
-    }
-
-    public void setImageThumb(Drawable imageThumb) {
-        this.imageThumb = imageThumb;
-    }
 }

@@ -1,6 +1,7 @@
 package com.seem.android.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,6 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
 
     private List<Feed> itemList;
     private Context context;
-    private Map<View,List<AsyncTask>> processMap;
 
     private FetchLastItemListener fetchLastItemListener;
 
@@ -35,7 +35,6 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         super(ctx, R.layout.component_seem_list, itemList);
         this.itemList = itemList;
         this.context = ctx;
-        processMap = new HashMap<View, List<AsyncTask>>();
     }
 
     public int getCount() {
@@ -79,17 +78,6 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
                 convertView = inflater.inflate(R.layout.component_feed_list_reply, null);
             }
         }
-        List<AsyncTask> toCancelTasks = processMap.get(convertView);
-        if(toCancelTasks == null){
-            toCancelTasks = new ArrayList<AsyncTask>();
-            processMap.put(convertView,toCancelTasks);
-        }
-
-        for(AsyncTask task:toCancelTasks){
-            task.cancel(true);
-        }
-
-        toCancelTasks.clear();
 
         //Common stuff
         TextView agentTextView = (TextView) convertView.findViewById(R.id.agentTextView);
@@ -99,13 +87,10 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         agentTextView.setText("@"+feed.getUsername());
         dateTextView.setText(Utils.getRelativeTime(feed.getCreated()));
 
-        Media media = new Media(feed.getItemMediaId());
         mainImageView.setText(feed.getItemCaption());
-        mainImageView.setLoading(true);
-        mainImageView.getImageView().setImageDrawable(null);
-        FetchThumbs fetchThumbs1 = new FetchThumbs(mainImageView,media);
-        toCancelTasks.add(fetchThumbs1);
-        fetchThumbs1.execute();
+        mainImageView.setLoading(false);
+
+        Utils.loadBitmap(feed.getItemMediaId(),mainImageView.getImageView(),true,context.getResources());
 
         //TODO specific stuff
         if(fa == Feed.FeedAction.CREATE_SEEM) {
@@ -118,14 +103,10 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
             TextView originalPostAuthor = (TextView) convertView.findViewById(R.id.originalPostAuthor);
             originalPostAuthor.setText("@"+feed.getReplyToUsername());
             SpinnerImageView originalPost = (SpinnerImageView) convertView.findViewById(R.id.originalPost);
-            Media originalPostMedia =  new Media(feed.getReplyToMediaId());
             originalPost.setText(feed.getReplyToCaption());
-            originalPost.setLoading(true);
-            originalPost.getImageView().setImageDrawable(null);
+            originalPost.setLoading(false);
 
-            FetchThumbs fetchThumbs2 = new FetchThumbs(originalPost,originalPostMedia);
-            toCancelTasks.add(fetchThumbs2);
-            fetchThumbs2.execute();
+            Utils.loadBitmap(feed.getReplyToMediaId(),originalPost.getImageView(),true,context.getResources());
 
         }
 
@@ -154,36 +135,6 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         return Feed.FeedAction.values().length; // Count of different layouts
     }
 
-    private class FetchThumbs extends AsyncTask<Void,Void,Void> {
-        private SpinnerImageView imageView;
-        private Media media;
-
-        public FetchThumbs(SpinnerImageView imageView,Media media){
-            this.imageView = imageView;
-            this.media = media;
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            MediaService.getInstance().getThumb(media);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            if(this.isCancelled()){
-                //well... do not paint...
-            }else if(media != null) {
-                imageView.getImageView().setImageDrawable(media.getImageThumb());
-                imageView.getImageView().setVisibility(View.VISIBLE);
-                imageView.setLoading(false);
-            }
-            imageView = null;
-            media = null;
-        }
-    }
 
     public FetchLastItemListener getFetchLastItemListener() {
         return fetchLastItemListener;

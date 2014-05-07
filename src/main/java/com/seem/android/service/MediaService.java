@@ -1,6 +1,7 @@
 package com.seem.android.service;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.seem.android.MyApplication;
 import com.seem.android.model.Media;
@@ -37,7 +38,7 @@ public class MediaService {
         this.context = context;
     }
 
-    public void getThumb(Media media){
+    public Bitmap getThumb(Media media){
 
         //check in the internal filesystem
         File file = new File(context.getCacheDir(), media.getId()+"_thumb.jpg");
@@ -56,13 +57,14 @@ public class MediaService {
             }
         }
         try {
-            media.setImageThumb(Utils.fromFile(file.getAbsolutePath()));
+            return Utils.fromFile(file.getAbsolutePath());
         }catch(IOException ex){
             Utils.debug(this.getClass(),ex.getMessage());
         }
+        return null;
     }
 
-    public void getLarge(Media media){
+    public Bitmap getLarge(Media media){
 
         //check in the internal filesystem
         File file = new File(context.getCacheDir(), media.getId()+"_large.jpg");
@@ -82,12 +84,11 @@ public class MediaService {
             }
         }
         try {
-            media.setImageLarge(Utils.fromFile(file.getAbsolutePath()));
+            return Utils.fromFile(file.getAbsolutePath());
         }catch(IOException ex){
             Utils.debug(this.getClass(),ex.getMessage());
         }
-
-
+        return null;
     }
 
     private void checkCacheSize(){

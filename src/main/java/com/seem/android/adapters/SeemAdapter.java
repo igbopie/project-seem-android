@@ -1,6 +1,7 @@
 package com.seem.android.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.model.Seem;
+import com.seem.android.util.Utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,6 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
 
     private List<Seem> itemList;
     private Context context;
-    private Map<ImageView,DownloadAsyncTask> imageViewProcesses = new HashMap<ImageView, DownloadAsyncTask>();
     private SeemListFragment.QueryType queryType;
 
     public SeemAdapter(List<Seem> itemList, Context ctx) {
@@ -76,14 +77,8 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         SpinnerImageView mainImageView = (SpinnerImageView) v.findViewById(R.id.mainImageView);
         mainImageView.setText(c.getItemCaption());
 
-        if(imageViewProcesses.containsKey(mainImageView.getImageView())){
-            imageViewProcesses.get(mainImageView.getImageView()).cancel(true);
-        }
 
-        mainImageView.getImageView().setImageBitmap(null);
-        DownloadAsyncTask mainDTask = new DownloadAsyncTask(c.getItemMediaId(),mainImageView.getImageView(),true);
-        imageViewProcesses.put(mainImageView.getImageView(),mainDTask);
-        mainDTask.execute();
+        Utils.loadBitmap(c.getItemMediaId(), mainImageView.getImageView(), true, context.getResources());
 
         mainImageView.setLoading(false);
 
@@ -100,62 +95,26 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         miniView2.setVisibility(View.INVISIBLE);
         miniView1.setVisibility(View.INVISIBLE);
 
-        miniView1.getImageView().setImageBitmap(null);
-        miniView2.getImageView().setImageBitmap(null);
-        miniView3.getImageView().setImageBitmap(null);
-        miniView4.getImageView().setImageBitmap(null);
-        miniView5.getImageView().setImageBitmap(null);
-
-        if(imageViewProcesses.containsKey(miniView1.getImageView())){
-            imageViewProcesses.get(miniView1.getImageView()).cancel(true);
-        }
-
-        if(imageViewProcesses.containsKey(miniView2.getImageView())){
-            imageViewProcesses.get(miniView2.getImageView()).cancel(true);
-        }
-
-        if(imageViewProcesses.containsKey(miniView3.getImageView())){
-            imageViewProcesses.get(miniView3.getImageView()).cancel(true);
-        }
-
-        if(imageViewProcesses.containsKey(miniView4.getImageView())){
-            imageViewProcesses.get(miniView4.getImageView()).cancel(true);
-        }
-
-        if(imageViewProcesses.containsKey(miniView5.getImageView())){
-            imageViewProcesses.get(miniView5.getImageView()).cancel(true);
-        }
-
         switch (c.getLastestItems().size()){
             case 5:
                 miniView5.setLoading(false);
-                DownloadAsyncTask miniTask = new DownloadAsyncTask(c.getLastestItems().get(4),miniView5.getImageView(),true);
-                miniTask.execute();
-                imageViewProcesses.put(miniView5.getImageView(),miniTask);
+                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), miniView5.getImageView(), true, context.getResources());
                 miniView5.setVisibility(View.VISIBLE);
             case 4:
                 miniView4.setLoading(false);
-                miniTask = new DownloadAsyncTask(c.getLastestItems().get(3),miniView4.getImageView(),true);
-                miniTask.execute();
-                imageViewProcesses.put(miniView4.getImageView(), miniTask);
+                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), miniView4.getImageView(), true, context.getResources());
                 miniView4.setVisibility(View.VISIBLE);
             case 3:
                 miniView3.setLoading(false);
-                miniTask = new DownloadAsyncTask(c.getLastestItems().get(2),miniView3.getImageView(),true);
-                miniTask.execute();
-                imageViewProcesses.put(miniView3.getImageView(), miniTask);
+                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), miniView3.getImageView(), true, context.getResources());
                 miniView3.setVisibility(View.VISIBLE);
             case 2:
                 miniView2.setLoading(false);
-                miniTask = new DownloadAsyncTask(c.getLastestItems().get(1),miniView2.getImageView(),true);
-                miniTask.execute();
-                imageViewProcesses.put(miniView2.getImageView(), miniTask);
+                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), miniView2.getImageView(), true, context.getResources());
                 miniView2.setVisibility(View.VISIBLE);
             case 1:
                 miniView1.setLoading(false);
-                miniTask = new DownloadAsyncTask(c.getLastestItems().get(0),miniView1.getImageView(),true);
-                miniTask.execute();
-                imageViewProcesses.put(miniView1.getImageView(), miniTask);
+                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), miniView1.getImageView(), true, context.getResources());
                 miniView1.setVisibility(View.VISIBLE);
             case 0:
                 break;

@@ -12,6 +12,7 @@ import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.R;
 
 import com.seem.android.model.Item;
+import com.seem.android.util.Utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,6 @@ public class ThreadedAdapter extends ArrayAdapter<Item> {
 
     private List<Item> itemList;
     private Context context;
-    private Map<View,DownloadAsyncTask> taskMap = new HashMap<View, DownloadAsyncTask>();
 
     public ThreadedAdapter(List<Item> itemList, Context ctx) {
         super(ctx, R.layout.component_threaded_list, itemList);
@@ -53,14 +53,6 @@ public class ThreadedAdapter extends ArrayAdapter<Item> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        if(convertView != null){
-            DownloadAsyncTask dat = taskMap.get(convertView);
-            if(dat != null){
-                dat.cancel(true);
-                taskMap.put(convertView,null);
-            }
-        }
-
         View v = convertView;
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -76,11 +68,7 @@ public class ThreadedAdapter extends ArrayAdapter<Item> {
         TextView captionTextView = (TextView) v.findViewById(R.id.captionTextView);
         captionTextView.setText(c.getCaption());
 
-
-        DownloadAsyncTask dat = new DownloadAsyncTask(c,imageView,true);
-        dat.execute();
-        taskMap.put(convertView,dat);
-
+        Utils.loadBitmap(c.getMediaId(),imageView,true,context.getResources());
 
         return v;
 

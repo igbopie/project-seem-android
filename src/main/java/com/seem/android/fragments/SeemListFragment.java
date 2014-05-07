@@ -27,6 +27,7 @@ import com.seem.android.service.SeemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -270,4 +271,22 @@ public class SeemListFragment extends ListFragment {
         public void onClick(String seemId,String itemId);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Utils.debug(getClass(),"onDestroyView");
+        cleanMe();
+    }
+
+    private void cleanMe(){
+        for(Field field:this.getClass().getFields()){
+            try {
+                if(!field.getType().isPrimitive()){
+                    field.set(this,null);
+                }
+            } catch (IllegalAccessException e) {
+                Utils.debug(getClass(),e.getMessage());
+            }
+        }
+    }
 }

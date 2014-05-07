@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +32,7 @@ import com.seem.android.service.ItemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -368,13 +370,13 @@ public class ItemFullScreenFragment extends Fragment {
                 //First Thumb
                 downloadAsyncTask = new DownloadAsyncTask(item,getImageView(),true){
                     @Override
-                    protected void onPostExecute(Void result) {
+                    protected void onPostExecute(Bitmap result) {
                         super.onPostExecute(result);
                         if(!this.isCancelled()) {
                             //Then large
                             downloadAsyncTask = new DownloadAsyncTask(item, getImageView(), false) {
                                 @Override
-                                protected void onPostExecute(Void result) {
+                                protected void onPostExecute(Bitmap result) {
                                     super.onPostExecute(result);
                                     progressBar.setVisibility(View.INVISIBLE);
                                     downloadAsyncTask = null;

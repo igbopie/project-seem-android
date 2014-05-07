@@ -43,6 +43,7 @@ import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.ItemSelectedListener;
 import com.seem.android.util.Utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -316,9 +317,9 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         if(item.getDepth() > 0){
             //upButton.setVisible(true);
         }
-
-
     }
+
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -348,6 +349,12 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Utils.debug(getClass(),"onDestroyView");
+        cleanMe();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -826,5 +833,18 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         abstract protected Boolean doAction();
 
 
+    }
+
+
+    private void cleanMe(){
+        for(Field field:this.getClass().getFields()){
+            try {
+                if(!field.getType().isPrimitive()){
+                    field.set(this,null);
+                }
+            } catch (IllegalAccessException e) {
+                Utils.debug(getClass(),e.getMessage());
+            }
+        }
     }
 }

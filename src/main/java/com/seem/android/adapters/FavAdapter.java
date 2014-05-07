@@ -1,6 +1,7 @@
 package com.seem.android.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,6 @@ public class FavAdapter extends ArrayAdapter<Item> {
 
     private List<Item> itemList;
     private Context context;
-    private Map<View,List<AsyncTask>> processMap;
 
     private FetchLastItemListener fetchLastItemListener;
 
@@ -37,7 +37,6 @@ public class FavAdapter extends ArrayAdapter<Item> {
         super(ctx, R.layout.component_seem_list, itemList);
         this.itemList = itemList;
         this.context = ctx;
-        processMap = new HashMap<View, List<AsyncTask>>();
     }
 
     public int getCount() {
@@ -73,19 +72,7 @@ public class FavAdapter extends ArrayAdapter<Item> {
             // You can move this line into your constructor, the inflater service won't change.
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.component_feed_list_favourite, null);
-
         }
-        List<AsyncTask> toCancelTasks = processMap.get(convertView);
-        if(toCancelTasks == null){
-            toCancelTasks = new ArrayList<AsyncTask>();
-            processMap.put(convertView,toCancelTasks);
-        }
-
-        for(AsyncTask task:toCancelTasks){
-            task.cancel(true);
-        }
-
-        toCancelTasks.clear();
 
         //Common stuff
         TextView agentTextView = (TextView) convertView.findViewById(R.id.agentTextView);
@@ -95,16 +82,10 @@ public class FavAdapter extends ArrayAdapter<Item> {
         agentTextView.setText("@" + MyApplication.getUsername());
         dateTextView.setText(Utils.getRelativeTime(item.getFavouritedDate()));
 
-        Media media = new Media(item.getMediaId());
         mainImageView.setText(item.getCaption());
-        mainImageView.setLoading(true);
-        mainImageView.getImageView().setImageDrawable(null);
-        FetchThumbs fetchThumbs1 = new FetchThumbs(mainImageView,media);
-        toCancelTasks.add(fetchThumbs1);
-        fetchThumbs1.execute();
+        mainImageView.setLoading(false);
 
-
-
+        Utils.loadBitmap(item.getMediaId(),mainImageView.getImageView(),true,context.getResources());
 
         return convertView;
 
@@ -120,36 +101,6 @@ public class FavAdapter extends ArrayAdapter<Item> {
     }
 
 
-    private class FetchThumbs extends AsyncTask<Void,Void,Void> {
-        private SpinnerImageView imageView;
-        private Media media;
-
-        public FetchThumbs(SpinnerImageView imageView,Media media){
-            this.imageView = imageView;
-            this.media = media;
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            MediaService.getInstance().getThumb(media);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            if(this.isCancelled()){
-                //well... do not paint...
-            }else if(media != null) {
-                imageView.getImageView().setImageDrawable(media.getImageThumb());
-                imageView.getImageView().setVisibility(View.VISIBLE);
-                imageView.setLoading(false);
-            }
-            imageView = null;
-            media = null;
-        }
-    }
 
     public FetchLastItemListener getFetchLastItemListener() {
         return fetchLastItemListener;
