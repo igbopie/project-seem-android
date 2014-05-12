@@ -930,6 +930,8 @@ public class Api {
         }
         if(itemJson.has(JSON_TAG_ITEM_USER_ID)) {
             item.setUserId(itemJson.getString(JSON_TAG_ITEM_USER_ID));
+        }
+        if(itemJson.has(JSON_TAG_ITEM_USERNAME)) {
             item.setUsername(itemJson.getString(JSON_TAG_ITEM_USERNAME));
         }
 

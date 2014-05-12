@@ -30,6 +30,7 @@ import com.seem.android.fragments.FeedListFragment;
 import com.seem.android.fragments.HomeFragment;
 import com.seem.android.fragments.ItemFragment;
 import com.seem.android.fragments.ItemFragmentV2;
+import com.seem.android.fragments.ItemFragmentV3;
 import com.seem.android.fragments.LoginFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
@@ -53,6 +54,7 @@ public class MainActivity extends Activity implements
                                             SignUpFragment.SignUpInteractionListener,
                                             ItemFragment.OnItemClickListener,
                                             ItemFragmentV2.OnItemClickListener,
+                                            ItemFragmentV3.OnItemClickListener,
                                             FeedListFragment.OnItemClickListener,
                                             SeemListFragment.OnItemClickListener,
                                             FavListFragment.OnItemClickListener
@@ -108,6 +110,9 @@ public class MainActivity extends Activity implements
                 int parentHeight = findViewById(R.id.drawer_layout).getHeight();
                 GlobalVars.GRID_SIZE = parentHeight / GlobalVars.GRID_NUMBER_OF_PHOTOS;
                 GlobalVars.GRID_SIZE_V2 = parentWidth / GlobalVars.GRID_NUMBER_OF_PHOTOS_V2;
+
+                GlobalVars.SCREEN_HEIGHT = parentHeight;
+                GlobalVars.SCREEN_WIDTH = parentWidth;
             }
         });
 
@@ -391,7 +396,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onClick( String seemId,String itemId) {
-        android.app.Fragment fragment = ItemFragmentV2.newInstance(seemId, itemId);
+        android.app.Fragment fragment = ItemFragmentV3.newInstance(seemId, itemId);
         displayView(fragment);
     }
 

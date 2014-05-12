@@ -67,4 +67,7 @@ public class GlobalVars {
 
     public static int GRID_NUMBER_OF_PHOTOS = 4;
     public static int GRID_NUMBER_OF_PHOTOS_V2 = 3;
+
+    public static int SCREEN_WIDTH;
+    public static int SCREEN_HEIGHT;
 }

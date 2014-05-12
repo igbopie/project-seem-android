@@ -6,8 +6,9 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
@@ -32,6 +33,7 @@ import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.adapters.ThumbnailAdapterV2;
+import com.seem.android.adapters.ThumbnailAdapterV3;
 import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Item;
@@ -48,10 +50,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
+public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
 
-    public static ItemFragmentV2 newInstance(String seemId,String itemId) {
-        ItemFragmentV2 f = new ItemFragmentV2();
+    public static ItemFragmentV3 newInstance(String seemId,String itemId) {
+        ItemFragmentV3 f = new ItemFragmentV3();
         Bundle args = new Bundle();
         args.putString(GlobalVars.EXTRA_ITEM_ID, itemId);
         args.putString(GlobalVars.EXTRA_SEEM_ID, seemId);
@@ -62,19 +64,21 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
 
     AnimatorSet animatorSet;
     private boolean refresh = true;
-    private SpinnerImageView image;
+    private ImageView image;
+    private ImageView fakeImage;
+
     private Item item;
 
     private List<Item> replies = new ArrayList<Item>();
 
     GridView gridView;
-    ThumbnailAdapterV2 thumbnailAdapter;
+    ThumbnailAdapterV3 thumbnailAdapter;
     Seem seem = null;
     boolean isMin = false;
     boolean isMax = true;
     int minSize = -1;
     int maxSize =-1;
-    int currentSize;
+    //int currentSize;
     View gridviewmask;
     View miniActionPanel;
     View bigActionPanel;
@@ -103,6 +107,12 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
     ImageView thumbDownIconSmall;
     ImageView favIconBigSmall;
 
+    TextView commentsNumberBig;
+    View parentView;
+
+    int parentWidth=0;
+    int parentHeight=0;
+
 
 
 
@@ -123,7 +133,7 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_item_view_v2, container, false);
+        return inflater.inflate(R.layout.fragment_item_view_v3, container, false);
     }
 
     @Override
@@ -131,7 +141,8 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         super.onViewCreated(view, savedInstanceState);
 
 
-        image = (SpinnerImageView) findViewById(R.id.itemMainImage);
+        image = (ImageView) findViewById(R.id.itemMainImage);
+        fakeImage = (ImageView) findViewById(R.id.fakeItemMainImage);
         gridView = (GridView) view.findViewById(R.id.gridview);
         gridviewmask= view.findViewById(R.id.gridviewmask);
         miniActionPanel = view.findViewById(R.id.miniActionPanel);
@@ -161,6 +172,8 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         thumbDownIconSmall = (ImageView) findViewById(R.id.thumbDownIconSmall);
         favIconBigSmall = (ImageView) findViewById(R.id.favIconBigSmall);
 
+        commentsNumberBig = (TextView) findViewById(R.id.commentsNumberBig);
+
 
         favIconBig.setOnClickListener(this);
         thumbUpIconBig.setOnClickListener(this);
@@ -169,6 +182,10 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         favIconBigSmall.setOnClickListener(this);
         thumbUpIconSmall.setOnClickListener(this);
         thumbDownIconSmall.setOnClickListener(this);
+        parentWidth = GlobalVars.SCREEN_WIDTH;
+        parentHeight = GlobalVars.SCREEN_HEIGHT;
+
+        parentView = view;
     }
 
     @Override
@@ -182,9 +199,10 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
 
         minSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics());
-        maxSize = GlobalVars.GRID_SIZE_V2*GlobalVars.GRID_NUMBER_OF_PHOTOS_V2;
-        currentSize = maxSize;
-        image.setLayoutParams(new RelativeLayout.LayoutParams(maxSize, maxSize));
+        //maxSize = GlobalVars.GRID_SIZE_V2*GlobalVars.GRID_NUMBER_OF_PHOTOS_V2;
+        //currentSize = maxSize;
+        image.setLayoutParams(new RelativeLayout.LayoutParams(parentWidth,parentHeight));
+        fakeImage.setLayoutParams(new RelativeLayout.LayoutParams(parentWidth,parentHeight));
         isMax = true;
         isMin = false;
 
@@ -216,7 +234,7 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         });
         new GetItemAndPaintTask().execute(getItemId());
 
-        thumbnailAdapter = new ThumbnailAdapterV2(getActivity(),
+        thumbnailAdapter = new ThumbnailAdapterV3(getActivity(),
                 new ItemSelectedListener() {
                     @Override
                     public void itemSelected(Item item) {
@@ -250,24 +268,21 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         thumbnailAdapter.clear();
 
 
-        image.setDepthNumber(item.getDepth());
-        if(item.getDepth() > 0) {
-            image.setViewThreadOnClick(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ActivityFactory.startThreadedActivity(getActivity(), item.getId());
-                }
-            });
-        }
         //FIND replies
         if(item.getReplyCount() > 0 ){
             new GetRepliesTask(item).execute();
-        } else {
-            image.setLoading(false);
         }
+        commentsNumberBig.setText(item.getReplyCount()+"");
 
-
-        new DownloadAsyncTask(item,image.getImageView(),false).execute();
+        new DownloadAsyncTask(item,image,false) {
+            @Override
+            protected void onPostExecute(Bitmap v) {
+                super.onPostExecute(v);
+                if(v != null) {
+                    fakeImage.setImageBitmap(v);
+                }
+            }
+        }.execute();
         getActivity().setTitle(item.getCaption());
 
         //
@@ -488,7 +503,6 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            image.setLoading(true);
         }
 
         @Override
@@ -533,7 +547,6 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
             for(Item item:replies) {
                 addToGrid(item);
             }
-            image.setLoading(false);
 
         }
     }
@@ -567,10 +580,11 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
 
 
     public void scrollToMax(){
+
         gridviewmask.setVisibility(View.VISIBLE);
         //restore image size
         animatorSet = new AnimatorSet();
-        animatorSet.play(ObjectAnimator.ofInt(ItemFragmentV2.this, "imageScroll", minSize, maxSize));
+        animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV3.this, "imageScroll", 0, 1));
 
         animatorSet.setDuration((long) 500);
         animatorSet.setInterpolator(new DecelerateInterpolator());
@@ -603,7 +617,7 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
     public void scrollToMin(){
         //restore image size
         animatorSet = new AnimatorSet();
-        animatorSet.play(ObjectAnimator.ofInt(ItemFragmentV2.this, "imageScroll",currentSize, minSize));
+        animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV3.this, "imageScroll", 1, 0));
         animatorSet.setDuration((long) 500);
         animatorSet.setInterpolator(new DecelerateInterpolator());
         animatorSet.addListener(new Animator.AnimatorListener() {
@@ -634,45 +648,51 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
     }
 
 
-    public void setImageScroll(int scroll){
+    public void setImageScroll(float scroll){
+        // 1 (max) - 0 min
+
+        float heightAux = parentHeight - minSize;
+        float widthAux = parentWidth - minSize;
+
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) image.getLayoutParams();
-        params.height = scroll;
+        params.height = (int) (heightAux * scroll) + minSize;
         if(params.height < minSize) {
             params.height =(int) minSize;
             isMin = true;
-            if(animatorSet != null){
-                animatorSet.cancel();
-            }
         }else{
             isMin = false;
         }
-        if(params.height > maxSize){
-            params.height = maxSize;
+        if(params.height >= parentHeight){
+            params.height = parentHeight;
             isMax = true;
-            if(animatorSet != null){
-                animatorSet.cancel();
-            }
         }else{
             isMax = false;
         }
-        params.width = params.height;
+        params.width = (int) (widthAux * scroll) + minSize;
         image.setLayoutParams(params);
-        currentSize = params.width;
+        fakeImage.setLayoutParams(params);
 
-        float maxTrimmed = maxSize - minSize;
-        float currentSizeTrimmed = currentSize -minSize;
-        float percCompleted = currentSizeTrimmed/maxTrimmed;
 
-        gridviewmask.setAlpha(percCompleted);
-        miniActionPanel.setAlpha(1-percCompleted);
-        bigActionPanel.setAlpha(percCompleted);
+        gridviewmask.setAlpha(scroll);
+        miniActionPanel.setAlpha(1-scroll);
+        bigActionPanel.setAlpha(scroll);
+        image.setAlpha(scroll);
+        fakeImage.setAlpha(1-scroll);
+
+        int color = (int) (255 * (1-scroll));
+        parentView.setBackgroundColor(Color.rgb(color,color,color));
+
+
+
+
+
     }
 
-    public void goBack(){
+    public void goBack(){/*
         Utils.debug(getClass(),"Go Back!");
         animatorSet = new AnimatorSet();
         animatorSet.play(ObjectAnimator.ofFloat(image, View.Y,0, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics())))
-        .with(ObjectAnimator.ofInt(ItemFragmentV2.this, "imageScroll", currentSize, minSize));
+        .with(ObjectAnimator.ofInt(ItemFragmentV3.this, "imageScroll", currentSize, minSize));
         animatorSet.setDuration((long) 250);
         animatorSet.setInterpolator(new DecelerateInterpolator());
         animatorSet.addListener(new Animator.AnimatorListener() {
@@ -685,9 +705,9 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
             public void onAnimationEnd(Animator animator) {
                 Utils.debug(getClass(),"onAnimationEnd");
                 if(item.getReplyTo() != null) {
-                    ItemFragmentV2.this.onItemClickListener.onClick(item.getSeemId(), item.getReplyTo());
+                    ItemFragmentV3.this.onItemClickListener.onClick(item.getSeemId(), item.getReplyTo());
                 } else {
-                    ItemFragmentV2.this.onItemClickListener.onFinish();
+                    ItemFragmentV3.this.onItemClickListener.onFinish();
                 }
             }
 
@@ -701,14 +721,14 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
                 Utils.debug(getClass(),"onAnimationRepeat");
             }
         });
-        animatorSet.start();
+        animatorSet.start();*/
     }
 
     public void goFullScreen(){
         //FullScreen
 
         Utils.debug(this.getClass(), "Item:" + item.getId());
-        Item parentItem = ItemFragmentV2.this.item;
+        Item parentItem = ItemFragmentV3.this.item;
         ActivityFactory.startItemFullscreenActivity(getActivity(), getSeemId(), parentItem.getId(),parentItem.getId());
         /*animatorSet = new AnimatorSet();
         animatorSet.play(ObjectAnimator.ofFloat(this,"imageSize",maxSize,1080));
@@ -745,9 +765,8 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         public boolean onFling(MotionEvent start, MotionEvent finish, float xVelocity, float yVelocity) {
             if (isMin && start.getRawY() < finish.getRawY()) {
                 scrollToMax();
-            }else if(start.getRawY() < finish.getRawY()){
-                goBack();
             }else if(isMax && start.getRawY() > finish.getRawY()){
+                Utils.debug(getClass(),"ScrollToMin");
                 scrollToMin();
             }
             Utils.debug(getClass(),"onfling");
@@ -758,9 +777,7 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
             if (isMin) {
                 scrollToMax();
             } else {
-                goFullScreen();
-
-
+                scrollToMin();
             }
             Utils.debug(getClass(),"onSingleTapUp");
             return false;

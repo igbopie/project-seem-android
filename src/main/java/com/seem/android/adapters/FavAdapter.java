@@ -79,7 +79,7 @@ public class FavAdapter extends ArrayAdapter<Item> {
         TextView dateTextView = (TextView)  convertView.findViewById(R.id.dateTextView);
         SpinnerImageView mainImageView = (SpinnerImageView) convertView.findViewById(R.id.mainImageView);
 
-        agentTextView.setText("@" + MyApplication.getUsername());
+        agentTextView.setText("@" + item.getUsername());
         dateTextView.setText(Utils.getRelativeTime(item.getFavouritedDate()));
 
         mainImageView.setText(item.getCaption());
