@@ -11,10 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.seem.android.R;
-import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.model.Seem;
+import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
 
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         mainImageView.setText(c.getItemCaption());
 
 
-        Utils.loadBitmap(c.getItemMediaId(), mainImageView.getImageView(), true, context.getResources());
+        Utils.loadBitmap(c.getItemMediaId(), Api.ImageFormat.THUMB, mainImageView.getImageView(), context);
 
         mainImageView.setLoading(false);
 
@@ -98,23 +98,23 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         switch (c.getLastestItems().size()){
             case 5:
                 miniView5.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), miniView5.getImageView(), true, context.getResources());
+                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), Api.ImageFormat.THUMB,miniView5.getImageView(), context);
                 miniView5.setVisibility(View.VISIBLE);
             case 4:
                 miniView4.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), miniView4.getImageView(), true, context.getResources());
+                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), Api.ImageFormat.THUMB, miniView4.getImageView(), context);
                 miniView4.setVisibility(View.VISIBLE);
             case 3:
                 miniView3.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), miniView3.getImageView(), true, context.getResources());
+                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), Api.ImageFormat.THUMB, miniView3.getImageView(), context);
                 miniView3.setVisibility(View.VISIBLE);
             case 2:
                 miniView2.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), miniView2.getImageView(), true, context.getResources());
+                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), Api.ImageFormat.THUMB, miniView2.getImageView(), context);
                 miniView2.setVisibility(View.VISIBLE);
             case 1:
                 miniView1.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), miniView1.getImageView(), true, context.getResources());
+                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), Api.ImageFormat.THUMB, miniView1.getImageView(), context);
                 miniView1.setVisibility(View.VISIBLE);
             case 0:
                 break;

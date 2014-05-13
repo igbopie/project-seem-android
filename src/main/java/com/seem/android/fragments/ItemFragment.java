@@ -29,15 +29,16 @@ import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.adapters.ThumbnailAdapter;
-import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
+import com.seem.android.service.Api;
 import com.seem.android.service.ItemService;
 import com.seem.android.service.SeemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.ItemSelectedListener;
 import com.seem.android.util.Utils;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,8 +159,7 @@ public class ItemFragment extends Fragment {
             image.setLoading(false);
         }
 
-
-        new DownloadAsyncTask(item,image.getImageView(),true).execute();
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,image.getImageView(),getActivity());
 
         image.setOnClickListener(new View.OnClickListener() {
             @Override

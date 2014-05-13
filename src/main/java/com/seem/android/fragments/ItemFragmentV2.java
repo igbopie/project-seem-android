@@ -32,7 +32,6 @@ import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.adapters.ThumbnailAdapterV2;
-import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
@@ -267,7 +266,7 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         }
 
 
-        new DownloadAsyncTask(item,image.getImageView(),false).execute();
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image.getImageView(),getActivity());
         getActivity().setTitle(item.getCaption());
 
         //

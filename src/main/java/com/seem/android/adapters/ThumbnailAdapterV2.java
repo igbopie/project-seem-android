@@ -10,7 +10,7 @@ import com.seem.android.GlobalVars;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Item;
 import com.seem.android.model.Media;
-import com.seem.android.service.MediaService;
+import com.seem.android.service.Api;
 import com.seem.android.util.ItemSelectedListener;
 import com.seem.android.util.Utils;
 
@@ -70,7 +70,7 @@ public class ThumbnailAdapterV2 extends BaseAdapter {
 
             view.setTag(Integer.valueOf( position));
 
-            Utils.loadBitmap(item.getMediaId(),view.getImageView(),true,context.getResources());
+            Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,view.getImageView(),context);
 
             return view;
         }

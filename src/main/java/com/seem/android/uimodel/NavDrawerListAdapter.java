@@ -12,7 +12,8 @@ import android.widget.TextView;
 
 import com.seem.android.MyApplication;
 import com.seem.android.R;
-import com.seem.android.asynctask.DownloadAsyncTask;
+import com.seem.android.service.Api;
+import com.seem.android.util.Utils;
 
 import java.util.ArrayList;
 
@@ -61,7 +62,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
 
         if(dItem.getItem() != null){
             txtTitle.setText(dItem.getItem().getCaption());
-            new DownloadAsyncTask(dItem.getItem(),imgIcon,true).execute();
+            Utils.loadBitmap(dItem.getItem().getMediaId(), Api.ImageFormat.THUMB, imgIcon, context);
         }else {
             if(dItem.isSectionTitle()) {
                 imgIcon.setVisibility(View.INVISIBLE);

@@ -155,6 +155,8 @@ public class Api {
     public static final String JSON_TAG_TOPIC_CODE = "code";
     public static final String JSON_TAG_TOPIC_NAME = "name";
 
+    public enum ImageFormat{THUMB,LARGE};
+
     public static List<Item> getSeemItemsByFavourited(String username,int page){
         try {
             HashMap<String,String>params = new HashMap<String, String>();
@@ -973,16 +975,26 @@ public class Api {
 
 
     public static InputStream downloadLargeImage(Media media) throws IOException {
-        return  (InputStream) new URL(S3_ENPOINT+media.getId()+"_"+"large").getContent();
+        return  (InputStream) new URL(getImageEndpoint(media.getId(),ImageFormat.LARGE)).getContent();
        //return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_LARGE+media.getId()).getContent();
         //media.setImageLarge(Drawable.createFromStream(is, media.getId()));
     }
 
     public static InputStream downloadThumbImage(Media media) throws IOException {
-        return  (InputStream) new URL(S3_ENPOINT+media.getId()+"_"+"thumb").getContent();
+        return  (InputStream) new URL(getImageEndpoint(media.getId(),ImageFormat.THUMB)).getContent();
         //return (InputStream) new URL(ENDPOINT+ENDPOINT_GET_MEDIA_THUMB+media.getId()).getContent();
     }
 
+    public static String getImageEndpoint(String mediaId,ImageFormat format){
+        switch (format){
+            case LARGE:
+                return S3_ENPOINT+mediaId+"_"+"large";
+            case THUMB:
+            default:
+                return S3_ENPOINT+mediaId+"_"+"thumb";
+        }
+
+    }
 
 
     public static HttpResponse makeRequest(String path, Map<String,String> params) throws Exception

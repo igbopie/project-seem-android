@@ -46,7 +46,6 @@ public class CreateSeemFlowActivity extends Activity {
     EditText titleText;
     Button submit;
     Uri localTempFile;
-    Bitmap localBitmap;
     Boolean cameraStarted = false;
     private Spinner topicSpinner;
     List<String> topicNameList;
@@ -142,27 +141,17 @@ public class CreateSeemFlowActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         Utils.debug(this.getClass(),"Create Seem Flow Activity OnActivityResult");
         if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic taken");
-            localBitmap = Utils.shrinkBitmap(localTempFile.getPath());
-            imageView.setImageBitmap(localBitmap);
-            new FetchTopics().execute();
+            //Do nothing
         } else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
-            //localTempFile = ;
-
-            try {
-                localTempFile =data.getData();
-                imageView.setImageBitmap(
-                        Utils.shrinkBitmapFromStream(
-                                getContentResolver().openInputStream(data.getData()),
-                                getContentResolver().openInputStream(data.getData()))
-                );
-                new FetchTopics().execute();
-            } catch (FileNotFoundException e) {
-                Utils.debug(getClass(),"Error "+e);
-            }
+            localTempFile =data.getData();
         } else {
             Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
+        }
+
+        if(resultCode == Activity.RESULT_OK){
+            Utils.loadStream(data.getData(),imageView,this);
+            new FetchTopics().execute();
         }
 
     }

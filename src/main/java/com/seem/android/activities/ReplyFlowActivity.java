@@ -112,28 +112,16 @@ public class ReplyFlowActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            Utils.debug(this.getClass(),"Reply Flow Activity - Pic taken");
-            try {
-                imageView.setImageBitmap(Utils.shrinkBitmap(itemInProgress.getTempLocalFile().getPath()));
-            }catch(Exception e){
-                Utils.debug(this.getClass(),"ERROR trying to save the image",e);
-                //
-                //ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
-            }
+            //DO nothing
         }  else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
-            //localTempFile = ;
-            try {
-                itemInProgress.setTempLocalFile(data.getData());
-                imageView.setImageBitmap(
-                        Utils.shrinkBitmapFromStream(
-                                getContentResolver().openInputStream(data.getData()),
-                                getContentResolver().openInputStream(data.getData())));
-            }catch(Exception e){
-                Utils.debug(getClass(),"Error "+e);
-            }
+            itemInProgress.setTempLocalFile(data.getData());
         } else {
             Utils.debug(this.getClass(),"Reply Flow Activity - Pic Cancelled");
             ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
+        }
+
+        if(resultCode == Activity.RESULT_OK){
+            Utils.loadStream(itemInProgress.getTempLocalFile(),imageView,this);
         }
 
     }

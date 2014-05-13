@@ -12,14 +12,9 @@ import android.widget.TextView;
 import com.seem.android.R;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Feed;
-import com.seem.android.model.Media;
-import com.seem.android.service.MediaService;
+import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by igbopie on 18/03/14.
@@ -90,7 +85,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         mainImageView.setText(feed.getItemCaption());
         mainImageView.setLoading(false);
 
-        Utils.loadBitmap(feed.getItemMediaId(),mainImageView.getImageView(),true,context.getResources());
+        Utils.loadBitmap(feed.getItemMediaId(), Api.ImageFormat.THUMB,mainImageView.getImageView(),context);
 
         //TODO specific stuff
         if(fa == Feed.FeedAction.CREATE_SEEM) {
@@ -106,7 +101,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
             originalPost.setText(feed.getReplyToCaption());
             originalPost.setLoading(false);
 
-            Utils.loadBitmap(feed.getReplyToMediaId(),originalPost.getImageView(),true,context.getResources());
+            Utils.loadBitmap(feed.getReplyToMediaId(), Api.ImageFormat.THUMB,originalPost.getImageView(),context);
 
         }
 

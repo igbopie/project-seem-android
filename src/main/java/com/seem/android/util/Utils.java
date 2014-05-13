@@ -4,14 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
@@ -19,12 +12,11 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.seem.android.GlobalVars;
-import com.seem.android.MyApplication;
-import com.seem.android.asynctask.DownloadAsyncTask;
+import com.seem.android.service.Api;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,183 +25,12 @@ import java.util.Date;
  */
 public class Utils {
 
-    private static DownloadAsyncTask getBitmapWorkerTask(ImageView imageView) {
-        if (imageView != null) {
-            final Drawable drawable = imageView.getDrawable();
-            if (drawable instanceof AsyncDrawable) {
-                final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
-                return asyncDrawable.getBitmapWorkerTask();
-            }
-        }
-        return null;
+    public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context) {
+        Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).into(imageView);
     }
 
-    public static boolean cancelPotentialWork(String mediaId, ImageView imageView) {
-        final DownloadAsyncTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
-
-        if (bitmapWorkerTask != null) {
-            final String taskMediaId = bitmapWorkerTask.getMedia().getId();
-            // If bitmapData is not yet set or it differs from the new data
-            if (taskMediaId == null || !taskMediaId.equals(mediaId)) {
-                // Cancel previous task
-                bitmapWorkerTask.cancel(true);
-            } else {
-                // The same work is already in progress
-                return false;
-            }
-        }
-        // No task associated with the ImageView, or an existing task was cancelled
-        return true;
-    }
-
-    public static void loadBitmap(String mediaId,ImageView imageView,boolean thumb,Resources res) {
-        if (cancelPotentialWork(mediaId, imageView)) {
-            Bitmap mLoadingBitmap = null;
-            final DownloadAsyncTask task = new DownloadAsyncTask(mediaId,imageView,thumb);
-            final AsyncDrawable asyncDrawable =
-                    new AsyncDrawable(res,mLoadingBitmap, task);
-            imageView.setImageDrawable(asyncDrawable);
-            task.execute();
-        }
-    }
-
-    public static Bitmap fromFile(String file) throws IOException {
-        //System.gc();
-        ExifInterface exif  = new ExifInterface(file);;
-        int rotate = 0;
-
-        int orientation = exif.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_NORMAL);
-
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                rotate = 270;
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                rotate = 180;
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                rotate = 90;
-                break;
-        }
-        Matrix matrix = new Matrix();
-        matrix.postRotate(rotate);
-        BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-        bmpFactoryOptions.inJustDecodeBounds = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
-        int ratio = 0;
-        boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
-        if(width) {
-            ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) GlobalVars.MAX_WIDTH);
-        } else {
-            ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) GlobalVars.MAX_WIDTH);
-        }
-        bmpFactoryOptions.inSampleSize = ratio;
-        bmpFactoryOptions.inJustDecodeBounds = false;
-        bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
-        Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
-        BitmapDrawable br =  new BitmapDrawable(MyApplication.getAppContext().getResources(),croppedBmp);
-        bitmap = null;
-        croppedBmp = null;
-        bmpFactoryOptions = null;
-        matrix = null;
-        return br.getBitmap();
-    }
-
-    /**
-     * We need it twice. One for check the size, and the other one to really read it.
-     * @param stream
-     * @param clonStream
-     * @return
-     */
-    public static Bitmap shrinkBitmapFromStream(InputStream stream,InputStream clonStream){
-        System.gc();
-        try {
-            //500x500
-            BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-            bmpFactoryOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(stream, null, bmpFactoryOptions);
-            boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
-            int ratio = 0;
-            if(width) {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) GlobalVars.MAX_WIDTH);
-            } else {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) GlobalVars.MAX_WIDTH);
-            }
-            Utils.debug(Utils.class,"Bitmap size "+bmpFactoryOptions.outWidth +"x"+ bmpFactoryOptions.outHeight+" Ratio:"+ratio);
-            bmpFactoryOptions.inSampleSize = ratio;
-
-            bmpFactoryOptions.inJustDecodeBounds = false;
-
-            //stream.reset();
-
-            Bitmap bitmap =  BitmapFactory.decodeStream(clonStream, null, bmpFactoryOptions);
-            if(bitmap == null){
-                Utils.debug(Utils.class,"ERROR bitmap is null!! wrong file or what?");
-            }
-            Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),new Matrix(),true);
-
-            return croppedBmp;
-        } catch (Exception e) {
-            Utils.debug(Utils.class,"Error shrinking the photo :",e);
-        }
-        return null;
-    }
-
-
-    public static Bitmap shrinkBitmap(String file){
-        System.gc();
-        try {
-            ExifInterface exif  = new ExifInterface(file);;
-            int rotate = 0;
-
-            int orientation = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL);
-
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotate = 270;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotate = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotate = 90;
-                    break;
-            }
-
-            //500x500
-            BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-            bmpFactoryOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(file, bmpFactoryOptions);
-            boolean width = bmpFactoryOptions.outWidth > bmpFactoryOptions.outHeight;
-            int ratio = 0;
-            if(width) {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outHeight / (float) GlobalVars.MAX_WIDTH);
-            } else {
-                ratio = (int) Math.ceil(bmpFactoryOptions.outWidth / (float) GlobalVars.MAX_WIDTH);
-            }
-            bmpFactoryOptions.inSampleSize = ratio;
-
-            bmpFactoryOptions.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeFile(file, bmpFactoryOptions);
-            if(bitmap == null){
-                Utils.debug(Utils.class,"ERROR bitmap is null!! wrong file or what? : "+file);
-            }
-            //int squareSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
-
-            Matrix matrix = new Matrix();
-            matrix.postRotate(rotate);
-
-            Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
-
-            return croppedBmp;
-        } catch (Exception e) {
-            Utils.debug(Utils.class,"Error shrinking the photo: "+file);
-        }
-        return null;
+    public static void loadStream(Uri path,ImageView imageview,Context context){
+        Picasso.with(context).load(path).resize(GlobalVars.SCREEN_WIDTH, GlobalVars.SCREEN_HEIGHT).centerInside().into(imageview);
     }
 
     public static void initApp(){

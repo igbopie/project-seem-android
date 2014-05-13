@@ -21,7 +21,6 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
@@ -85,7 +84,6 @@ public class ItemFullScreenFragment extends Fragment {
 
 
     GetItem getItemTask;
-    DownloadAsyncTask downloadAsyncTask;
 
     //Actions
     ImageView replyButton;
@@ -302,9 +300,7 @@ public class ItemFullScreenFragment extends Fragment {
         if(getItemTask != null){
             getItemTask.cancel(true);
         }
-        if(downloadAsyncTask != null) {
-            downloadAsyncTask.cancel(true);
-        }
+
     }
 
     private ImageView getImageView(){
@@ -367,26 +363,8 @@ public class ItemFullScreenFragment extends Fragment {
                     thumbDownActionImageView.setImageResource(R.drawable.thumbs_o_down);
                 }
 
-                //First Thumb
-                downloadAsyncTask = new DownloadAsyncTask(item,getImageView(),true){
-                    @Override
-                    protected void onPostExecute(Bitmap result) {
-                        super.onPostExecute(result);
-                        if(!this.isCancelled()) {
-                            //Then large
-                            downloadAsyncTask = new DownloadAsyncTask(item, getImageView(), false) {
-                                @Override
-                                protected void onPostExecute(Bitmap result) {
-                                    super.onPostExecute(result);
-                                    progressBar.setVisibility(View.INVISIBLE);
-                                    downloadAsyncTask = null;
-                                }
-                            };
-                            downloadAsyncTask.execute();
-                        }
-                    }
-                };
-                downloadAsyncTask.execute();
+                //TODO first thumb, then big
+                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,getImageView(),getActivity());
             }
             getItemTask = null;
         }

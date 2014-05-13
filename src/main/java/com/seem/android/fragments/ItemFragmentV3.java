@@ -34,7 +34,6 @@ import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.adapters.ThumbnailAdapterV2;
 import com.seem.android.adapters.ThumbnailAdapterV3;
-import com.seem.android.asynctask.DownloadAsyncTask;
 import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
@@ -274,15 +273,10 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         }
         commentsNumberBig.setText(item.getReplyCount()+"");
 
-        new DownloadAsyncTask(item,image,false) {
-            @Override
-            protected void onPostExecute(Bitmap v) {
-                super.onPostExecute(v);
-                if(v != null) {
-                    fakeImage.setImageBitmap(v);
-                }
-            }
-        }.execute();
+        //TODO
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image,getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,getActivity());
+
         getActivity().setTitle(item.getCaption());
 
         //

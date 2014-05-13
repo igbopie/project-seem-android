@@ -15,7 +15,7 @@ import com.seem.android.customviews.SpinnerImageView;
 import com.seem.android.model.Feed;
 import com.seem.android.model.Item;
 import com.seem.android.model.Media;
-import com.seem.android.service.MediaService;
+import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
 
 import java.util.ArrayList;
@@ -85,7 +85,7 @@ public class FavAdapter extends ArrayAdapter<Item> {
         mainImageView.setText(item.getCaption());
         mainImageView.setLoading(false);
 
-        Utils.loadBitmap(item.getMediaId(),mainImageView.getImageView(),true,context.getResources());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,mainImageView.getImageView(),context);
 
         return convertView;
 
