@@ -12,7 +12,7 @@ import com.seem.android.activities.ItemsFullScreenActivity;
 import com.seem.android.activities.MainActivity;
 import com.seem.android.activities.ReplyFlowActivity;
 import com.seem.android.activities.ThreadedViewActivity;
-import com.seem.android.activities.UserProfileActivity;
+import com.seem.android.fragments.UserProfileFragment;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public class ActivityFactory {
 
 
     public static void startUserProfileActivity(Fragment context,String username) {
-        Intent intent = new Intent(context.getActivity(),UserProfileActivity.class);
+        Intent intent = new Intent(context.getActivity(),UserProfileFragment.class);
         intent.putExtra(GlobalVars.EXTRA_USERNAME, username);
         context.startActivity(intent);
     }

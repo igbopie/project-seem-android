@@ -4,62 +4,194 @@
     android:layout_height="match_parent"
     tools:context="com.seem.android.fragments.UserProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:scaleType="centerCrop"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/imageView"
+        android:src="@drawable/anonymoususer" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
-        android:id="@+id/logoutButton"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_below="@+id/email"
+        android:text="John Doe"
+        android:id="@+id/name"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_toRightOf="@+id/imageView"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:textColor="#000"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:text="\@johndoe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/usernameTextView"
+        android:textSize="12sp"
+        android:textColor="#444"
+        android:layout_below="@+id/name"
+        android:layout_toRightOf="@+id/imageView"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        android:id="@+id/bio"
+        android:layout_below="@+id/usernameTextView"
+        android:layout_toRightOf="@+id/imageView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textSize="12sp"
+        android:layout_alignBottom="@+id/imageView"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Is following you"
+        android:id="@+id/isFollowingYouTextView"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:id="@+id/saveButton"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_alignTop="@+id/logoutButton"
-        android:layout_toLeftOf="@+id/logoutButton" />
-
-    <ImageView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:id="@+id/imageView"
-        android:src="@drawable/user_profile_nophoto"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_marginTop="40dp"
-        android:scaleType="centerCrop"/>
-
-    <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/name"
+        android:text="Follow"
+        android:id="@+id/followButton"
+        android:background="@drawable/followbutton"
         android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        android:hint="John Doe"/>
 
-    <EditText
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stats"
+            android:gravity="center"
+            android:textColor="#fff"
+            android:background="#54b4d0"
+            android:id="@+id/statsText"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/followButton"
+            android:textStyle="bold" />
+
+
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:shrinkColumns="*"
+            android:stretchColumns="*"
+            android:layout_marginTop="20dp"
+
+            android:layout_below="@+id/statsText"
+            android:id="@+id/tableLayout">
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                >
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Published"
+                    android:id="@+id/publishedTextView"
+                    android:textSize="15sp"
+                    android:layout_gravity="center"
+                    />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Favourites"
+                    android:id="@+id/favouritesTextView"
+                    android:textSize="15sp"
+                    android:layout_gravity="center"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Followers"
+                    android:id="@+id/followersTextView"
+                    android:textSize="15sp"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Following"
+                    android:id="@+id/followingTextView"
+                    android:textSize="15sp"
+                    android:layout_gravity="center" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                >
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:id="@+id/publishedCountTextView"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:id="@+id/favsCountTextView"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:id="@+id/followersCountTextView"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:id="@+id/followingCountTextView"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"/>
+            </TableRow>
+        </TableLayout>
+
+    <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bio"
-        android:layout_below="@+id/name"
+        android:text="Latest Seems"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/tableLayout"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:hint="I am a cool dude!"/>
+        android:gravity="center"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:textColor="#fff"
+        android:background="#54b4d0"
+        android:autoText="true" />
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/email"
-        android:layout_below="@+id/bio"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:hint="john.doe@coolestguy.com" />
 
 </RelativeLayout>

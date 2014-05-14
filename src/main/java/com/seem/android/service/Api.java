@@ -127,6 +127,8 @@ public class Api {
 
     public static final String JSON_TAG_USER_PROFILE_ID = "_id";
     public static final String JSON_TAG_USER_PROFILE_USERNAME = "username";
+    public static final String JSON_TAG_USER_PROFILE_PUBLISHED = "published";
+    public static final String JSON_TAG_USER_PROFILE_FAVOURITES = "favourites";
     public static final String JSON_TAG_USER_PROFILE_FOLLOWERS = "followers";
     public static final String JSON_TAG_USER_PROFILE_FOLLOWING= "following";
     public static final String JSON_TAG_USER_PROFILE_MEDIA_ID= "mediaId";
@@ -950,6 +952,12 @@ public class Api {
         }
         if(itemJson.has(JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME)){
             user.setIsFollowingMe(itemJson.getBoolean(JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME));
+        }
+        if(itemJson.has(JSON_TAG_USER_PROFILE_FAVOURITES)){
+            user.setFavourites(itemJson.getInt(JSON_TAG_USER_PROFILE_FAVOURITES));
+        }
+        if(itemJson.has(JSON_TAG_USER_PROFILE_PUBLISHED)){
+            user.setPublished(itemJson.getInt(JSON_TAG_USER_PROFILE_PUBLISHED));
         }
 
         user.setEmail(getStringJsonField(itemJson,JSON_TAG_USER_PROFILE_EMAIL));

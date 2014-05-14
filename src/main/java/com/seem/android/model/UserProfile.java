@@ -13,6 +13,9 @@ public class UserProfile {
 
     private int followers;
     private int following;
+    private int published;
+    private int favourites;
+
     private Boolean isFollowingMe;
     private Boolean isFollowedByMe;
 
@@ -97,6 +100,23 @@ public class UserProfile {
         this.email = email;
     }
 
+    public int getPublished() {
+        return published;
+    }
+
+    public void setPublished(int published) {
+        this.published = published;
+    }
+
+    public int getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(int favourites) {
+        this.favourites = favourites;
+    }
+
+
     @Override
     public String toString() {
         return "UserProfile{" +
@@ -108,6 +128,8 @@ public class UserProfile {
                 ", email='" + email + '\'' +
                 ", followers=" + followers +
                 ", following=" + following +
+                ", published=" + published +
+                ", favourites=" + favourites +
                 ", isFollowingMe=" + isFollowingMe +
                 ", isFollowedByMe=" + isFollowedByMe +
                 '}';

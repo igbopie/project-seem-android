@@ -351,11 +351,23 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
             }
             usernameBig.setText(item.getUserProfile().getUsername());
             usernameSmall.setText(item.getUserProfile().getUsername());
+
+            View.OnClickListener  profileAction = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onItemClickListener.onProfileClick(item.getUserProfile().getUsername());
+                }
+            };
+            userImageBig.setOnClickListener(profileAction);
+            nameBig.setOnClickListener(profileAction);
         } else{
             nameBig.setText("");
 
             usernameBig.setText("");
             usernameSmall.setText("");
+            userImageBig.setOnClickListener(null);
+            usernameBig.setOnClickListener(null);
+            usernameSmall.setText(null);
         }
 
         //
@@ -606,6 +618,8 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         public void onClick(String seemId, String itemId);
 
         public void onFinish();
+
+        public void onProfileClick(String username);
     }
 
 
@@ -713,7 +727,12 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         parentView.setBackgroundColor(Color.rgb(color,color,color));
 
 
-
+        if(params.height == minSize) {
+            Utils.debug(getClass(),"Invisible");
+            bigActionPanel.setVisibility(View.INVISIBLE);
+        }else{
+            bigActionPanel.setVisibility(View.VISIBLE);
+        }
 
 
     }

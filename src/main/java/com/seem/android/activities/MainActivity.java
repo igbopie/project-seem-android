@@ -25,6 +25,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
+import com.seem.android.fragments.EditUserFragment;
 import com.seem.android.fragments.FavListFragment;
 import com.seem.android.fragments.FeedListFragment;
 import com.seem.android.fragments.HomeFragment;
@@ -35,6 +36,7 @@ import com.seem.android.fragments.LoginFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
 import com.seem.android.fragments.UserProfileFragment;
+import com.seem.android.model.UserProfile;
 import com.seem.android.service.Api;
 import com.seem.android.uimodel.NavDrawerItem;
 import com.seem.android.uimodel.NavDrawerListAdapter;
@@ -50,14 +52,15 @@ import java.util.List;
  */
 public class MainActivity extends Activity implements
                                             LoginFragment.OnLoggedInInteractionListener,
-                                            UserProfileFragment.UserProfileInteractionListener,
+                                            EditUserFragment.UserProfileInteractionListener,
                                             SignUpFragment.SignUpInteractionListener,
                                             ItemFragment.OnItemClickListener,
                                             ItemFragmentV2.OnItemClickListener,
                                             ItemFragmentV3.OnItemClickListener,
                                             FeedListFragment.OnItemClickListener,
                                             SeemListFragment.OnItemClickListener,
-                                            FavListFragment.OnItemClickListener
+                                            FavListFragment.OnItemClickListener,
+                                            UserProfileFragment.OnProfileListener
                                             {
 
     private boolean lastDrawerStatus = true;
@@ -276,7 +279,7 @@ public class MainActivity extends Activity implements
             } else if (navDrawerItem == drawerItemSignUp) {
                 fragment = SignUpFragment.newInstance();
             } else if (navDrawerItem == drawerItemUserProfile) {
-                fragment = UserProfileFragment.newInstance();
+                fragment = UserProfileFragment.newInstance(MyApplication.getUsername());
             } else if (navDrawerItem == drawerItemTimeline) {
                 fragment = new FeedListFragment();
             } else if (navDrawerItem == drawerItemFavs) {
@@ -295,9 +298,10 @@ public class MainActivity extends Activity implements
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.frame_container, fragment);
-            if(addToBack) {
+            //no addtoback
+            if( fragment instanceof UserProfileFragment) {
                 // Add to backstack
-                //transaction.addToBackStack(null);
+                transaction.addToBackStack(null);
             }
             transaction.commit();
 
@@ -356,6 +360,13 @@ public class MainActivity extends Activity implements
     }
 
     @Override
+    public void editProfile() {
+
+        displayView(EditUserFragment.newInstance());
+
+    }
+
+    @Override
     public void hasLoggedOut() {
         buildDrawerMenu();
         displayView(0,drawerItemHome);
@@ -395,6 +406,13 @@ public class MainActivity extends Activity implements
     }
 
     @Override
+    public void onProfileClick(String username) {
+        Fragment f =UserProfileFragment.newInstance(username);
+        displayView(f);
+
+    }
+
+                                                @Override
     public void onClick( String seemId,String itemId) {
         android.app.Fragment fragment = ItemFragmentV3.newInstance(seemId, itemId);
         displayView(fragment);

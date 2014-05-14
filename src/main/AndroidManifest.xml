@@ -81,7 +81,7 @@
             android:theme="@style/Theme.Transparent" >
         </activity>
         <activity
-            android:name="com.seem.android.activities.UserProfileActivity"
+            android:name=".fragments.UserProfileFragment"
             android:label="@string/title_activity_user_profile"
             android:screenOrientation="portrait" >
         </activity>
