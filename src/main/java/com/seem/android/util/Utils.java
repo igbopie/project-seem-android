@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.service.Api;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -27,6 +28,10 @@ public class Utils {
 
     public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context) {
         Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).into(imageView);
+    }
+
+    public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context,Callback callback) {
+        Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).into(imageView,callback);
     }
 
     public static void loadStream(Uri path,ImageView imageview,Context context){

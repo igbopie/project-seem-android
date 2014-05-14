@@ -43,6 +43,7 @@ import com.seem.android.service.SeemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.ItemSelectedListener;
 import com.seem.android.util.Utils;
+import com.squareup.picasso.Callback;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
     AnimatorSet animatorSet;
     private boolean refresh = true;
     private ImageView image;
+    private ImageView imageLowRes;
     private ImageView fakeImage;
 
     private Item item;
@@ -83,6 +85,8 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
     View bigActionPanel;
 
 
+    TextView nameBig;
+    ImageView userImageBig;
     TextView captionBig;
     TextView usernameBig;
     TextView dateBig;
@@ -141,6 +145,7 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
 
 
         image = (ImageView) findViewById(R.id.itemMainImage);
+        imageLowRes = (ImageView) findViewById(R.id.itemMainImageLowRes);
         fakeImage = (ImageView) findViewById(R.id.fakeItemMainImage);
         gridView = (GridView) view.findViewById(R.id.gridview);
         gridviewmask= view.findViewById(R.id.gridviewmask);
@@ -167,6 +172,9 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         thumbDownIconBig = (ImageView) findViewById(R.id.thumbDownIconBig);
         favIconBig = (ImageView) findViewById(R.id.favIconBig);
 
+        nameBig = (TextView) findViewById(R.id.nameBig);
+        userImageBig = (ImageView) findViewById(R.id.userImageBig);
+
         thumbUpIconSmall = (ImageView) findViewById(R.id.thumbUpIconSmall);
         thumbDownIconSmall = (ImageView) findViewById(R.id.thumbDownIconSmall);
         favIconBigSmall = (ImageView) findViewById(R.id.favIconBigSmall);
@@ -183,6 +191,8 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         thumbDownIconSmall.setOnClickListener(this);
         parentWidth = GlobalVars.SCREEN_WIDTH;
         parentHeight = GlobalVars.SCREEN_HEIGHT;
+
+
 
         parentView = view;
     }
@@ -201,6 +211,7 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         //maxSize = GlobalVars.GRID_SIZE_V2*GlobalVars.GRID_NUMBER_OF_PHOTOS_V2;
         //currentSize = maxSize;
         image.setLayoutParams(new RelativeLayout.LayoutParams(parentWidth,parentHeight));
+        imageLowRes.setLayoutParams(new RelativeLayout.LayoutParams(parentWidth,parentHeight));
         fakeImage.setLayoutParams(new RelativeLayout.LayoutParams(parentWidth,parentHeight));
         isMax = true;
         isMin = false;
@@ -273,9 +284,22 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         }
         commentsNumberBig.setText(item.getReplyCount()+"");
 
-        //TODO
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image,getActivity());
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,imageLowRes,getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image,getActivity(), new Callback() {
+            @Override
+            public void onSuccess() {
+                imageLowRes.setVisibility(View.INVISIBLE);
+                image.setVisibility(View.VISIBLE);
+                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,getActivity());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+
+
 
         getActivity().setTitle(item.getCaption());
 
@@ -283,8 +307,6 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         captionBig.setText(item.getCaption());
         captionSmall.setText(item.getCaption());
 
-        usernameBig.setText(item.getUsername());
-        usernameSmall.setText(item.getUsername());
 
         dateBig.setText(Utils.getRelativeTime(item.getCreated()));
         dateSmall.setText(Utils.getRelativeTime(item.getCreated()));
@@ -320,6 +342,20 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         }else{
             thumbDownIconBig.setImageResource(R.drawable.thumbs_o_down);
             thumbDownIconSmall.setImageResource(R.drawable.thumbs_o_down_black);
+        }
+
+        if(item.getUserProfile() != null){
+            nameBig.setText(item.getUserProfile().getName());
+            if(item.getUserProfile().getMediaId() != null) {
+                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,getActivity());
+            }
+            usernameBig.setText(item.getUserProfile().getUsername());
+            usernameSmall.setText(item.getUserProfile().getUsername());
+        } else{
+            nameBig.setText("");
+
+            usernameBig.setText("");
+            usernameSmall.setText("");
         }
 
         //

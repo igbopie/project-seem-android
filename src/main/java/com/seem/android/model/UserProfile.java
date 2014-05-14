@@ -6,6 +6,11 @@ package com.seem.android.model;
 public class UserProfile {
     private String id;
     private String username;
+    private String mediaId;
+    private String name;
+    private String bio;
+    private String email;
+
     private int followers;
     private int following;
     private Boolean isFollowingMe;
@@ -59,11 +64,48 @@ public class UserProfile {
         this.isFollowedByMe = isFollowedByMe;
     }
 
+    public String getMediaId() {
+        return mediaId;
+    }
+
+    public void setMediaId(String mediaId) {
+        this.mediaId = mediaId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "UserProfile{" +
                 "id='" + id + '\'' +
                 ", username='" + username + '\'' +
+                ", mediaId='" + mediaId + '\'' +
+                ", name='" + name + '\'' +
+                ", bio='" + bio + '\'' +
+                ", email='" + email + '\'' +
                 ", followers=" + followers +
                 ", following=" + following +
                 ", isFollowingMe=" + isFollowingMe +

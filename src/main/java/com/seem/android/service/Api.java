@@ -58,6 +58,7 @@ public class Api {
     public static final String ENDPOINT_LOGIN = "api/user/login";
     public static final String ENDPOINT_CREATE = "api/user/create";
     public static final String ENDPOINT_USER_PROFILE = "api/user/profile";
+    public static final String ENDPOINT_USER_UPDATE = "api/user/update";
     public static final String ENDPOINT_FOLLOW = "api/follow";
     public static final String ENDPOINT_UNFOLLOW = "api/unfollow";
     public static final String ENDPOINT_FEED = "api/feed";
@@ -111,6 +112,7 @@ public class Api {
     public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
     public static final String JSON_TAG_ITEM_USERNAME = "username";
     public static final String JSON_TAG_ITEM_USER_ID = "userId";
+    public static final String JSON_TAG_ITEM_USER = "user";
     public static final String JSON_TAG_ITEM_FAVOURITE_COUNT = "favouriteCount";
     public static final String JSON_TAG_ITEM_FAVOURITED = "favourited";
     public static final String JSON_TAG_ITEM_THUMB_UP_COUNT = "thumbUpCount";
@@ -128,6 +130,9 @@ public class Api {
     public static final String JSON_TAG_USER_PROFILE_FOLLOWERS = "followers";
     public static final String JSON_TAG_USER_PROFILE_FOLLOWING= "following";
     public static final String JSON_TAG_USER_PROFILE_MEDIA_ID= "mediaId";
+    public static final String JSON_TAG_USER_PROFILE_NAME= "name";
+    public static final String JSON_TAG_USER_PROFILE_BIO= "bio";
+    public static final String JSON_TAG_USER_PROFILE_EMAIL= "email";
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWED_BY_ME= "isFollowedByMe";
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME= "isFollowingMe";
 
@@ -496,6 +501,37 @@ public class Api {
         }
     }
 
+    public static boolean updateUser(String username,String email,String name,String bio,String mediaId,String token){
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            if(username != null) {
+                params.put("username", username);
+            }
+            if(email != null) {
+                params.put("email", email);
+            }
+            if(name != null) {
+                params.put("name", name);
+            }
+            if(bio != null) {
+                params.put("bio", bio);
+            }
+            if(mediaId != null) {
+                params.put("mediaId", mediaId);
+            }
+            params.put("token", token);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_USER_UPDATE,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK) {
+                return true;
+            }else{
+                return false;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class,"API error:",e);
+            return false;
+        }
+    }
     public static UserProfile getUserProfile(String username,String token){
         try {
             HashMap<String,String>params = new HashMap<String, String>();
@@ -900,8 +936,12 @@ public class Api {
         UserProfile user = new UserProfile();
         user.setId(itemJson.getString(JSON_TAG_USER_PROFILE_ID));
         user.setUsername(itemJson.getString(JSON_TAG_USER_PROFILE_USERNAME));
-        user.setFollowers(itemJson.getInt(JSON_TAG_USER_PROFILE_FOLLOWERS));
-        user.setFollowing(itemJson.getInt(JSON_TAG_USER_PROFILE_FOLLOWING));
+        if(itemJson.has(JSON_TAG_USER_PROFILE_FOLLOWERS)){
+            user.setFollowers(itemJson.getInt(JSON_TAG_USER_PROFILE_FOLLOWERS));
+        }
+        if(itemJson.has(JSON_TAG_USER_PROFILE_FOLLOWING)) {
+            user.setFollowing(itemJson.getInt(JSON_TAG_USER_PROFILE_FOLLOWING));
+        }
         if(itemJson.has(JSON_TAG_USER_PROFILE_MEDIA_ID)) {
             user.setId(itemJson.getString(JSON_TAG_USER_PROFILE_MEDIA_ID));
         }
@@ -911,6 +951,12 @@ public class Api {
         if(itemJson.has(JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME)){
             user.setIsFollowingMe(itemJson.getBoolean(JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME));
         }
+
+        user.setEmail(getStringJsonField(itemJson,JSON_TAG_USER_PROFILE_EMAIL));
+        user.setName(getStringJsonField(itemJson, JSON_TAG_USER_PROFILE_NAME));
+        user.setBio(getStringJsonField(itemJson, JSON_TAG_USER_PROFILE_BIO));
+        user.setMediaId(getStringJsonField(itemJson, JSON_TAG_USER_PROFILE_MEDIA_ID));
+
         return user;
     }
 
@@ -967,6 +1013,10 @@ public class Api {
 
         if(itemJson.has(JSON_TAG_ITEM_FAVOURITED_DATE)) {
             item.setFavouritedDate(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_FAVOURITED_DATE)).getTime());
+        }
+
+        if(itemJson.has(JSON_TAG_ITEM_USER) && !(itemJson.getString(JSON_TAG_ITEM_USER).equals("null"))){
+            item.setUserProfile(fillUserProfile(itemJson.getJSONObject(JSON_TAG_ITEM_USER)));
         }
 
         return item;

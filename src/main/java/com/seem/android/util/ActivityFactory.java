@@ -63,6 +63,11 @@ public class ActivityFactory {
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, returnPhoto);
         activity.startActivityForResult(cameraIntent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
     }
+    public static void startCamera(Fragment fragment,Uri returnPhoto){
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, returnPhoto);
+        fragment.startActivityForResult(cameraIntent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
+    }
 
     public static void startGallery(Activity activity){
         Intent intent = new Intent();
@@ -70,6 +75,14 @@ public class ActivityFactory {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true); //TODO API>=honeycomb
         activity.startActivityForResult(Intent.createChooser(intent,"Select Picture"), GlobalVars.RETURN_CODE_GALLERY);
+    }
+
+    public static void startGallery(Fragment fragment){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true); //TODO API>=honeycomb
+        fragment.startActivityForResult(Intent.createChooser(intent,"Select Picture"), GlobalVars.RETURN_CODE_GALLERY);
     }
 
 

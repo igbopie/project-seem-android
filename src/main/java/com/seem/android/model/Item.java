@@ -28,6 +28,8 @@ public class Item {
     private Boolean thumbedDown;
     private Date favouritedDate;
 
+    private UserProfile userProfile;
+
     private Uri tempLocalFile;
 
     public String getId() {
@@ -181,6 +183,14 @@ public class Item {
 
     public void setFavouritedDate(Date favouritedDate) {
         this.favouritedDate = favouritedDate;
+    }
+
+    public UserProfile getUserProfile() {
+        return userProfile;
+    }
+
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 
     @Override
