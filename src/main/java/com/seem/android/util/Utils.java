@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.ImageView;
 
 import com.seem.android.GlobalVars;
@@ -26,6 +27,9 @@ import java.util.Date;
  */
 public class Utils {
 
+    public static float dpToPixel(float amount,Context context){
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
+    }
     public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context) {
         Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).into(imageView);
     }

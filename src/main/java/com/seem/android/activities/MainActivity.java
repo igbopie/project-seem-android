@@ -33,6 +33,7 @@ import com.seem.android.fragments.ItemFragment;
 import com.seem.android.fragments.ItemFragmentV2;
 import com.seem.android.fragments.ItemFragmentV3;
 import com.seem.android.fragments.ItemFragmentV4;
+import com.seem.android.fragments.ItemFragmentV5;
 import com.seem.android.fragments.LoginFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
@@ -59,6 +60,7 @@ public class MainActivity extends Activity implements
                                             ItemFragmentV2.OnItemClickListener,
                                             ItemFragmentV3.OnItemClickListener,
                                             ItemFragmentV4.OnItemClickListener,
+                                            ItemFragmentV5.OnItemClickListener,
                                             FeedListFragment.OnItemClickListener,
                                             SeemListFragment.OnItemClickListener,
                                             FavListFragment.OnItemClickListener,
@@ -414,9 +416,9 @@ public class MainActivity extends Activity implements
 
     }
 
-                                                @Override
+    @Override
     public void onClick( String seemId,String itemId) {
-        android.app.Fragment fragment = ItemFragmentV4.newInstance(seemId, itemId);
+        android.app.Fragment fragment = ItemFragmentV5.newInstance(seemId, itemId);
         displayView(fragment);
     }
 

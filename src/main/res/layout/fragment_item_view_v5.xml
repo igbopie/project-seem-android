@@ -1,0 +1,20 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" android:background="#000"
+
+    android:clipChildren="false"
+    android:clipToPadding="false"
+
+    >
+
+    <com.seem.android.customviews.ThreadedViewComponent
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.seem.android.customviews.ThreadedViewComponent>
+
+</RelativeLayout>
