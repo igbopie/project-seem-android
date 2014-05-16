@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -85,6 +86,8 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         float minSize = parentWidth - Utils.dpToPixel(100,getContext());
         float maxSize = parentWidth;
         float topOffset = 0;
+        int dark = 255;
+        int maxDark = 255;
 
         //0 up, 1 down
 
@@ -94,15 +97,19 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         float convertedAmount = 0;
         float size = parentWidth;
 
+
         if(amount < qrt1){
             convertedAmount = amount * (1/qrt1);
             size = (convertedAmount*(maxSize-minSize))+minSize;
+            dark = (int) (maxDark * (convertedAmount));
         }else if(amount>=qrt1 && amount <= qrt2){
             size=parentWidth;
         }else if (amount > qrt2){
             convertedAmount = (amount-qrt2) * (1/qrt1);
             size = ((1-convertedAmount)*(maxSize-minSize))+minSize;
             topOffset = convertedAmount * Utils.dpToPixel(200,getContext());
+
+            dark = (int) (maxDark * (1-convertedAmount));
         }
 
         if(size < minSize){
@@ -115,6 +122,14 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         params.topMargin= (int) ((parentHeight*amount)+topOffset);
 
         image.setLayoutParams(params);
+
+        if(dark<50){
+            dark = 50;
+        }
+        if(dark>255){
+            dark = 255;
+        }
+        ((ImageView)image).setColorFilter(Color.rgb(dark, dark, dark), PorterDuff.Mode.MULTIPLY);
 
     }
     public void fontImageMove(){
@@ -152,7 +167,7 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         float diffAmount = (e1.getRawY()-e2.getRawY()) /(float)parentHeight;
         float currentAmount = initialAmount - diffAmount;
 
-        float diff = .33f;
+        float diff = .38f;
         int index =layout.indexOfChild(currentAction);
         float firstAmount = currentAmount - (diff*index);
 
