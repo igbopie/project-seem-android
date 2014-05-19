@@ -11,7 +11,7 @@
     android:id="@+id/frameLayout"
 
     >
-    <ImageView
+   <!-- <ImageView
         android:layout_marginTop="30dp"
         android:layout_width="360dp"
         android:layout_height="360dp"
@@ -33,7 +33,7 @@
         android:layout_height="360dp"
         android:src="@drawable/boton"
         android:scaleType="centerCrop"
-        android:id="@+id/image3"/>
+        android:id="@+id/image3"/>-->
 
 
 
