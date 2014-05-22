@@ -13,7 +13,8 @@
 
     <com.seem.android.customviews.ThreadedViewComponent
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/threadedViewComponent">
 
     </com.seem.android.customviews.ThreadedViewComponent>
 

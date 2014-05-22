@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
+import com.seem.android.adapters.ThreadedViewAdapter;
+import com.seem.android.customviews.ThreadedViewComponent;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
 import com.seem.android.service.Api;
@@ -57,6 +59,11 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
     private List<Item> replies = new ArrayList<Item>();
 
+    ThreadedViewAdapter threadedViewAdapter;
+    ThreadedViewComponent threadedViewComponent;
+
+
+    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
     Seem seem = null;
     @Override
@@ -83,7 +90,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         new GetItems().execute();
-
+        threadedViewComponent = (ThreadedViewComponent) view.findViewById(R.id.threadedViewComponent);
 
     }
 
@@ -96,6 +103,13 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
 
 
+        //getView().setSystemUiVisibility(mSystemUiVisibility);
+        if (getActivity() != null &&
+                getActivity().getActionBar() != null  &&
+                getActivity().getActionBar().isShowing()){
+
+            getActivity().getActionBar().hide();
+        }
         Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
 
 
@@ -190,7 +204,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
             items.add(item);
             while(item.getReplyTo() != null){
                 item = ItemService.getInstance().findItemById(item.getReplyTo());
-                items.add(item);
+                items.add(items.size()-1,item);
             }
 
             return null;
@@ -199,6 +213,8 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            threadedViewAdapter = new ThreadedViewAdapter(items,getActivity());
+            threadedViewComponent.setAdapter(threadedViewAdapter);
 
             /*for(Item item:items){
                 adapter.addItem(item);

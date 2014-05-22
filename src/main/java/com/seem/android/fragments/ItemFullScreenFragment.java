@@ -92,7 +92,7 @@ public class ItemFullScreenFragment extends Fragment {
     ImageView thumbDownActionImageView;
     ImageView shareActionImageView;
 
-    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_FULLSCREEN;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

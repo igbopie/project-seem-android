@@ -1,14 +1,20 @@
 package com.seem.android.customviews;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.Adapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -24,24 +30,30 @@ import java.util.Queue;
  * Created by igbopie on 16/05/14.
  */
 public class ThreadedViewComponent extends FrameLayout  implements GestureDetector.OnGestureListener {
+
+    boolean disabled = true;
+
     int parentWidth;
     int parentHeight;
     GestureDetector mGestureDectector;
-
-    //ImageView image1;
-    //ImageView image2;
-    //ImageView image3;
     FrameLayout layout;
 
+
+    float qrt1 =10f/100f;
+    float qrt2 =15f/100f;
     int minDisplayedItem = 0;
     int maxDisplayedItem = 0;
     int nItems = 10;
-    final float ITEMS_DIFF = .33f;
-    final float INIT_POSITION = 0.2f;
+    final float ITEMS_DIFF = .10f;
+    final float INIT_POSITION = qrt1+0.01f;
+
+    Adapter adapter;
+
 
     Map<View,Float> amounts = new HashMap<View, Float>();
+    AnimatorSet animation;
+    float animDiff;
 
-    //List<ImageView> views = new ArrayList<ImageView>();
     Queue<View> freeQeue = new ArrayDeque<View>();
 
     public ThreadedViewComponent(Context context, AttributeSet attrs) {
@@ -73,12 +85,10 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
     }
 
     public void calculateImagePosition(View image,float amount){
+        if(disabled) return;
+
         //StoreAmount
         amounts.put(image,amount);
-
-        float qrt1 =5f/100f;
-        float qrt2 =40f/100f;
-        //float qrt3 =3f/3f;
 
         float minSize = parentWidth - Utils.dpToPixel(100,getContext());
         float maxSize = parentWidth;
@@ -119,29 +129,29 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         }else{
             params = new LayoutParams((int)size,(int)size);
         }
-        params.leftMargin = (int) ((parentWidth - size)/2);
-        params.topMargin= (int) ((parentHeight*amount)+topOffset);
+        //params.leftMargin = (int) ((parentWidth - size)/2);
+        //params.topMargin= (int) ((parentHeight*amount)+topOffset);
 
         image.setLayoutParams(params);
 
-        if(dark<50){
-            dark = 50;
+        image.setTranslationX((parentWidth - size)/2);
+        image.setTranslationY((parentHeight * amount) + topOffset);
+
+        if(dark<100){
+            dark = 100;
         }
         if(dark>255){
             dark = 255;
         }
-        ((ImageView)image).setColorFilter(Color.rgb(dark, dark, dark), PorterDuff.Mode.MULTIPLY);
+        if(image instanceof ImageView) {
+            ((ImageView) image).setColorFilter(Color.rgb(dark, dark, dark), PorterDuff.Mode.MULTIPLY);
+        }
 
     }
-    public void fontImageMove(){
-
-    }
-
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
 
         int lastParentWidth = parentWidth;
         int lastParentHeight = parentHeight;
@@ -166,11 +176,11 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
 
     @Override
     public boolean onDown(MotionEvent motionEvent) {
-        /*if(amounts.containsKey(gestureCurrentAction)){
-            gestureInitialAmount = amounts.get(gestureCurrentAction);
-        }else{
-            gestureInitialAmount = 0;
-        }*/
+        if(disabled) return false;
+
+        if(animation != null){
+            animation.cancel();
+        }
         return true;
     }
 
@@ -188,29 +198,78 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
     synchronized public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         float diffAmount = distanceY / parentHeight;
 
-        //Limits
-        /*if(maxDisplayedItem == nItems && amount < INIT_POSITION){
-            amount = INIT_POSITION;
+        scroll(diffAmount);
+
+        return true;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        final float distanceTimeFactor = 0.4f;
+        //final float totalDx = (distanceTimeFactor * velocityX/2);
+        final float totalDy = (distanceTimeFactor * velocityY/2);
+
+        float diffAmount = totalDy / parentHeight;
+        animDiff = 0;
+        if(animation != null){
+            animation.cancel();
         }
-        if(minDisplayedItem == 0 && amount > INIT_POSITION){
-            amount = INIT_POSITION;
-        }*/
+        animation = new AnimatorSet();
+        animation.play(ObjectAnimator.ofFloat(this, "scrollTotal", 0, diffAmount));
+
+        animation.setDuration((long) (1000 * distanceTimeFactor));
+
+        animation.setInterpolator(new DecelerateInterpolator());
+
+        animation.start();
+        return true;
+    }
+
+    public void setScrollTotal(float totalAmount) {
+        scroll(animDiff-totalAmount);
+        animDiff = totalAmount;
+    }
+
+    public void scroll(float diffAmount){
+        //Utils.debug(getClass(),"Scroll"+disabled);
+        if(disabled) return;
+
+
         boolean topRemoved = false;
         boolean bottomRemoved = false;
+
+        //Pre check to check limits
+        //TOP - first element
+        float firstChildPosition = amounts.get(layout.getChildAt(0)) - diffAmount;
+        if (minDisplayedItem == 0 && firstChildPosition > INIT_POSITION && diffAmount < 0) {
+            diffAmount = 0;
+            amounts.put(layout.getChildAt(0),INIT_POSITION);
+            if(animation != null){
+                animation.cancel();
+            }
+        }
+        //Bottom - last element
+        float lastChildPosition = amounts.get(layout.getChildAt(layout.getChildCount()-1)) - diffAmount;
+        if (maxDisplayedItem == nItems && lastChildPosition < INIT_POSITION && diffAmount > 0) {
+            diffAmount = 0;
+            int nChild = layout.getChildCount();
+            float totalDiff = (nChild-1)*ITEMS_DIFF;
+            float firstItemPosition = INIT_POSITION - totalDiff;
+            amounts.put(layout.getChildAt(0),firstItemPosition);
+            if(animation != null){
+                animation.cancel();
+            }
+        }
+
         for(int i = 0;i<layout.getChildCount();i++){
             View child = layout.getChildAt(i);
             float amount = amounts.get(layout.getChildAt(0));
             amount -= diffAmount;
             amount+=(i*ITEMS_DIFF);//This will avoid items from overlapping
-
-
-            if(minDisplayedItem == 0 && i == 0 && amount > INIT_POSITION) {
-                amount = INIT_POSITION;
-            }
-            if(minDisplayedItem == (nItems-1) && i == 0 && amount < INIT_POSITION) {
-                amount = INIT_POSITION;
-            }
-
 
             //check if out of screen
             if(amount > 1){
@@ -233,81 +292,89 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
             }
         }
 
-        //Now, lets check what we need to add
-        //Top
-        Float amount = amounts.get(layout.getChildAt(0));
-        Utils.debug(getClass(),""+amount);
-        while(!topRemoved && amount > ITEMS_DIFF && minDisplayedItem > 0){
 
-            View view = reuseView();
-            //Fill view with.. minDisplayedItem
-            amount -= ITEMS_DIFF;
-            calculateImagePosition(view,amount);
-            layout.addView(view,0);
+        if(layout.getChildCount() > 0) {
+            //Now, lets check what we need to add
+            //Top
+            Float amount = amounts.get(layout.getChildAt(0));
+            while (!topRemoved && amount > ITEMS_DIFF && minDisplayedItem > 0) {
 
-            minDisplayedItem--;
+                minDisplayedItem--;
+                View view = reuseView(minDisplayedItem);
+                //Fill view with.. minDisplayedItem
+                amount -= ITEMS_DIFF;
+                calculateImagePosition(view, amount);
+                layout.addView(view, 0);
+
+            }
+
+
+            //Bottom
+            int lastIndex = layout.getChildCount() - 1;
+            View lastView = layout.getChildAt(lastIndex);
+            Float lastAmount = amounts.get(lastView);
+            lastAmount = lastAmount == null ? 1 : lastAmount;
+            amount = lastAmount;
+            while (!bottomRemoved && amount < 1 && (1 - amount) > ITEMS_DIFF && maxDisplayedItem < nItems) {
+
+                maxDisplayedItem++;
+                View view = reuseView(maxDisplayedItem);
+                //Fill view with.. maxDisplayedItem
+                amount += ITEMS_DIFF;
+                calculateImagePosition(view, amount);
+                layout.addView(view);
+
+            }
         }
-
-        //Bottom
-        int lastIndex = layout.getChildCount()-1;
-        View lastView = layout.getChildAt(lastIndex);
-        Float lastAmount = amounts.get(lastView);
-        lastAmount = lastAmount == null?1:lastAmount;
-        amount = lastAmount;
-        while(!bottomRemoved && amount < 1 && (1-amount) > ITEMS_DIFF && maxDisplayedItem < nItems){
-            View view = reuseView();
-            //Fill view with.. maxDisplayedItem
-            amount += ITEMS_DIFF;
-            calculateImagePosition(view,amount);
-            layout.addView(view);
-
-            maxDisplayedItem++;
-        }
-
-        return true;
     }
-
-    @Override
-    public void onLongPress(MotionEvent motionEvent) {
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
-    }
-
 
     private void init(){
         Utils.debug(getClass(),"INIT");
-
-        float positions = INIT_POSITION;
-
-        int elements = nItems;
-
+        layout.removeAllViews();
+        if(adapter == null){
+            disabled = true;
+            return;
+        }
+        if(adapter.getCount() == 0){
+            disabled = true;
+            return;
+        }
+        disabled = false;
+        nItems = adapter.getCount();
+        freeQeue.clear();
         minDisplayedItem = 0;
         maxDisplayedItem = 0;
-        while(elements > 0 && positions < 1){
+        amounts.clear();
 
-            View view = reuseView();
+        float positions = INIT_POSITION;
+        minDisplayedItem = 0;
+        maxDisplayedItem = 0;
+        for(int i = 0;i < nItems && positions < 1;i++){
+
+            View view = reuseView(i);
 
             layout.addView(view);
 
             calculateImagePosition(view,positions);
             maxDisplayedItem++;
-            elements--;
             positions+= ITEMS_DIFF;
         }
     }
 
-    View reuseView(){
+    View reuseView(int position){
         View view = freeQeue.poll();
-        if(view == null){
-            ImageView imageView = new ImageView(getContext());
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setImageResource(R.drawable.boton);
-            view  = imageView;
-        }
-
+        view = adapter.getView(position,view,layout);
         return view;
+    }
+
+    public Adapter getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(Adapter adapter) {
+        this.adapter = adapter;
+        //reset things
+        init();
+
     }
 }
