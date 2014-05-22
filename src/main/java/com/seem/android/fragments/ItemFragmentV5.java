@@ -20,10 +20,16 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.adapters.ThreadedViewAdapter;
+import com.seem.android.adapters.ThumbnailAdapterV4;
 import com.seem.android.customviews.ThreadedViewComponent;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
@@ -55,17 +61,20 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     private boolean refresh = true;
 
     private Item item;
-    private Item parentItem;
 
     private List<Item> replies = new ArrayList<Item>();
+    private List<Item> parents = new ArrayList<Item>();
+
+    GridView gridView;
 
     ThreadedViewAdapter threadedViewAdapter;
     ThreadedViewComponent threadedViewComponent;
-
-
-    private int mSystemUiVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-
+    ImageView itemMainImage;
     Seem seem = null;
+    View threadedViewComponentMask;
+
+
+    ThumbnailAdapterV4 thumbnailAdapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +100,115 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         super.onViewCreated(view, savedInstanceState);
         new GetItems().execute();
         threadedViewComponent = (ThreadedViewComponent) view.findViewById(R.id.threadedViewComponent);
+        itemMainImage = (ImageView) view.findViewById(R.id.itemMainImage);
+        gridView = (GridView) view.findViewById(R.id.gridview);
+
+        threadedViewComponent.setOnItemClickListener(new ThreadedViewComponent.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                if(position == parents.size()-1){
+                    //It's me, just go back
+                    AnimatorSet animatorSet = new AnimatorSet();
+                    animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 0.0f, 1.0f));
+                    animatorSet.setDuration((long) 150);
+                    animatorSet.setInterpolator(new DecelerateInterpolator());
+                    animatorSet.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+
+                            gridView.setVisibility(View.VISIBLE);
+                            itemMainImage.setVisibility(View.VISIBLE);
+                            threadedViewComponentMask.setVisibility(View.VISIBLE);
+                            AnimatorSet animatorSet = new AnimatorSet();
+                            animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
+                                    .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 0.0f, 1.0f));
+
+
+                            animatorSet.setDuration((long) 150);
+                            animatorSet.setInterpolator(new DecelerateInterpolator());
+                            animatorSet.start();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    });
+                    animatorSet.start();
+                }
+            }
+        });
+
+        threadedViewComponentMask = (View) view.findViewById(R.id.threadedViewComponentMask);
+
+        threadedViewComponentMask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Utils.debug(getClass(),"Click");
+                AnimatorSet animatorSet = new AnimatorSet();
+                animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 1.0f, 0.0f))
+                        .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 1.0f, 0.0f));
+
+
+                animatorSet.setDuration((long) 150);
+                animatorSet.setInterpolator(new DecelerateInterpolator());
+
+                animatorSet.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        gridView.setVisibility(View.INVISIBLE);
+                        itemMainImage.setVisibility(View.INVISIBLE);
+                        threadedViewComponentMask.setVisibility(View.INVISIBLE);
+                        AnimatorSet animatorSet = new AnimatorSet();
+                        animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 1.0f, 0.0f));
+                        animatorSet.setDuration((long) 150);
+                        animatorSet.setInterpolator(new DecelerateInterpolator());
+                        animatorSet.start();
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+                animatorSet.start();
+            }
+        });
 
     }
+
+    //1 big, 0 small
+    public void setThreadViewSize(float amount){
+        float leftMargin = Utils.dpToPixel(20,getActivity());
+        leftMargin*=(1-amount);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) threadedViewComponent.getLayoutParams();
+        layoutParams.leftMargin = (int) leftMargin;
+        layoutParams.rightMargin = (int) leftMargin;
+        threadedViewComponent.setLayoutParams(layoutParams);
+
+    }
+
 
 
     @Override
@@ -100,10 +216,6 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     {
         super.onCreate(savedInstanceState);
         this.recoverFromSavedState(savedInstanceState);
-
-
-
-        //getView().setSystemUiVisibility(mSystemUiVisibility);
         if (getActivity() != null &&
                 getActivity().getActionBar() != null  &&
                 getActivity().getActionBar().isShowing()){
@@ -112,8 +224,21 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         }
         Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
 
-
-
+        thumbnailAdapter = new ThumbnailAdapterV4(getActivity(),
+                new ItemSelectedListener() {
+                    @Override
+                    public void itemSelected(Item item) {
+                        onItemClickListener.onClick(getSeemId(), item.getId());
+                    }
+                },
+                new ItemSelectedListener() {
+                    @Override
+                    public void itemSelected(Item item) {
+                        ActivityFactory.startThreadedActivity(getActivity(),item.getId());
+                    }
+                }
+        );
+        gridView.setAdapter(thumbnailAdapter);
     }
 
 
@@ -190,7 +315,6 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
     private class GetItems extends AsyncTask<Void,Void,Void> {
 
-        List<Item> items = new ArrayList<Item>();
 
         @Override
         protected void onPreExecute() {
@@ -201,11 +325,17 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         protected Void doInBackground(Void... id) {
             item = ItemService.getInstance().findItemById(getItemId(),refresh,true);
             Utils.debug(this.getClass(),"This is the item:" + item);
-            items.add(item);
-            while(item.getReplyTo() != null){
-                item = ItemService.getInstance().findItemById(item.getReplyTo());
-                items.add(items.size()-1,item);
+            parents.clear();
+            parents.add(item);
+
+            Item parentItem = item;
+            while(parentItem.getReplyTo() != null){
+                parentItem = ItemService.getInstance().findItemById(parentItem.getReplyTo());
+                parents.add(0,parentItem);
             }
+
+
+            replies = ItemService.getInstance().findItemReplies(item.getId(),refresh);
 
             return null;
         }
@@ -213,12 +343,28 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            threadedViewAdapter = new ThreadedViewAdapter(items,getActivity());
+
+
+
+            //Threaded view
+            threadedViewAdapter = new ThreadedViewAdapter(parents,getActivity());
             threadedViewComponent.setAdapter(threadedViewAdapter);
 
-            /*for(Item item:items){
-                adapter.addItem(item);
-            }*/
+
+            //Normal view
+            ViewGroup.LayoutParams layout = itemMainImage.getLayoutParams();
+            layout.height = GlobalVars.SCREEN_WIDTH;
+            layout.width = GlobalVars.SCREEN_WIDTH;
+            itemMainImage.setLayoutParams(layout);
+
+            Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getActivity());
+
+            thumbnailAdapter.clear();
+
+            for(Item item:replies) {
+                thumbnailAdapter.addItem(item);
+            }
+
 
 
         }

@@ -31,11 +31,13 @@ import java.util.Queue;
  */
 public class ThreadedViewComponent extends FrameLayout  implements GestureDetector.OnGestureListener {
 
+    final int TAG_POSITION = 2334;
     boolean disabled = true;
-
     int parentWidth;
     int parentHeight;
     GestureDetector mGestureDectector;
+
+    GestureDetector itemsGestureDectector;
     FrameLayout layout;
 
 
@@ -55,6 +57,12 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
     float animDiff;
 
     Queue<View> freeQeue = new ArrayDeque<View>();
+
+    int positionTouched;
+    long positionEventTouched;
+    View viewTouched;
+
+    OnItemClickListener onItemClickListener;
 
     public ThreadedViewComponent(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -191,7 +199,50 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
-        return false;
+
+        //Animate to center item
+        float amount = amounts.get(viewTouched);
+        float diffAmount = INIT_POSITION-amount;
+
+        Utils.debug(getClass(),"SingleTap "+positionTouched+" "+amount+" "+diffAmount);
+        animDiff = 0;
+        if(animation != null){
+            animation.cancel();
+        }
+        animation = new AnimatorSet();
+        animation.play(ObjectAnimator.ofFloat(this, "scrollTotal", 0, diffAmount));
+
+        animation.setDuration((long) (200));
+
+        animation.setInterpolator(new DecelerateInterpolator());
+        animation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                if(onItemClickListener != null){
+                    onItemClickListener.onClick(positionTouched);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+
+        animation.start();
+
+
+        return true;
     }
 
     @Override
@@ -347,23 +398,37 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         amounts.clear();
 
         float positions = INIT_POSITION;
-        minDisplayedItem = 0;
-        maxDisplayedItem = 0;
-        for(int i = 0;i < nItems && positions < 1;i++){
 
-            View view = reuseView(i);
 
-            layout.addView(view);
+        //Start in the bottom!
+        minDisplayedItem = nItems;
+        maxDisplayedItem = nItems;
 
+        for(;minDisplayedItem > 0 && positions > 0;minDisplayedItem--){
+
+            View view = reuseView(minDisplayedItem-1);
+            layout.addView(view,layout.getChildCount()-1);
             calculateImagePosition(view,positions);
-            maxDisplayedItem++;
-            positions+= ITEMS_DIFF;
+
+            positions-= ITEMS_DIFF;
         }
     }
 
-    View reuseView(int position){
+    View reuseView(final int position){
         View view = freeQeue.poll();
         view = adapter.getView(position,view,layout);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(positionEventTouched != motionEvent.getEventTime()){
+                    positionEventTouched = motionEvent.getEventTime();
+                    positionTouched = position;
+                    viewTouched = view;
+                }
+                ThreadedViewComponent.this.layout.onTouchEvent(motionEvent);
+                return false;
+            }
+        });
         return view;
     }
 
@@ -377,4 +442,18 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         init();
 
     }
+
+    public OnItemClickListener getOnItemClickListener() {
+        return onItemClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public interface OnItemClickListener{
+        public void onClick(int position);
+    }
+
+
 }
