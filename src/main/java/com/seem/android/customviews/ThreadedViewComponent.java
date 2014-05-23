@@ -58,7 +58,7 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
 
     Queue<View> freeQeue = new ArrayDeque<View>();
 
-    int positionTouched;
+    int positionTouched = -1;
     long positionEventTouched;
     View viewTouched;
 
@@ -199,7 +199,9 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
-
+        if(positionTouched < 0){
+            return false;
+        }
         //Animate to center item
         float amount = amounts.get(viewTouched);
         float diffAmount = INIT_POSITION-amount;
@@ -226,6 +228,8 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
                 if(onItemClickListener != null){
                     onItemClickListener.onClick(positionTouched);
                 }
+                positionTouched = -1;
+                viewTouched = null;
             }
 
             @Override
@@ -240,7 +244,6 @@ public class ThreadedViewComponent extends FrameLayout  implements GestureDetect
         });
 
         animation.start();
-
 
         return true;
     }

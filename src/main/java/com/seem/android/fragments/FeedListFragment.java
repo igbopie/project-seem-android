@@ -87,7 +87,8 @@ public class FeedListFragment extends ListFragment {
         if(feed.getAction() == Feed.FeedAction.CREATE_SEEM){
             onItemClickListener.onClick(feed.getSeemId(), feed.getItemId());
         }else {
-            ActivityFactory.startThreadedActivity(FeedListFragment.this.getActivity(), feed.getItemId());
+            onItemClickListener.onClick(feed.getSeemId(), feed.getItemId());
+            //ActivityFactory.startThreadedActivity(FeedListFragment.this.getActivity(), feed.getItemId());
         }
         //Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
         //ActivityFactory.startItemActivity(this.getActivity(), seem.getId(), seem.getItemId());
