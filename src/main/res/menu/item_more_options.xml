@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.seem.android.activities.ItemActivity" >
+
+    <item android:id="@+id/actionCopyLink"
+        android:title="Copy link"
+        android:visible="true"
+
+        />
+
+    <item android:id="@+id/action_refresh"
+        android:title="Refresh"
+        android:visible="true"
+        />
+
+
+</menu>

@@ -238,8 +238,8 @@
             android:textColor="#777" />
 
         <ImageView
-            android:layout_width="@dimen/fullscreen_topbar_icon"
-            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
             android:id="@+id/thumbUpIconSmall"
             android:src="@drawable/thumbs_o_up_black"
             android:layout_alignParentBottom="true"
@@ -257,8 +257,8 @@
             android:gravity="center"/>
 
         <ImageView
-            android:layout_width="@dimen/fullscreen_topbar_icon"
-            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
             android:id="@+id/thumbDownIconSmall"
             android:src="@drawable/thumbs_o_down_black"
             android:layout_alignParentBottom="true"
@@ -276,8 +276,8 @@
             android:gravity="center"/>
 
         <ImageView
-            android:layout_width="@dimen/fullscreen_topbar_icon"
-            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
             android:id="@+id/favIconBigSmall"
             android:src="@drawable/star_o_black"
             android:layout_alignParentBottom="true"

@@ -24,7 +24,9 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
@@ -85,9 +87,34 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     int maxSize =-1;
 
     ImageView fromGridViewToMainImage;
-
-
     ThumbnailAdapterV4 thumbnailAdapter;
+
+
+    View bigActionPanel;
+    ImageView thumbUpIconBig;
+    ImageView thumbDownIconBig;
+    ImageView favIconBig;
+    TextView nameBig;
+    ImageView userImageBig;
+    TextView captionBig;
+    TextView usernameBig;
+    TextView dateBig;
+    TextView thumbsUpScoreBig;
+    TextView thumbsDownScoreBig;
+    TextView favsScoreBig;
+    TextView commentsNumberBig;
+    ImageView replyIconBig;
+    ImageView moreOptionsIconBig;
+
+
+
+    TextView captionSmall;
+    TextView usernameSmall;
+    TextView dateSmall;
+    ImageView thumbUpIconSmall;
+    ImageView thumbDownIconSmall;
+    ImageView favIconBigSmall;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,9 +125,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
     }
 
-    public View findViewById(int id){
-        return getActivity().findViewById(id);
-    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -112,6 +137,84 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         new GetItems().execute();
+
+
+        captionSmall = (TextView) view.findViewById(R.id.captionSmall);
+        usernameSmall = (TextView) view.findViewById(R.id.usernameSmall);
+        dateSmall = (TextView) view.findViewById(R.id.dateSmall);
+        thumbUpIconSmall = (ImageView) view.findViewById(R.id.thumbUpIconSmall);
+        thumbDownIconSmall = (ImageView) view.findViewById(R.id.thumbDownIconSmall);
+        favIconBigSmall = (ImageView) view.findViewById(R.id.favIconBigSmall);
+
+
+        bigActionPanel = view.findViewById(R.id.bigActionPanel);
+        captionBig = (TextView) view.findViewById(R.id.captionBig);
+        usernameBig = (TextView) view.findViewById(R.id.usernameBig);
+        dateBig = (TextView) view.findViewById(R.id.dateBig);
+        thumbsUpScoreBig = (TextView) view.findViewById(R.id.thumbsUpScoreBig);
+        thumbsDownScoreBig = (TextView) view.findViewById(R.id.thumbsDownScoreBig);
+        favsScoreBig = (TextView) view.findViewById(R.id.favsScoreBig);
+        thumbUpIconBig = (ImageView) view.findViewById(R.id.thumbUpIconBig);
+        thumbDownIconBig = (ImageView) view.findViewById(R.id.thumbDownIconBig);
+        favIconBig = (ImageView) view.findViewById(R.id.favIconBig);
+        nameBig = (TextView) view.findViewById(R.id.nameBig);
+        userImageBig = (ImageView) view.findViewById(R.id.userImageBig);
+        commentsNumberBig = (TextView) view.findViewById(R.id.commentsNumberBig);
+        replyIconBig = (ImageView) view.findViewById(R.id.replyIconBig);
+        moreOptionsIconBig = (ImageView) view.findViewById(R.id.moreOptionsIconBig);
+
+        moreOptionsIconBig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(getActivity(), moreOptionsIconBig);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.item_more_options, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        //TODO
+                        return false;
+                    }
+                });
+                popup.show();
+            }
+        });
+
+        replyIconBig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Utils.debug(this.getClass(),"Action camera!");
+                PopupMenu popup = new PopupMenu(getActivity(), replyIconBig);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.actionPopupCamera:
+                                ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.CAMERA);
+                                return true;
+                            case R.id.actionPopupGallery:
+                                ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.GALLERY);
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
+            }
+        });
+
+
+        favIconBig.setOnClickListener(this);
+        thumbUpIconBig.setOnClickListener(this);
+        thumbDownIconBig.setOnClickListener(this);
+
+
+        favIconBigSmall.setOnClickListener(this);
+        thumbUpIconSmall.setOnClickListener(this);
+        thumbDownIconSmall.setOnClickListener(this);
+
         threadedViewComponent = (ThreadedViewComponent) view.findViewById(R.id.threadedViewComponent);
         itemMainImage = (ImageView) view.findViewById(R.id.itemMainImage);
         gridView = (GridView) view.findViewById(R.id.gridview);
@@ -121,51 +224,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         threadedViewComponent.setOnItemClickListener(new ThreadedViewComponent.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-                if(position == parents.size()-1){
-                    //It's me, just go back
-                    AnimatorSet animatorSet = new AnimatorSet();
-                    animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 0.0f, 1.0f));
-                    animatorSet.setDuration((long) 150);
-                    animatorSet.setInterpolator(new DecelerateInterpolator());
-                    animatorSet.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-
-                            gridView.setVisibility(View.VISIBLE);
-                            itemMainImage.setVisibility(View.VISIBLE);
-                            threadedViewComponentMask.setVisibility(View.VISIBLE);
-                            mainImageBackground.setVisibility(View.VISIBLE);
-
-                            gridviewmask.setVisibility(View.VISIBLE);
-                            AnimatorSet animatorSet = new AnimatorSet();
-                            animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
-                                    .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 0.0f, 1.0f))
-                                    .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 0.0f, 1.0f))
-                                    .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 0.0f, 1.0f));
-
-
-                            animatorSet.setDuration((long) 150);
-                            animatorSet.setInterpolator(new DecelerateInterpolator());
-                            animatorSet.start();
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
-                    animatorSet.start();
-                } else {
+                if(position != parents.size()-1){
                     Item changeItem = parents.get(position);
                     getArguments().putString(GlobalVars.EXTRA_ITEM_ID, changeItem.getId());
                     //init
@@ -174,49 +233,51 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
                     setImageScroll(1f);
                     thumbnailAdapter.clear();
                     thumbnailAdapter.notifyDataSetChanged();
-
-                    AnimatorSet animatorSet = new AnimatorSet();
-                    animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 0.0f, 1.0f));
-                    animatorSet.setDuration((long) 150);
-                    animatorSet.setInterpolator(new DecelerateInterpolator());
-                    animatorSet.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-
-                            gridView.setVisibility(View.VISIBLE);
-                            gridviewmask.setVisibility(View.VISIBLE);
-                            itemMainImage.setVisibility(View.VISIBLE);
-                            threadedViewComponentMask.setVisibility(View.VISIBLE);
-                            mainImageBackground.setVisibility(View.VISIBLE);
-                            AnimatorSet animatorSet = new AnimatorSet();
-                            animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
-                                    .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 0.0f, 1.0f))
-                                    .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 0.0f, 1.0f))
-                                    .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 0.0f, 1.0f));
-
-
-                            animatorSet.setDuration((long) 150);
-                            animatorSet.setInterpolator(new DecelerateInterpolator());
-                            animatorSet.start();
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
-                    animatorSet.start();
                 }
+
+                AnimatorSet animatorSet = new AnimatorSet();
+                animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 0.0f, 1.0f));
+                animatorSet.setDuration((long) 150);
+                animatorSet.setInterpolator(new DecelerateInterpolator());
+                animatorSet.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+
+                        gridView.setVisibility(View.VISIBLE);
+                        gridviewmask.setVisibility(View.VISIBLE);
+                        itemMainImage.setVisibility(View.VISIBLE);
+                        threadedViewComponentMask.setVisibility(View.VISIBLE);
+                        mainImageBackground.setVisibility(View.VISIBLE);
+                        bigActionPanel.setVisibility(View.VISIBLE);
+                        AnimatorSet animatorSet = new AnimatorSet();
+                        animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
+                                .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 0.0f, 1.0f))
+                                .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 0.0f, 1.0f))
+                                .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 0.0f, 1.0f))
+                                .with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 0.0f, 1.0f));;
+
+
+                        animatorSet.setDuration((long) 150);
+                        animatorSet.setInterpolator(new DecelerateInterpolator());
+                        animatorSet.start();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+                animatorSet.start();
             }
         });
 
@@ -230,7 +291,8 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
                 animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 1.0f, 0.0f))
                         .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 1.0f, 0.0f))
                         .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 1.0f, 0.0f))
-                        .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 1.0f, 0.0f));
+                        .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 1.0f, 0.0f))
+                        .with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 1.0f, 0.0f));
 
 
                 animatorSet.setDuration((long) 150);
@@ -249,6 +311,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
                         threadedViewComponentMask.setVisibility(View.INVISIBLE);
                         mainImageBackground.setVisibility(View.INVISIBLE);
                         gridviewmask.setVisibility(View.INVISIBLE);
+                        bigActionPanel.setVisibility(View.INVISIBLE);
                         AnimatorSet animatorSet = new AnimatorSet();
                         animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 1.0f, 0.0f));
                         animatorSet.setDuration((long) 150);
@@ -305,7 +368,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
                 fromGridViewToMainImage.setLayoutParams(params);
                 Utils.loadBitmap(replies.get(position).getMediaId(), Api.ImageFormat.THUMB, fromGridViewToMainImage, getActivity());
                 fromGridViewToMainImage.setVisibility(View.VISIBLE);
-
+                fromGridViewToMainImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 view.setVisibility(View.INVISIBLE);
 
                 AnimatorSet animator = new AnimatorSet();
@@ -464,7 +527,25 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-
+        if (view.equals(favIconBig) || view.equals(favIconBigSmall)) {
+            if (item.isFavourited() != null && item.isFavourited()) {
+                new UnfavouriteTask().execute();
+            } else {
+                new FavouriteTask().execute();
+            }
+        } else if (view.equals(thumbUpIconBig)|| view.equals(thumbUpIconSmall)) {
+            if (item.getThumbedUp() != null && item.getThumbedUp()) {
+                new ThumbClearTask().execute();
+            } else {
+                new ThumbUpTask().execute();
+            }
+        } else if (view.equals(thumbDownIconBig) || view.equals(thumbDownIconSmall) ) {
+            if (item.getThumbedDown() != null && item.getThumbedDown()) {
+                new ThumbClearTask().execute();
+            } else {
+                new ThumbDownTask().execute();
+            }
+        }
     }
 
 
@@ -538,6 +619,74 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
             thumbnailAdapter.notifyDataSetChanged();
             gridView.setAdapter(thumbnailAdapter);
 
+            commentsNumberBig.setText(item.getReplyCount()+"");
+
+            captionBig.setText(item.getCaption());
+            captionSmall.setText(item.getCaption());
+
+
+            dateBig.setText(Utils.getRelativeTime(item.getCreated()));
+            dateSmall.setText(Utils.getRelativeTime(item.getCreated()));
+
+            thumbsUpScoreBig.setText(""+item.getThumbUpCount());
+            //thumbsUpScoreSmall.setText(""+item.getThumbUpCount());
+
+            thumbsDownScoreBig.setText(""+item.getThumbDownCount());
+            //thumbsDownScoreSmall.setText(""+item.getThumbDownCount());
+
+            favsScoreBig.setText(""+item.getFavouriteCount());
+            //favsScoreSmall.setText(""+item.getFavouriteCount());
+
+            if(item.isFavourited()){
+                favIconBig.setImageResource(R.drawable.star);
+                favIconBigSmall.setImageResource(R.drawable.star_black);
+            }else{
+                favIconBig.setImageResource(R.drawable.star_o);
+                favIconBigSmall.setImageResource(R.drawable.star_o_black);
+            }
+
+            if(item.getThumbedUp()){
+                thumbUpIconBig.setImageResource(R.drawable.thumbs_up);
+                thumbUpIconSmall.setImageResource(R.drawable.thumbs_up_black);
+            }else{
+                thumbUpIconBig.setImageResource(R.drawable.thumbs_o_up);
+                thumbUpIconSmall.setImageResource(R.drawable.thumbs_o_up_black);
+            }
+
+            if(item.getThumbedDown()){
+                thumbDownIconBig.setImageResource(R.drawable.thumbs_down);
+                thumbDownIconSmall.setImageResource(R.drawable.thumbs_down_black);
+            }else{
+                thumbDownIconBig.setImageResource(R.drawable.thumbs_o_down);
+                thumbDownIconSmall.setImageResource(R.drawable.thumbs_o_down_black);
+            }
+
+            if(item.getUserProfile() != null){
+                nameBig.setText(item.getUserProfile().getName());
+                if(item.getUserProfile().getMediaId() != null) {
+                    Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,getActivity());
+                }
+                usernameBig.setText("@"+item.getUserProfile().getUsername());
+                usernameSmall.setText("@"+item.getUserProfile().getUsername());
+
+                View.OnClickListener  profileAction = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onItemClickListener.onProfileClick(item.getUserProfile().getUsername());
+                    }
+                };
+                userImageBig.setOnClickListener(profileAction);
+                nameBig.setOnClickListener(profileAction);
+            } else{
+                nameBig.setText("");
+
+                usernameBig.setText("");
+                usernameSmall.setText("");
+                userImageBig.setOnClickListener(null);
+                usernameBig.setOnClickListener(null);
+                usernameSmall.setText(null);
+            }
+
 
         }
     }
@@ -592,6 +741,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     public void scrollToMax(){
 
         gridviewmask.setVisibility(View.VISIBLE);
+        bigActionPanel.setVisibility(View.VISIBLE);
         //restore image size
         animatorSet = new AnimatorSet();
         animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "imageScroll", 0, 1));
@@ -640,6 +790,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
             public void onAnimationEnd(Animator animator) {
                 Utils.debug(getClass(),"onAnimationEnd");
                 gridviewmask.setVisibility(View.INVISIBLE);
+                bigActionPanel.setVisibility(View.INVISIBLE);
                 isMax = false;
                 isMin = true;
             }
@@ -680,8 +831,90 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         itemMainImage.setLayoutParams(params);
 
         gridviewmask.setAlpha(scroll);
+        bigActionPanel.setAlpha(scroll);
 
 
+    }
+
+    class FavouriteTask extends ActionTask{
+        @Override
+        protected Boolean doAction() {
+            return Api.favourite(item.getId(), MyApplication.getToken());
+        }
+
+
+    }
+
+    class UnfavouriteTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.unfavourite(item.getId(),MyApplication.getToken());
+        }
+
+    }
+    class ThumbUpTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.thumbUp(item.getId(),MyApplication.getToken());
+        }
+
+    }
+    class ThumbDownTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.thumbDown(item.getId(),MyApplication.getToken());
+        }
+
+    }
+    class ThumbClearTask extends ActionTask{
+
+        @Override
+        protected Boolean doAction() {
+            return Api.thumbClear(item.getId(),MyApplication.getToken());
+        }
+
+    }
+
+    abstract class ActionTask extends AsyncTask<Void,Void,Boolean>{
+
+
+        private final ProgressDialog dialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+
+            if(!success){
+                dialog.dismiss();
+                Utils.dialog("Error","Action could not be completed, check connection and try again later.",getActivity());
+            }else{
+                GetItems getItemAndPaintTask = new GetItems(){
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+                        dialog.dismiss();
+                    }
+                };
+                getItemAndPaintTask.execute();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Loading...");
+            dialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return doAction();
+        }
+
+        abstract protected Boolean doAction();
 
 
     }

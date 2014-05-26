@@ -48,6 +48,251 @@
         android:background="#99000000"
         />
 
+    <RelativeLayout
+        android:id="@+id/bigActionPanel"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/itemMainImage"
+        android:padding="5dp"
+        >
+        <com.seem.android.customviews.RoundedImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/user_profile_nophoto"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/userImageBig" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ignacio Bona"
+            android:id="@+id/nameBig"
+            android:textColor="#fff"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/userImageBig" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\@igbopie"
+            android:id="@+id/usernameBig"
+            android:textColor="#aaa"
+            android:layout_below="@+id/nameBig"
+            android:layout_toRightOf="@+id/userImageBig" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Caption"
+            android:id="@+id/captionBig"
+            android:textColor="#fff"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="center_vertical"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_above="@+id/thumbUpIconBig"
+            android:layout_below="@+id/usernameBig"
+            android:textSize="18sp"/>
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_icon"
+            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:id="@+id/thumbUpIconBig"
+            android:src="@drawable/thumbs_o_up"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="300"
+            android:id="@+id/thumbsUpScoreBig"
+            android:layout_alignTop="@+id/thumbUpIconBig"
+            android:layout_toRightOf="@+id/thumbUpIconBig"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:textColor="#fff" />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_icon"
+            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:id="@+id/thumbDownIconBig"
+            android:src="@drawable/thumbs_o_down"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/thumbsUpScoreBig"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="300"
+            android:id="@+id/thumbsDownScoreBig"
+            android:layout_alignTop="@+id/thumbDownIconBig"
+            android:layout_toRightOf="@+id/thumbDownIconBig"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:textColor="#fff" />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_icon"
+            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:id="@+id/favIconBig"
+            android:src="@drawable/star_o"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/thumbsDownScoreBig"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="300"
+            android:id="@+id/favsScoreBig"
+            android:layout_alignTop="@+id/favIconBig"
+            android:layout_toRightOf="@+id/favIconBig"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:textColor="#fff" />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_icon"
+            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:id="@+id/replyIconBig"
+            android:src="@drawable/replybig"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/moreOptionsIconBig" />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_icon"
+            android:layout_height="@dimen/fullscreen_topbar_icon"
+            android:id="@+id/moreOptionsIconBig"
+            android:src="@drawable/more_options"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20 min"
+            android:id="@+id/dateBig"
+            android:textColor="#fff"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:id="@+id/commentsIconBig"
+            android:src="@drawable/comments"
+
+            android:layout_alignBottom="@+id/commentsNumberBig"
+            android:layout_toLeftOf="@+id/commentsNumberBig" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10"
+            android:id="@+id/commentsNumberBig"
+
+            android:gravity="center"
+            android:textColor="#fff"
+            android:layout_below="@+id/dateBig"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/miniActionPanel"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+
+        android:layout_alignTop="@+id/itemMainImage"
+        android:layout_toRightOf="@+id/itemMainImage"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Caption"
+            android:id="@+id/captionSmall"
+            android:layout_below="@+id/usernameSmall"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\@igbopie"
+            android:id="@+id/usernameSmall"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20 min"
+            android:id="@+id/dateSmall"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="12sp"
+            android:textColor="#777" />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
+            android:id="@+id/thumbUpIconSmall"
+            android:src="@drawable/thumbs_o_up_black"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
+            android:id="@+id/thumbDownIconSmall"
+            android:src="@drawable/thumbs_o_down_black"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/thumbUpIconSmall"
+            android:layout_marginLeft="10dp"/>
+
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
+            android:id="@+id/favIconBigSmall"
+            android:src="@drawable/star_o_black"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/thumbDownIconSmall"
+            android:layout_marginLeft="10dp" />
+
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
+            android:id="@+id/replyIconSmall"
+            android:src="@drawable/reply_black"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/moreOptionsIconSmall"
+            android:layout_marginLeft="10dp" />
+        <ImageView
+            android:layout_width="@dimen/fullscreen_topbar_small_icon"
+            android:layout_height="@dimen/fullscreen_topbar_small_icon"
+            android:id="@+id/moreOptionsIconSmall"
+            android:src="@drawable/more_options_black"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+
+
+    </RelativeLayout>
+
+
     <ImageView
         android:layout_width="360dp"
         android:layout_height="360dp"
