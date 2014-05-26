@@ -206,7 +206,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/miniActionPanel"
+        android:id="@+id/smallActionPanel"
         android:layout_width="match_parent"
         android:layout_height="80dp"
 

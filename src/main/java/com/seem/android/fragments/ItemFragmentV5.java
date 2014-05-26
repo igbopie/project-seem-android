@@ -108,6 +108,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
     ImageView moreOptionsIconBig;
 
 
+    View smallActionPanel;
     TextView captionSmall;
     TextView usernameSmall;
     TextView dateSmall;
@@ -140,7 +141,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
         super.onViewCreated(view, savedInstanceState);
         new GetItems().execute();
 
-
+        smallActionPanel= (View) view.findViewById(R.id.smallActionPanel);
         captionSmall = (TextView) view.findViewById(R.id.captionSmall);
         usernameSmall = (TextView) view.findViewById(R.id.usernameSmall);
         dateSmall = (TextView) view.findViewById(R.id.dateSmall);
@@ -257,17 +258,24 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                     public void onAnimationEnd(Animator animator) {
 
                         gridView.setVisibility(View.VISIBLE);
-                        gridviewmask.setVisibility(View.VISIBLE);
                         itemMainImage.setVisibility(View.VISIBLE);
                         threadedViewComponentMask.setVisibility(View.VISIBLE);
                         mainImageBackground.setVisibility(View.VISIBLE);
-                        bigActionPanel.setVisibility(View.VISIBLE);
+                        if(isMax) {
+                            bigActionPanel.setVisibility(View.VISIBLE);
+                            gridviewmask.setVisibility(View.VISIBLE);
+                        }
+                        smallActionPanel.setVisibility(View.VISIBLE);
                         AnimatorSet animatorSet = new AnimatorSet();
-                        animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
+                        AnimatorSet.Builder builder = animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
                                 .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 0.0f, 1.0f))
                                 .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 0.0f, 1.0f))
-                                .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 0.0f, 1.0f))
-                                .with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 0.0f, 1.0f));;
+                                .with(ObjectAnimator.ofFloat(smallActionPanel, View.ALPHA, 0.0f, 1.0f));
+
+                        if(isMax) {
+                            builder.with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 0.0f, 1.0f))
+                                    .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 0.0f, 1.0f));
+                        }
 
 
                         animatorSet.setDuration((long) 150);
@@ -300,7 +308,8 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                         .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 1.0f, 0.0f))
                         .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 1.0f, 0.0f))
                         .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 1.0f, 0.0f))
-                        .with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 1.0f, 0.0f));
+                        .with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 1.0f, 0.0f))
+                        .with(ObjectAnimator.ofFloat(smallActionPanel, View.ALPHA, 1.0f, 0.0f));
 
 
                 animatorSet.setDuration((long) 150);
@@ -320,6 +329,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                         mainImageBackground.setVisibility(View.INVISIBLE);
                         gridviewmask.setVisibility(View.INVISIBLE);
                         bigActionPanel.setVisibility(View.INVISIBLE);
+                        smallActionPanel.setVisibility(View.INVISIBLE);
                         AnimatorSet animatorSet = new AnimatorSet();
                         animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 1.0f, 0.0f));
                         animatorSet.setDuration((long) 150);
