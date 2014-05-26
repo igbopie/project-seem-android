@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -49,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
+public class ItemFragmentV5 extends Fragment implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     public static ItemFragmentV5 newInstance(String seemId,String itemId) {
         ItemFragmentV5 f = new ItemFragmentV5();
@@ -107,13 +108,14 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
     ImageView moreOptionsIconBig;
 
 
-
     TextView captionSmall;
     TextView usernameSmall;
     TextView dateSmall;
     ImageView thumbUpIconSmall;
     ImageView thumbDownIconSmall;
     ImageView favIconBigSmall;
+    ImageView replyIconSmall;
+    ImageView moreOptionsIconSmall;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -145,7 +147,8 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         thumbUpIconSmall = (ImageView) view.findViewById(R.id.thumbUpIconSmall);
         thumbDownIconSmall = (ImageView) view.findViewById(R.id.thumbDownIconSmall);
         favIconBigSmall = (ImageView) view.findViewById(R.id.favIconBigSmall);
-
+        replyIconSmall =  (ImageView) view.findViewById(R.id.replyIconSmall);
+        moreOptionsIconSmall =  (ImageView) view.findViewById(R.id.moreOptionsIconSmall);
 
         bigActionPanel = view.findViewById(R.id.bigActionPanel);
         captionBig = (TextView) view.findViewById(R.id.captionBig);
@@ -163,44 +166,44 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         replyIconBig = (ImageView) view.findViewById(R.id.replyIconBig);
         moreOptionsIconBig = (ImageView) view.findViewById(R.id.moreOptionsIconBig);
 
+
+        moreOptionsIconSmall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(getActivity(), moreOptionsIconSmall);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.item_more_options, popup.getMenu());
+                popup.setOnMenuItemClickListener(ItemFragmentV5.this);
+                popup.show();
+            }
+        });
         moreOptionsIconBig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PopupMenu popup = new PopupMenu(getActivity(), moreOptionsIconBig);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.item_more_options, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        //TODO
-                        return false;
-                    }
-                });
+                popup.setOnMenuItemClickListener(ItemFragmentV5.this);
                 popup.show();
             }
         });
-
+        replyIconSmall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(getActivity(), replyIconSmall);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(ItemFragmentV5.this);
+                popup.show();
+            }
+        });
         replyIconBig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Utils.debug(this.getClass(),"Action camera!");
                 PopupMenu popup = new PopupMenu(getActivity(), replyIconBig);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.actionPopupCamera:
-                                ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.CAMERA);
-                                return true;
-                            case R.id.actionPopupGallery:
-                                ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.GALLERY);
-                                return true;
-                        }
-                        return false;
-                    }
-                });
+                popup.setOnMenuItemClickListener(ItemFragmentV5.this);
                 popup.show();
             }
         });
@@ -217,6 +220,11 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
         threadedViewComponent = (ThreadedViewComponent) view.findViewById(R.id.threadedViewComponent);
         itemMainImage = (ImageView) view.findViewById(R.id.itemMainImage);
+        ViewGroup.LayoutParams layout = itemMainImage.getLayoutParams();
+        layout.height = GlobalVars.SCREEN_WIDTH;
+        layout.width = GlobalVars.SCREEN_WIDTH;
+        itemMainImage.setLayoutParams(layout);
+
         gridView = (GridView) view.findViewById(R.id.gridview);
         gridviewmask = view.findViewById(R.id.gridviewmask);
         mainImageBackground = view.findViewById(R.id.mainImageBackground);
@@ -548,20 +556,26 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
         }
     }
 
-
-    public class InitAsyncTask extends AsyncTask<Void,Void,Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            seem = SeemService.getInstance().findSeemById(getSeemId());
-            return null;
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.actionPopupCamera:
+                ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.CAMERA);
+                return true;
+            case R.id.actionPopupGallery:
+                ActivityFactory.startReplyItemActivity(getActivity(),item.getId(), GlobalVars.PhotoSource.GALLERY);
+                return true;
+            case R.id.actionCopyLink:
+                String link = "http://seem-test.herokuapp.com/item/"+item.getId();
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+                clipboard.setPrimaryClip(clip);
+                return true;
+            case R.id.actionRefresh:
+                new GetItems().execute();
+                return true;
         }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            getActivity().setTitle(seem.getTitle());
-        }
+        return false;
     }
 
 
@@ -604,10 +618,6 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener{
 
 
             //Normal view
-            ViewGroup.LayoutParams layout = itemMainImage.getLayoutParams();
-            layout.height = GlobalVars.SCREEN_WIDTH;
-            layout.width = GlobalVars.SCREEN_WIDTH;
-            itemMainImage.setLayoutParams(layout);
 
             Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getActivity());
 
