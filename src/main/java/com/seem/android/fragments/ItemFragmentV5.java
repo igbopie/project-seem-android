@@ -9,6 +9,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
@@ -34,6 +36,7 @@ import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.adapters.ThreadedViewAdapter;
 import com.seem.android.adapters.ThumbnailAdapterV4;
+import com.seem.android.adapters.ThumbnailAdapterV5;
 import com.seem.android.customviews.ThreadedViewComponent;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
@@ -88,7 +91,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
     int maxSize =-1;
 
     ImageView fromGridViewToMainImage;
-    ThumbnailAdapterV4 thumbnailAdapter;
+    ThumbnailAdapterV5 thumbnailAdapter;
 
 
     View bigActionPanel;
@@ -118,6 +121,10 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
     ImageView replyIconSmall;
     ImageView moreOptionsIconSmall;
 
+    TextView depthNumber;
+
+    ImageView backButton;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,6 +147,17 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         new GetItems().execute();
+
+        depthNumber = (TextView)view.findViewById(R.id.depthNumber);
+
+        backButton = (ImageView) view.findViewById(R.id.backButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO go back
+                Utils.dialog("Work in progress","Not done yet. So, just open the drawer sliding your finger from left to right.",getActivity());
+            }
+        });
 
         smallActionPanel= (View) view.findViewById(R.id.smallActionPanel);
         captionSmall = (TextView) view.findViewById(R.id.captionSmall);
@@ -266,11 +284,13 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                             gridviewmask.setVisibility(View.VISIBLE);
                         }
                         smallActionPanel.setVisibility(View.VISIBLE);
+                        depthNumber.setVisibility(View.VISIBLE);
                         AnimatorSet animatorSet = new AnimatorSet();
                         AnimatorSet.Builder builder = animatorSet.play(ObjectAnimator.ofFloat(gridView, View.ALPHA, 0.0f, 1.0f))
                                 .with(ObjectAnimator.ofFloat(itemMainImage, View.ALPHA, 0.0f, 1.0f))
                                 .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 0.0f, 1.0f))
-                                .with(ObjectAnimator.ofFloat(smallActionPanel, View.ALPHA, 0.0f, 1.0f));
+                                .with(ObjectAnimator.ofFloat(smallActionPanel, View.ALPHA, 0.0f, 1.0f))
+                                .with(ObjectAnimator.ofFloat(depthNumber, View.ALPHA, 0.0f, 1.0f));
 
                         if(isMax) {
                             builder.with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 0.0f, 1.0f))
@@ -309,7 +329,8 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                         .with(ObjectAnimator.ofFloat(mainImageBackground, View.ALPHA, 1.0f, 0.0f))
                         .with(ObjectAnimator.ofFloat(gridviewmask, View.ALPHA, 1.0f, 0.0f))
                         .with(ObjectAnimator.ofFloat(bigActionPanel, View.ALPHA, 1.0f, 0.0f))
-                        .with(ObjectAnimator.ofFloat(smallActionPanel, View.ALPHA, 1.0f, 0.0f));
+                        .with(ObjectAnimator.ofFloat(smallActionPanel, View.ALPHA, 1.0f, 0.0f))
+                        .with(ObjectAnimator.ofFloat(depthNumber,View.ALPHA,1.0f,0.0f));
 
 
                 animatorSet.setDuration((long) 150);
@@ -330,6 +351,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                         gridviewmask.setVisibility(View.INVISIBLE);
                         bigActionPanel.setVisibility(View.INVISIBLE);
                         smallActionPanel.setVisibility(View.INVISIBLE);
+                        depthNumber.setVisibility(View.INVISIBLE);
                         AnimatorSet animatorSet = new AnimatorSet();
                         animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV5.this, "threadViewSize", 1.0f, 0.0f));
                         animatorSet.setDuration((long) 150);
@@ -355,7 +377,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
         gridviewmask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isMax){
+                if(isMax && item.getReplyCount() > 0){
                     scrollToMin();
                 }
             }
@@ -379,20 +401,21 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fromGridViewToMainImage.getLayoutParams();
-                params.topMargin = view.getTop() + gridView.getTop();
-                params.leftMargin = view.getLeft();
                 params.width = GlobalVars.SCREEN_WIDTH / 3;
                 params.height = params.width;
                 fromGridViewToMainImage.setLayoutParams(params);
+                view.setX(view.getLeft());
+                view.setY(view.getTop() + gridView.getTop());
+
                 Utils.loadBitmap(replies.get(position).getMediaId(), Api.ImageFormat.THUMB, fromGridViewToMainImage, getActivity());
                 fromGridViewToMainImage.setVisibility(View.VISIBLE);
                 fromGridViewToMainImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 view.setVisibility(View.INVISIBLE);
 
                 AnimatorSet animator = new AnimatorSet();
-                animator.play(ObjectAnimator.ofFloat(fromGridViewToMainImage,View.Y,params.topMargin,itemMainImage.getTop()))
+                animator.play(ObjectAnimator.ofFloat(fromGridViewToMainImage,View.Y,view.getY(),itemMainImage.getTop()))
                 .with(ObjectAnimator.ofFloat(ItemFragmentV5.this,"fromGridViewToMainImageSize",params.width,GlobalVars.SCREEN_WIDTH))
-                .with(ObjectAnimator.ofFloat(fromGridViewToMainImage,View.X,params.leftMargin,0));
+                .with(ObjectAnimator.ofFloat(fromGridViewToMainImage,View.X,view.getX(),0));
                 animator.setDuration(500);
                 animator.addListener(new Animator.AnimatorListener() {
                     @Override
@@ -402,15 +425,20 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
-                        Item changeItem = replies.get(position);
+                        final Item changeItem = replies.get(position);
                         getArguments().putString(GlobalVars.EXTRA_ITEM_ID, changeItem.getId());
                         //init
                         new GetItems().execute();
-                        Utils.loadBitmap(changeItem.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getActivity());
+
+                        fromGridViewToMainImage.destroyDrawingCache();
+                        fromGridViewToMainImage.buildDrawingCache(false);
+                        itemMainImage.setImageBitmap(fromGridViewToMainImage.getDrawingCache());
+                        fromGridViewToMainImage.setVisibility(View.INVISIBLE);
+
+
                         setImageScroll(1f);
                         thumbnailAdapter.clear();
                         thumbnailAdapter.notifyDataSetChanged();
-                        fromGridViewToMainImage.setVisibility(View.INVISIBLE);
                         view.setVisibility(View.VISIBLE);
                     }
 
@@ -466,20 +494,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
         }
         Utils.debug(this.getClass(),"ItemActivity OnCreate - Seem: "+getSeemId()+" Item: "+getItemId());
 
-        thumbnailAdapter = new ThumbnailAdapterV4(getActivity(),
-                new ItemSelectedListener() {
-                    @Override
-                    public void itemSelected(Item item) {
-                        onItemClickListener.onClick(getSeemId(), item.getId());
-                    }
-                },
-                new ItemSelectedListener() {
-                    @Override
-                    public void itemSelected(Item item) {
-                        ActivityFactory.startThreadedActivity(getActivity(),item.getId());
-                    }
-                }
-        );
+        thumbnailAdapter = new ThumbnailAdapterV5(getActivity());
         gridView.setAdapter(thumbnailAdapter);
 
 
@@ -620,15 +635,11 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
 
-
-
             //Threaded view
             threadedViewAdapter = new ThreadedViewAdapter(parents,getActivity());
             threadedViewComponent.setAdapter(threadedViewAdapter);
 
-
             //Normal view
-
             Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getActivity());
 
             thumbnailAdapter.clear();
@@ -681,6 +692,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                 thumbDownIconSmall.setImageResource(R.drawable.thumbs_o_down_black);
             }
 
+            depthNumber.setText(""+item.getDepth());
             if(item.getUserProfile() != null){
                 nameBig.setText(item.getUserProfile().getName());
                 if(item.getUserProfile().getMediaId() != null) {

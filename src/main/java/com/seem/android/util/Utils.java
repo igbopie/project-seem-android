@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
@@ -32,6 +33,10 @@ public class Utils {
     }
     public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context) {
         Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).into(imageView);
+    }
+
+    public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context,Drawable placeholder) {
+        Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).placeholder(placeholder).into(imageView);
     }
 
     public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context,Callback callback) {
