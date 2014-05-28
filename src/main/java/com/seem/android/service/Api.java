@@ -699,11 +699,14 @@ public class Api {
         }
     }
 
-    public static List<Item> getReplies(String itemId,int page){
+    public static List<Item> getReplies(String itemId,int page,String token){
         try {
             HashMap<String,String>params = new HashMap<String, String>();
             params.put("itemId",itemId);
             params.put("page",page+"");
+            if(token != null){
+                params.put("token",token+"");
+            }
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLIES,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();

@@ -128,12 +128,16 @@ public class ItemService {
     }
 
     public List<Item> findItemReplies(String parentItemId){
-        return this.findItemReplies(parentItemId,0,false);
+        return this.findItemReplies(parentItemId,0,false,false);
     }
     public List<Item> findItemReplies(String parentItemId,boolean refresh){
-        return this.findItemReplies(parentItemId,0,refresh);
+        return this.findItemReplies(parentItemId,0,refresh,false);
     }
-    public List<Item> findItemReplies(String parentItemId, int page,boolean refresh){
+    public List<Item> findItemReplies(String parentItemId, int page,boolean refresh,boolean useToken){
+        String token = null;
+        if(useToken){
+            token = MyApplication.getToken();
+        }
 
         Item parentItem = findItemById(parentItemId,refresh,false);
         if(parentItem == null){
@@ -155,11 +159,11 @@ public class ItemService {
         //TODO NO PAGE FOR NOW
         page = 0;
         if(refresh){
-            List<Item> items = Api.getReplies(parentItemId, page);
+            List<Item> items = Api.getReplies(parentItemId, page,token);
             this.saveItems(items);
         }
         if(replyCount > this.countItemRepliesDb(parentItemId)){
-            List<Item> apiReplies = Api.getReplies(parentItemId,page);
+            List<Item> apiReplies = Api.getReplies(parentItemId,page,token);
             saveItems(apiReplies);
         }
 
