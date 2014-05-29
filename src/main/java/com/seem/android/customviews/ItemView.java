@@ -20,11 +20,19 @@ import android.widget.TextView;
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
+import com.seem.android.adapters.ItemViewAdapter;
+import com.seem.android.adapters.ThreadedV6Adapter;
 import com.seem.android.model.Item;
 import com.seem.android.service.Api;
 import com.seem.android.service.ItemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import it.sephiroth.android.library.widget.AdapterView;
+import it.sephiroth.android.library.widget.HListView;
 
 /**
  * Created by igbopie on 20/03/14.
@@ -56,7 +64,11 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     View bigCommentsSection;
     OnItemClickListener onItemClickListener;
 
+    HListView threadedView;
+    ThreadedV6Adapter threadedV6Adapter;
+
     Item item;
+    List<Item> parents = new ArrayList<Item>();
 
     public ItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -86,11 +98,15 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         commentsIcon = (ImageView) findViewById(R.id.commentsIcon);
         commentsNumberBig = (TextView) findViewById(R.id.commentsNumberBig);
 
+
+        threadedView = (HListView) findViewById(R.id.threadedView);
+
         itemMainImage = (ImageView) findViewById(R.id.itemMainImage);
         ViewGroup.LayoutParams layout = itemMainImage.getLayoutParams();
         layout.height = GlobalVars.SCREEN_WIDTH;
         layout.width = GlobalVars.SCREEN_WIDTH;
         itemMainImage.setLayoutParams(layout);
+
 
         bigCommentsSection = findViewById(R.id.bigCommentsSection);
         moreOptionsIcon.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +135,16 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         thumbUpIcon.setOnClickListener(this);
         thumbDownIcon.setOnClickListener(this);
 
+        threadedView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(onItemClickListener != null) {
+                    Item clicked = parents.get(i);
+                    onItemClickListener.onClick(clicked.getSeemId(), clicked.getId());
+                }
+            }
+        });
+
 
     }
 
@@ -138,12 +164,18 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             thumbsDownScore.setTextColor(Color.WHITE);
             favsScore.setTextColor(Color.WHITE);
             name.setTextColor(Color.WHITE);
-            username.setTextColor(Color.rgb(225,225,225));
+            username.setTextColor(Color.rgb(225, 225, 225));
             date.setTextColor(Color.WHITE);
 
             bigCommentsSection.setVisibility(VISIBLE);
             commentsIcon.setVisibility(INVISIBLE);
             commentsNumber.setVisibility(INVISIBLE);
+            if(item.getDepth()>0) {
+                threadedView.setVisibility(VISIBLE);
+                loadThreadedView();
+            }else{
+                threadedView.setVisibility(GONE);
+            }
         }else{
             setBackgroundColor(Color.WHITE);
 
@@ -160,6 +192,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             date.setTextColor(Color.BLACK);
 
 
+            threadedView.setVisibility(GONE);
             bigCommentsSection.setVisibility(GONE);
             commentsIcon.setVisibility(VISIBLE);
             commentsNumber.setVisibility(VISIBLE);
@@ -246,6 +279,10 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         public void onClick(String seemId, String itemId);
 
         public void onProfileClick(String username);
+
+        public void onReplyFromCamera(String itemId);
+
+        public void onReplyFromGallery(String itemId);
     }
 
 
@@ -377,10 +414,10 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.actionPopupCamera:
-                //ActivityFactory.startReplyItemActivity(getContext(), item.getId(), GlobalVars.PhotoSource.CAMERA);
+                onItemClickListener.onReplyFromCamera(item.getId());
                 return true;
             case R.id.actionPopupGallery:
-                //ActivityFactory.startReplyItemActivity(getContext(),item.getId(), GlobalVars.PhotoSource.GALLERY);
+                onItemClickListener.onReplyFromGallery(item.getId());
                 return true;
             case R.id.actionCopyLink:
                 String link = "http://seem-test.herokuapp.com/item/"+item.getId();
@@ -395,5 +432,39 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         return false;
     }
 
+    private void loadThreadedView(){
+        new LoadThreadView().execute();
 
+    }
+    private class LoadThreadView extends AsyncTask<Void,Void,Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... id) {
+            Utils.debug(this.getClass(), "This is the item:" + item);
+            parents.clear();
+            Item parentItem = item;
+            while(parentItem.getReplyTo() != null){
+                parentItem = ItemService.getInstance().findItemById(parentItem.getReplyTo());
+                parents.add(0,parentItem);
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+            threadedV6Adapter = new ThreadedV6Adapter(parents,getContext());
+            threadedView.setAdapter(threadedV6Adapter);
+
+        }
+    }
 }

@@ -24,11 +24,13 @@ public class ItemViewAdapter  extends BaseAdapter {
 
     private List<Item> itemList;
     private Context context;
+    private ItemView.OnItemClickListener onItemClickListener;
 
-    public ItemViewAdapter(List<Item> itemList, Context ctx) {
+    public ItemViewAdapter(List<Item> itemList, Context ctx,ItemView.OnItemClickListener onItemClickListener) {
         super();
         this.itemList = itemList;
         this.context = ctx;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -52,6 +54,7 @@ public class ItemViewAdapter  extends BaseAdapter {
             ItemView view;
             if (convertView == null) {
                 view = new ItemView(context, null);
+                view.setOnItemClickListener(onItemClickListener);
             } else {
                 //Reusing views...
                 view = (ItemView) convertView;

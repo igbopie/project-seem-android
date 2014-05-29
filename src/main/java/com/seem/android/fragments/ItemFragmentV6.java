@@ -32,11 +32,13 @@ import com.seem.android.adapters.ItemViewAdapter;
 import com.seem.android.adapters.ThreadedV6Adapter;
 import com.seem.android.adapters.ThreadedViewAdapter;
 import com.seem.android.adapters.ThumbnailAdapterV5;
+import com.seem.android.customviews.ItemView;
 import com.seem.android.customviews.ThreadedViewComponent;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
 import com.seem.android.service.Api;
 import com.seem.android.service.ItemService;
+import com.seem.android.service.SeemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
@@ -96,10 +98,23 @@ public class ItemFragmentV6 extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         threadedView = (HListView) view.findViewById(R.id.threadedView);
+        threadedView.setOnItemClickListener(new it.sephiroth.android.library.widget.AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(it.sephiroth.android.library.widget.AdapterView<?> adapterView, View view, int i, long l) {
+                Item clicked = parents.get(i);
+                onItemClickListener.onClick(clicked.getSeemId(),clicked.getId());
+            }
+        });
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) threadedView.getLayoutParams();
         layoutParams.topMargin=-layoutParams.height;
 
         listView = (ListView) view.findViewById(R.id.listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                onItemClickListener.onClick(getSeemId(), ((Item) itemViewAdapter.getItem(i)).getId());
+            }
+        });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
@@ -225,6 +240,8 @@ public class ItemFragmentV6 extends Fragment {
 
         @Override
         protected Void doInBackground(Void... id) {
+            seem = SeemService.getInstance().findSeemById(getSeemId());
+
             item = ItemService.getInstance().findItemById(getItemId(),refresh,true);
             Utils.debug(this.getClass(),"This is the item:" + item);
             parents.clear();
@@ -247,7 +264,31 @@ public class ItemFragmentV6 extends Fragment {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
 
-            itemViewAdapter = new ItemViewAdapter(replies,getActivity());
+            if(seem != null) {
+                getActivity().getActionBar().setTitle(seem.getTitle());
+            }
+
+            itemViewAdapter = new ItemViewAdapter(replies,getActivity(), new ItemView.OnItemClickListener() {
+                @Override
+                public void onClick(String seemId, String itemId) {
+                    onItemClickListener.onClick(seemId,itemId);
+                }
+
+                @Override
+                public void onProfileClick(String username) {
+                    onItemClickListener.onProfileClick(username);
+                }
+
+                @Override
+                public void onReplyFromCamera(String itemId) {
+                    ActivityFactory.startReplyItemActivity(getActivity(), itemId, GlobalVars.PhotoSource.CAMERA);
+                }
+
+                @Override
+                public void onReplyFromGallery(String itemId) {
+                    ActivityFactory.startReplyItemActivity(getActivity(),itemId, GlobalVars.PhotoSource.GALLERY);
+                }
+            });
             listView.setAdapter(itemViewAdapter);
 
             threadedV6Adapter = new ThreadedV6Adapter(parents,getActivity());
