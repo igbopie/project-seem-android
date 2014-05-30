@@ -1,10 +1,12 @@
 package com.seem.android.adapters;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.seem.android.R;
 import com.seem.android.customviews.SquareImageView;
@@ -51,25 +53,24 @@ public class ThreadedV6Adapter extends ArrayAdapter<Item> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = convertView;
-        if (v == null) {
-            v = new SquareImageView(getContext());
-            ((SquareImageView)v).setScaleType(ImageView.ScaleType.CENTER_CROP);
-            ViewGroup.LayoutParams layout = v.getLayoutParams();
-            if(layout == null){
-                layout = new AbsHListView.LayoutParams(parent.getLayoutParams().height,parent.getLayoutParams().height);
-            }
-            layout.width = parent.getLayoutParams().height;
-            layout.height = parent.getLayoutParams().height;
-            v.setLayoutParams(layout);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.component_threaded_view_item_v6, null);
         }
 
         Item c = itemList.get(position);
 
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.itemMainImage);
+        ViewGroup.LayoutParams layout = imageView.getLayoutParams();
+        if(layout == null){
+            layout = new RelativeLayout.LayoutParams(parent.getLayoutParams().height,parent.getLayoutParams().height);
+        }
+        layout.width = parent.getLayoutParams().height;
+        layout.height = parent.getLayoutParams().height;
+        imageView.setLayoutParams(layout);
 
-
-        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.THUMB, (ImageView) v, getContext());
-        return v;
+        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.THUMB, imageView, getContext());
+        return convertView;
 
     }
 

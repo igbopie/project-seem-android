@@ -12,12 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/listView"
-        android:dividerHeight="10dp"
-        android:layout_below="@+id/threadedView"></ListView>
+        android:dividerHeight="10dp"></ListView>
 
     <it.sephiroth.android.library.widget.HListView
         android:id="@+id/threadedView"
-        android:layout_height="40dp"
+        android:layout_height="60dp"
         android:layout_width="match_parent"
         android:background="#ccffffff"/>
 

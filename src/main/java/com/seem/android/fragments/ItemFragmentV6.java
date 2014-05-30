@@ -73,7 +73,8 @@ public class ItemFragmentV6 extends Fragment {
     ItemViewAdapter itemViewAdapter;
     HListView threadedView;
     ThreadedV6Adapter threadedV6Adapter;
-    boolean showedThreadedView = false;
+    boolean showedThreadedView = true;
+    boolean loadThreadView = true;
     private int lastTop;
     private int lastItem;
 
@@ -105,16 +106,10 @@ public class ItemFragmentV6 extends Fragment {
                 onItemClickListener.onClick(clicked.getSeemId(),clicked.getId());
             }
         });
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) threadedView.getLayoutParams();
-        layoutParams.topMargin=-layoutParams.height;
+        //RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) threadedView.getLayoutParams();
+        //layoutParams.topMargin=-layoutParams.height;
 
         listView = (ListView) view.findViewById(R.id.listView);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                onItemClickListener.onClick(getSeemId(), ((Item) itemViewAdapter.getItem(i)).getId());
-            }
-        });
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
@@ -129,13 +124,19 @@ public class ItemFragmentV6 extends Fragment {
 
                     if(lastItem > firstVisibleItem){
                         //Utils.debug(getClass(),"Scroll Up");
+                        showThreadedView();
                     } else if (lastItem < firstVisibleItem){
                         //Utils.debug(getClass(),"Scroll Down");
+
+                        hideThreadedView();
                     } else {
                         if(lastTop > currentTop){
                             //Utils.debug(getClass(),"Scroll Down");
+
+                            hideThreadedView();
                         } else if(lastTop < currentTop) {
                             //Utils.debug(getClass(),"Scroll Up");
+                            showThreadedView();
                         } else{
                             //Utils.debug(getClass(),"Stop");
                         }
@@ -145,12 +146,13 @@ public class ItemFragmentV6 extends Fragment {
                     lastItem = firstVisibleItem;
                 }
 
-
+                /*
                 if(firstVisibleItem > 0){
                     showThreadedView();
                 } else {
                     hideThreadedView();
                 }
+                */
 
             }
         });
@@ -240,17 +242,20 @@ public class ItemFragmentV6 extends Fragment {
 
         @Override
         protected Void doInBackground(Void... id) {
-            seem = SeemService.getInstance().findSeemById(getSeemId());
+            //seem = SeemService.getInstance().findSeemById(getSeemId());
 
             item = ItemService.getInstance().findItemById(getItemId(),refresh,true);
             Utils.debug(this.getClass(),"This is the item:" + item);
-            parents.clear();
-            parents.add(item);
+            if(loadThreadView) {
+                parents.clear();
+                parents.add(item);
 
-            Item parentItem = item;
-            while(parentItem.getReplyTo() != null){
-                parentItem = ItemService.getInstance().findItemById(parentItem.getReplyTo());
-                parents.add(0,parentItem);
+                Item parentItem = item;
+                while (parentItem.getReplyTo() != null) {
+                    parentItem = ItemService.getInstance().findItemById(parentItem.getReplyTo());
+                    parents.add(0, parentItem);
+                }
+
             }
 
             replies.clear();
@@ -270,8 +275,44 @@ public class ItemFragmentV6 extends Fragment {
 
             itemViewAdapter = new ItemViewAdapter(replies,getActivity(), new ItemView.OnItemClickListener() {
                 @Override
-                public void onClick(String seemId, String itemId) {
-                    onItemClickListener.onClick(seemId,itemId);
+                public void onClick(final Item item,ImageView imageView) {
+
+                    replies.clear();
+                    itemViewAdapter.notifyDataSetChanged();
+                    getArguments().putString(GlobalVars.EXTRA_ITEM_ID, item.getId());
+                    new GetItems().execute();
+
+                    //Todo animation
+                    showThreadedView();
+
+                    int lastVisiblePosition = threadedView.getLastVisiblePosition();
+
+                    Utils.debug(getClass(),"lastVisiblePosition:"+lastVisiblePosition+" "+parents.size());
+
+                    parents.add(item);
+                    threadedV6Adapter.notifyDataSetChanged();
+                    threadedView.smoothScrollToPosition(parents.size() - 1);
+                    threadedView.setOnItemSelectedListener(new it.sephiroth.android.library.widget.AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(it.sephiroth.android.library.widget.AdapterView<?> adapterView, View view, int i, long l) {
+                            threadedView.setOnItemSelectedListener(null);
+
+                        }
+
+                        @Override
+                        public void onNothingSelected(it.sephiroth.android.library.widget.AdapterView<?> adapterView) {
+
+                        }
+                    });
+
+
+
+
+
+
+
+
+                    //onItemClickListener.onClick(seemId,itemId);
                 }
 
                 @Override
@@ -290,9 +331,12 @@ public class ItemFragmentV6 extends Fragment {
                 }
             });
             listView.setAdapter(itemViewAdapter);
-
-            threadedV6Adapter = new ThreadedV6Adapter(parents,getActivity());
-            threadedView.setAdapter(threadedV6Adapter);
+            if(loadThreadView) {
+                threadedV6Adapter = new ThreadedV6Adapter(parents, getActivity());
+                threadedView.setAdapter(threadedV6Adapter);
+                threadedView.smoothScrollToPosition(parents.size()-1);
+                loadThreadView = false;
+            }
 
         }
     }

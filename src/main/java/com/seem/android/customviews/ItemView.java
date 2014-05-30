@@ -64,8 +64,9 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     View bigCommentsSection;
     OnItemClickListener onItemClickListener;
 
-    HListView threadedView;
-    ThreadedV6Adapter threadedV6Adapter;
+    View threadedView;//Space
+    View mainContent;
+    //ThreadedV6Adapter threadedV6Adapter;
 
     Item item;
     List<Item> parents = new ArrayList<Item>();
@@ -97,9 +98,9 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         moreOptionsIcon = (ImageView) findViewById(R.id.moreOptionsIcon);
         commentsIcon = (ImageView) findViewById(R.id.commentsIcon);
         commentsNumberBig = (TextView) findViewById(R.id.commentsNumberBig);
+        mainContent = findViewById(R.id.mainContent);
 
-
-        threadedView = (HListView) findViewById(R.id.threadedView);
+        threadedView = findViewById(R.id.threadedView);
 
         itemMainImage = (ImageView) findViewById(R.id.itemMainImage);
         ViewGroup.LayoutParams layout = itemMainImage.getLayoutParams();
@@ -135,7 +136,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         thumbUpIcon.setOnClickListener(this);
         thumbDownIcon.setOnClickListener(this);
 
-        threadedView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*threadedView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(onItemClickListener != null) {
@@ -143,7 +144,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
                     onItemClickListener.onClick(clicked.getSeemId(), clicked.getId());
                 }
             }
-        });
+        });*/
 
 
     }
@@ -152,6 +153,24 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     public void setItem(final Item item,Theme theme){
         this.item = item;
         this.theme = theme;
+        commentsIcon.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onItemClickListener != null){
+                    Utils.debug(getClass(),"Top:"+itemMainImage.getTop()+" "+((View)itemMainImage.getParent()).getTop());
+                    onItemClickListener.onClick(item,itemMainImage);
+                }
+            }
+        });
+        commentsNumber.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onItemClickListener != null){
+                    Utils.debug(getClass(),"Top:"+itemMainImage.getTop()+" "+ItemView.this.getTop());
+                    onItemClickListener.onClick(item,itemMainImage);
+                }
+            }
+        });
         if(theme.equals(Theme.MAIN)){
             setBackgroundResource(R.color.SeemBlue);
 
@@ -172,10 +191,12 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             commentsNumber.setVisibility(INVISIBLE);
             if(item.getDepth()>0) {
                 threadedView.setVisibility(VISIBLE);
-                loadThreadedView();
+                //loadThreadedView();
             }else{
                 threadedView.setVisibility(GONE);
             }
+
+            mainContent.setVisibility(GONE);
         }else{
             setBackgroundColor(Color.WHITE);
 
@@ -196,9 +217,12 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             bigCommentsSection.setVisibility(GONE);
             commentsIcon.setVisibility(VISIBLE);
             commentsNumber.setVisibility(VISIBLE);
+
+
+            mainContent.setVisibility(VISIBLE);
         }
 
-        commentsNumber.setText(item.getReplyCount()+"");
+        commentsNumber.setText(item.getReplyCount()+" replies");
         commentsNumberBig.setText(item.getReplyCount()+"");
 
         caption.setText(item.getCaption());
@@ -276,7 +300,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     }
 
     public interface OnItemClickListener {
-        public void onClick(String seemId, String itemId);
+        public void onClick(Item item,ImageView imageView);
 
         public void onProfileClick(String username);
 
@@ -462,8 +486,8 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
 
-            threadedV6Adapter = new ThreadedV6Adapter(parents,getContext());
-            threadedView.setAdapter(threadedV6Adapter);
+            //threadedV6Adapter = new ThreadedV6Adapter(parents,getContext());
+            //threadedView.setAdapter(threadedV6Adapter);
 
         }
     }
