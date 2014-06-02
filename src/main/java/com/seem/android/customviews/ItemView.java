@@ -39,7 +39,7 @@ import it.sephiroth.android.library.widget.HListView;
  */
 public class ItemView extends RelativeLayout implements View.OnClickListener, PopupMenu.OnMenuItemClickListener{
 
-    public enum Theme{MAIN,REPLY};
+    public enum Theme{MAIN,MINIMAL_MAIN,REPLY};
 
     Theme theme = Theme.REPLY;
     ImageView itemMainImage;
@@ -157,8 +157,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             @Override
             public void onClick(View view) {
                 if(onItemClickListener != null){
-                    Utils.debug(getClass(),"Top:"+itemMainImage.getTop()+" "+((View)itemMainImage.getParent()).getTop());
-                    onItemClickListener.onClick(item,itemMainImage);
+                    onItemClickListener.onClick(item,ItemView.this);
                 }
             }
         });
@@ -166,8 +165,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             @Override
             public void onClick(View view) {
                 if(onItemClickListener != null){
-                    Utils.debug(getClass(),"Top:"+itemMainImage.getTop()+" "+ItemView.this.getTop());
-                    onItemClickListener.onClick(item,itemMainImage);
+                    onItemClickListener.onClick(item,ItemView.this);
                 }
             }
         });
@@ -191,12 +189,20 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             commentsNumber.setVisibility(INVISIBLE);
             if(item.getDepth()>0) {
                 threadedView.setVisibility(VISIBLE);
-                //loadThreadedView();
+            }else{
+                threadedView.setVisibility(GONE);
+            }
+            mainContent.setVisibility(VISIBLE);
+        }else if (theme.equals(Theme.MINIMAL_MAIN)){
+
+            if(item.getDepth()>0) {
+                threadedView.setVisibility(VISIBLE);
             }else{
                 threadedView.setVisibility(GONE);
             }
 
             mainContent.setVisibility(GONE);
+
         }else{
             setBackgroundColor(Color.WHITE);
 
@@ -300,7 +306,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     }
 
     public interface OnItemClickListener {
-        public void onClick(Item item,ImageView imageView);
+        public void onClick(Item item,ItemView itemView);
 
         public void onProfileClick(String username);
 

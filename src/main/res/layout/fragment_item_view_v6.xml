@@ -21,4 +21,12 @@
         android:background="#ccffffff"/>
 
 
+    <ImageView
+        android:layout_width="360dp"
+        android:layout_height="360dp"
+        android:id="@+id/animationImage"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        />
+
 </RelativeLayout>

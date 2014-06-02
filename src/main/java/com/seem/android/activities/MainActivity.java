@@ -419,7 +419,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onClick( String seemId,String itemId) {
-        android.app.Fragment fragment = ItemFragmentV6.newInstance(seemId, itemId);
+        android.app.Fragment fragment = ItemFragmentV6.newInstance(seemId, itemId,true);
         displayView(fragment);
     }
 

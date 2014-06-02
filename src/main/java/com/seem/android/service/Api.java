@@ -173,23 +173,23 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_SEEM_ITEM_BY_FAVOURITED,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
                 JSONObject jsonObj = new JSONObject(output);
 
                 return fillItems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -204,23 +204,23 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_SEEM_BY_TOPIC,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
                 JSONObject jsonObj = new JSONObject(output);
 
                 return fillSeems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -243,23 +243,23 @@ public class Api {
             HttpResponse httpResponse = makeRequest(endpoint,new HashMap<String, String>());
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
                 JSONObject jsonObj = new JSONObject(output);
 
                 return fillSeems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -268,23 +268,23 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_SEEMS,new HashMap<String, String>());
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
                 JSONObject jsonObj = new JSONObject(output);
 
                 return fillSeems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -303,33 +303,33 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_ITEM,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
 
                 JSONObject jsonObj = new JSONObject(output);
                 JSONObject itemJson = jsonObj.getJSONObject(JSON_TAG_RESPONSE);
                 Item item = fillItem(itemJson);
-                Utils.debug(Api.class,"Item fetched: "+item);
-                Utils.debug(Api.class,"Now fetching images...");
+                //Utils.debug(Api.class,"Item fetched: "+item);
+                //Utils.debug(Api.class,"Now fetching images...");
 
                 //fetch IMAGEs
                 //downloadLargeImage(item);
                 //downloadThumbImage(item);
 
-                Utils.debug(Api.class,"Images fetched");
+                //Utils.debug(Api.class,"Images fetched");
                 return item;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -342,15 +342,15 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_ADD_GCM_TOKEN,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false;
         }
     }
@@ -359,19 +359,19 @@ public class Api {
             HashMap<String,String>params = new HashMap<String, String>();
             params.put("token",token);
             params.put("username",username);
-            Utils.debug(Api.class,"Username:"+username);
+            //Utils.debug(Api.class,"Username:"+username);
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FOLLOW,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false;
         }
     }
@@ -381,19 +381,19 @@ public class Api {
             HashMap<String,String>params = new HashMap<String, String>();
             params.put("token",token);
             params.put("username",username);
-            Utils.debug(Api.class,"Username:"+username);
+            //Utils.debug(Api.class,"Username:"+username);
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFOLLOW,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false ;
         }
     }
@@ -406,15 +406,15 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_UP,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false ;
         }
     }
@@ -427,15 +427,15 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_DOWN,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false ;
         }
     }
@@ -448,15 +448,15 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_CLEAR,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false ;
         }
     }
@@ -469,15 +469,15 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FAVOURITE,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false ;
         }
     }
@@ -490,15 +490,15 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFAVOURITE,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
                 return true;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false ;
         }
     }
@@ -530,7 +530,7 @@ public class Api {
                 return false;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return false;
         }
     }
@@ -541,30 +541,30 @@ public class Api {
             if(token != null){
                 params.put("token",token);
             }
-            Utils.debug(Api.class,"Username:"+username);
+            //Utils.debug(Api.class,"Username:"+username);
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_USER_PROFILE,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
 
                 JSONObject jsonObj = new JSONObject(output);
                 JSONObject itemJson = jsonObj.getJSONObject(JSON_TAG_RESPONSE);
                 UserProfile userProfile = fillUserProfile(itemJson);
-                Utils.debug(Api.class,"Userprofile fetched: "+userProfile);
+                //Utils.debug(Api.class,"Userprofile fetched: "+userProfile);
                 return userProfile;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -621,7 +621,7 @@ public class Api {
 
             return json.getString(JSON_TAG_RESPONSE);
         } catch (Exception e){
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -637,12 +637,12 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLY,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
                 Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
@@ -656,7 +656,7 @@ public class Api {
             }
             return null;
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -675,12 +675,12 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE_SEEM,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
                 Seem seem = fillSeem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
 
@@ -694,7 +694,7 @@ public class Api {
             }
             return null;
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -711,27 +711,27 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLIES,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
 
                 JSONObject jsonObj = new JSONObject(output);
                 JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
                 List<Item> items = fillItems(itemJson);
-                Utils.debug(Api.class,"Items fetched: "+items);
+                //Utils.debug(Api.class,"Items fetched: "+items);
 
                 return items;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -745,27 +745,27 @@ public class Api {
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FEED,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
-                Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
 
                 JSONObject jsonObj = new JSONObject(output);
                 JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
                 List<Feed> feeds = fillFeeds(itemJson);
-                Utils.debug(Api.class,"Items fetched: "+feeds);
+                //Utils.debug(Api.class,"Items fetched: "+feeds);
 
                 return feeds;
 
             } else {
-                Utils.debug(Api.class,"API response code is: "+responseCode);
+                //Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
             return null;
         }
     }
@@ -783,7 +783,7 @@ public class Api {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             httpResponse.getEntity().writeTo(os);
             String output = os.toString( "UTF-8" );
-            Utils.debug(Api.class,"Output:"+output);
+            //Utils.debug(Api.class,"Output:"+output);
             JSONObject jsonObj = new JSONObject(output);
             String token = jsonObj.getString(JSON_TAG_RESPONSE);
             return token;
@@ -808,7 +808,7 @@ public class Api {
             throw new EmailAlreadyExistsException();
 
         }else {
-            Utils.debug(Api.class,"Api response code:"+responseCode);
+            //Utils.debug(Api.class,"Api response code:"+responseCode);
         }
         return null;
     }
@@ -824,7 +824,7 @@ public class Api {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 httpResponse.getEntity().writeTo(os);
                 String output = os.toString( "UTF-8" );
-                Utils.debug(Api.class,"Output:"+output);
+                //Utils.debug(Api.class,"Output:"+output);
 
 
                 JSONObject jsonObj = new JSONObject(output);
@@ -833,10 +833,10 @@ public class Api {
 
                 return topics;
             }else{
-                Utils.debug(Api.class,"API return code: "+responseCode);
+                //Utils.debug(Api.class,"API return code: "+responseCode);
             }
         }  catch (Exception e) {
-            Utils.debug(Api.class,"API error:",e);
+            //Utils.debug(Api.class,"API error:",e);
 
         }
         return null;

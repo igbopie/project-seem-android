@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -52,11 +53,12 @@ import it.sephiroth.android.library.widget.HListView;
 
 public class ItemFragmentV6 extends Fragment {
 
-    public static ItemFragmentV6 newInstance(String seemId,String itemId) {
+    public static ItemFragmentV6 newInstance(String seemId,String itemId,boolean showFirst) {
         ItemFragmentV6 f = new ItemFragmentV6();
         Bundle args = new Bundle();
         args.putString(GlobalVars.EXTRA_ITEM_ID, itemId);
         args.putString(GlobalVars.EXTRA_SEEM_ID, seemId);
+        args.putBoolean(GlobalVars.EXTRA_SHOW_FIRST, showFirst);
         f.setArguments(args);
         return f;
     }
@@ -69,6 +71,8 @@ public class ItemFragmentV6 extends Fragment {
     private Item item;
     private Seem seem = null;
 
+
+    private ImageView animationImage;
     private ListView listView;
     ItemViewAdapter itemViewAdapter;
     HListView threadedView;
@@ -77,7 +81,6 @@ public class ItemFragmentV6 extends Fragment {
     boolean loadThreadView = true;
     private int lastTop;
     private int lastItem;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +101,8 @@ public class ItemFragmentV6 extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        animationImage = (ImageView) view.findViewById(R.id.animationImage);
+
         threadedView = (HListView) view.findViewById(R.id.threadedView);
         threadedView.setOnItemClickListener(new it.sephiroth.android.library.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -106,8 +111,6 @@ public class ItemFragmentV6 extends Fragment {
                 onItemClickListener.onClick(clicked.getSeemId(),clicked.getId());
             }
         });
-        //RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) threadedView.getLayoutParams();
-        //layoutParams.topMargin=-layoutParams.height;
 
         listView = (ListView) view.findViewById(R.id.listView);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -118,25 +121,22 @@ public class ItemFragmentV6 extends Fragment {
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                boolean scrolledUp = false;
+                boolean scrolledDown = false;
                 if(view != null && view.getChildCount() > 0) {
+
                     //Utils.debug(getClass(), "Scroll: " + view.getChildAt(0).getTop());
                     int currentTop =view.getChildAt(0).getTop();
 
                     if(lastItem > firstVisibleItem){
-                        //Utils.debug(getClass(),"Scroll Up");
-                        showThreadedView();
+                        scrolledUp = true;
                     } else if (lastItem < firstVisibleItem){
-                        //Utils.debug(getClass(),"Scroll Down");
-
-                        hideThreadedView();
+                        scrolledDown = true;
                     } else {
                         if(lastTop > currentTop){
-                            //Utils.debug(getClass(),"Scroll Down");
-
-                            hideThreadedView();
+                            scrolledDown = true;
                         } else if(lastTop < currentTop) {
-                            //Utils.debug(getClass(),"Scroll Up");
-                            showThreadedView();
+                            scrolledUp = true;
                         } else{
                             //Utils.debug(getClass(),"Stop");
                         }
@@ -146,13 +146,16 @@ public class ItemFragmentV6 extends Fragment {
                     lastItem = firstVisibleItem;
                 }
 
-                /*
-                if(firstVisibleItem > 0){
-                    showThreadedView();
-                } else {
+
+                if(item != null && firstVisibleItem == 0 && item.getDepth() == 0 ){
                     hideThreadedView();
+                } else {
+                    if(scrolledUp){
+                        showThreadedView();
+                    }else if(scrolledDown){
+                        hideThreadedView();
+                    }
                 }
-                */
 
             }
         });
@@ -230,6 +233,9 @@ public class ItemFragmentV6 extends Fragment {
         String itemId =getArguments().getString(GlobalVars.EXTRA_ITEM_ID);
         return  itemId;
     }
+    public Boolean getShowFirst(){
+        return getArguments().getBoolean(GlobalVars.EXTRA_SHOW_FIRST);
+    }
 
 
     private class GetItems extends AsyncTask<Void,Void,Void> {
@@ -275,11 +281,15 @@ public class ItemFragmentV6 extends Fragment {
 
             itemViewAdapter = new ItemViewAdapter(replies,getActivity(), new ItemView.OnItemClickListener() {
                 @Override
-                public void onClick(final Item item,ImageView imageView) {
+                public void onClick(final Item item,ItemView itemView) {
 
+
+                    final float imageTopPosition = itemView.getTop();
                     replies.clear();
+                    itemViewAdapter.setShowFirst(getShowFirst());
                     itemViewAdapter.notifyDataSetChanged();
                     getArguments().putString(GlobalVars.EXTRA_ITEM_ID, item.getId());
+                    getArguments().putBoolean(GlobalVars.EXTRA_SHOW_FIRST, false);
                     new GetItems().execute();
 
                     //Todo animation
@@ -289,28 +299,80 @@ public class ItemFragmentV6 extends Fragment {
 
                     Utils.debug(getClass(),"lastVisiblePosition:"+lastVisiblePosition+" "+parents.size());
 
-                    parents.add(item);
-                    threadedV6Adapter.notifyDataSetChanged();
-                    threadedView.smoothScrollToPosition(parents.size() - 1);
-                    threadedView.setOnItemSelectedListener(new it.sephiroth.android.library.widget.AdapterView.OnItemSelectedListener() {
+
+                    RelativeLayout.LayoutParams layoutParams  = (RelativeLayout.LayoutParams) animationImage.getLayoutParams();
+                    layoutParams.height = GlobalVars.SCREEN_WIDTH;
+                    layoutParams.width = GlobalVars.SCREEN_WIDTH;
+
+
+                    Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,animationImage,getActivity());
+                    animationImage.setTop(0);
+                    animationImage.setY(imageTopPosition);
+                    animationImage.setVisibility(View.VISIBLE);
+                    AnimatorSet animatorSet = new AnimatorSet();
+                    animatorSet.play(ObjectAnimator.ofFloat(ItemFragmentV6.this,"animationImageSize",GlobalVars.SCREEN_WIDTH,Utils.dpToPixel(80,getActivity())));
+                    animatorSet.setDuration(250);
+                    animatorSet.addListener(new Animator.AnimatorListener() {
                         @Override
-                        public void onItemSelected(it.sephiroth.android.library.widget.AdapterView<?> adapterView, View view, int i, long l) {
-                            threadedView.setOnItemSelectedListener(null);
+                        public void onAnimationStart(Animator animator) {
 
                         }
 
                         @Override
-                        public void onNothingSelected(it.sephiroth.android.library.widget.AdapterView<?> adapterView) {
+                        public void onAnimationEnd(Animator animator) {
+                            AnimatorSet animatorSet = new AnimatorSet();
+                            animatorSet.play(ObjectAnimator.ofFloat(animationImage,View.Y,animationImage.getY(),-GlobalVars.SCREEN_WIDTH));
+                            animatorSet.setDuration(250);
+                            animatorSet.addListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animator) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animator animator) {
+                                    parents.add(item);
+                                    threadedV6Adapter.notifyDataSetChanged();
+                                    threadedView.smoothScrollToPosition(parents.size() - 1);
+                                    threadedView.setOnItemSelectedListener(new it.sephiroth.android.library.widget.AdapterView.OnItemSelectedListener() {
+                                        @Override
+                                        public void onItemSelected(it.sephiroth.android.library.widget.AdapterView<?> adapterView, View view, int i, long l) {
+                                            threadedView.setOnItemSelectedListener(null);
+
+                                        }
+
+                                        @Override
+                                        public void onNothingSelected(it.sephiroth.android.library.widget.AdapterView<?> adapterView) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onAnimationCancel(Animator animator) {
+
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animator) {
+
+                                }
+                            });
+                            animatorSet.start();
+
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
 
                         }
                     });
-
-
-
-
-
-
-
+                    animatorSet.start();
 
                     //onItemClickListener.onClick(seemId,itemId);
                 }
@@ -330,7 +392,15 @@ public class ItemFragmentV6 extends Fragment {
                     ActivityFactory.startReplyItemActivity(getActivity(),itemId, GlobalVars.PhotoSource.GALLERY);
                 }
             });
+            itemViewAdapter.setShowFirst(getShowFirst());
             listView.setAdapter(itemViewAdapter);
+            if(item.getDepth() == 0){
+                showedThreadedView = false;
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) threadedView.getLayoutParams();
+                layoutParams.topMargin=-layoutParams.height;
+
+            }
+
             if(loadThreadView) {
                 threadedV6Adapter = new ThreadedV6Adapter(parents, getActivity());
                 threadedView.setAdapter(threadedV6Adapter);
@@ -403,4 +473,12 @@ public class ItemFragmentV6 extends Fragment {
     }
 
 
+    public void setAnimationImageSize(float size){
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) animationImage.getLayoutParams();
+        layoutParams.height = (int) size;
+        layoutParams.width = (int) size;
+        layoutParams.leftMargin = (int) ((GlobalVars.SCREEN_WIDTH-size) / 2);
+        layoutParams.topMargin = (int) ((GlobalVars.SCREEN_WIDTH-size) / 2);
+        animationImage.setLayoutParams(layoutParams);
+    }
 }

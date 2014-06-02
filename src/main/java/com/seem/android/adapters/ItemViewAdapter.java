@@ -25,6 +25,7 @@ public class ItemViewAdapter  extends BaseAdapter {
     private List<Item> itemList;
     private Context context;
     private ItemView.OnItemClickListener onItemClickListener;
+    private Boolean showFirst = true;
 
     public ItemViewAdapter(List<Item> itemList, Context ctx,ItemView.OnItemClickListener onItemClickListener) {
         super();
@@ -61,8 +62,10 @@ public class ItemViewAdapter  extends BaseAdapter {
             }
             final Item item = (Item) getItem(position);
             ItemView.Theme theme;
-            if(position == 0){
+            if(position == 0 && showFirst){
                 theme = ItemView.Theme.MAIN;
+            }else if(position == 0 && !showFirst){
+                theme = ItemView.Theme.MINIMAL_MAIN;
             }else{
                 theme = ItemView.Theme.REPLY;
             }
@@ -73,5 +76,13 @@ public class ItemViewAdapter  extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    public Boolean getShowFirst() {
+        return showFirst;
+    }
+
+    public void setShowFirst(Boolean showFirst) {
+        this.showFirst = showFirst;
     }
 }

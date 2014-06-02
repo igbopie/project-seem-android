@@ -18,6 +18,7 @@ public class GlobalVars {
     public static final String SAVED_BUNDLE_CAMERA_OUT_FILE ="cameraOutFile";
 
     public static final String EXTRA_SEEM_ID = "seemId";
+    public static final String EXTRA_SHOW_FIRST = "showFirst";
 
     public static final String EXTRA_IS_MAIN_ITEM = "isMainItem";
     public static final String EXTRA_ITEM_ID = "replyId";
