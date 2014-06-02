@@ -85,7 +85,7 @@ public class FavAdapter extends ArrayAdapter<Item> {
         mainImageView.setText(item.getCaption());
         mainImageView.setLoading(false);
 
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,mainImageView.getImageView(),context);
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,mainImageView.getImageView(),mainImageView.getHeight(),mainImageView.getHeight(),context);
 
         return convertView;
 

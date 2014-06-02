@@ -266,7 +266,7 @@ public class ItemFragmentV2 extends Fragment implements View.OnClickListener{
         }
 
 
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image.getImageView(),getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image.getImageView(),GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
         getActivity().setTitle(item.getCaption());
 
         //

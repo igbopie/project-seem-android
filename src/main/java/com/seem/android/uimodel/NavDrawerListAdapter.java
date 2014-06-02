@@ -62,7 +62,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
 
         if(dItem.getItem() != null){
             txtTitle.setText(dItem.getItem().getCaption());
-            Utils.loadBitmap(dItem.getItem().getMediaId(), Api.ImageFormat.THUMB, imgIcon, context);
+            //Utils.loadBitmap(dItem.getItem().getMediaId(), Api.ImageFormat.THUMB, imgIcon, context);
         }else {
             if(dItem.isSectionTitle()) {
                 imgIcon.setVisibility(View.INVISIBLE);

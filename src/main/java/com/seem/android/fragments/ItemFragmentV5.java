@@ -256,7 +256,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                     getArguments().putString(GlobalVars.EXTRA_ITEM_ID, changeItem.getId());
                     //init
                     new GetItems().execute();
-                    Utils.loadBitmap(changeItem.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getActivity());
+                    Utils.loadBitmap(changeItem.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
                     setImageScroll(1f);
                     thumbnailAdapter.clear();
                     thumbnailAdapter.notifyDataSetChanged();
@@ -407,7 +407,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
                 view.setX(view.getLeft());
                 view.setY(view.getTop() + gridView.getTop());
 
-                Utils.loadBitmap(replies.get(position).getMediaId(), Api.ImageFormat.THUMB, fromGridViewToMainImage, getActivity());
+                Utils.loadBitmap(replies.get(position).getMediaId(), Api.ImageFormat.THUMB, fromGridViewToMainImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
                 fromGridViewToMainImage.setVisibility(View.VISIBLE);
                 fromGridViewToMainImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 view.setVisibility(View.INVISIBLE);
@@ -640,7 +640,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
             threadedViewComponent.setAdapter(threadedViewAdapter);
 
             //Normal view
-            Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getActivity());
+            Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
 
             thumbnailAdapter.clear();
 
@@ -696,7 +696,7 @@ public class ItemFragmentV5 extends Fragment implements View.OnClickListener, Po
             if(item.getUserProfile() != null){
                 nameBig.setText(item.getUserProfile().getName());
                 if(item.getUserProfile().getMediaId() != null) {
-                    Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,getActivity());
+                    Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
                 }
                 usernameBig.setText("@"+item.getUserProfile().getUsername());
                 usernameSmall.setText("@"+item.getUserProfile().getUsername());

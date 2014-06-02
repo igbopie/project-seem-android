@@ -305,7 +305,7 @@ public class ItemFragmentV6 extends Fragment {
                     layoutParams.width = GlobalVars.SCREEN_WIDTH;
 
 
-                    Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,animationImage,getActivity());
+                    Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,animationImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
                     animationImage.setTop(0);
                     animationImage.setY(imageTopPosition);
                     animationImage.setVisibility(View.VISIBLE);

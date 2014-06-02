@@ -17,6 +17,7 @@ import com.seem.android.GlobalVars;
 import com.seem.android.service.Api;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +32,15 @@ public class Utils {
     public static float dpToPixel(float amount,Context context){
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
     }
-    public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context) {
-        Picasso.with(context).load(Api.getImageEndpoint(mediaId,format)).into(imageView);
+    public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,int width,int height,Context context) {
+        boolean centerCrop = imageView.getScaleType() == ImageView.ScaleType.CENTER_CROP;
+
+        RequestCreator rc = Picasso.with(context).load(Api.getImageEndpoint(mediaId,format));
+        rc.resize(width,height);
+        if(centerCrop){
+            rc.centerCrop();
+        }
+        rc.into(imageView);
     }
 
     public static void loadBitmap(String mediaId,Api.ImageFormat format,ImageView imageView,Context context,Drawable placeholder) {

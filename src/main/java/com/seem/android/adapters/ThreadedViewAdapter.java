@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.seem.android.GlobalVars;
 import com.seem.android.R;
 import com.seem.android.customviews.SquareImageView;
 import com.seem.android.model.Item;
@@ -62,7 +63,7 @@ public class ThreadedViewAdapter extends ArrayAdapter<Item> {
         }
 
         Item c = itemList.get(position);
-        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.LARGE, (ImageView) v, getContext());
+        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.LARGE, (ImageView) v, GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH, getContext());
         /*ImageView imageView = (ImageView) v.findViewById(R.id.threadImageView);
 
         TextView depthTextView = (TextView) v.findViewById(R.id.depthTextView);

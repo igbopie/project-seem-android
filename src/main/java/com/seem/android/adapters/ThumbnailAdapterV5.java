@@ -58,7 +58,7 @@ public class ThumbnailAdapterV5 extends BaseAdapter {
 
             view.setTag(Integer.valueOf(position));
 
-            Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,view.getImageView(),context);
+            Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,view.getImageView(),GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,context);
 
             return view;
         }

@@ -159,7 +159,7 @@ public class ItemFragment extends Fragment {
             image.setLoading(false);
         }
 
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,image.getImageView(),getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,image.getImageView(), GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
 
         image.setOnClickListener(new View.OnClickListener() {
             @Override

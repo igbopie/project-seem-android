@@ -192,7 +192,7 @@ public class EditUserFragment extends Fragment {
                 email.setText(userProfile.getEmail());
                 username.setText(userProfile.getUsername());
                 if(userProfile.getMediaId() != null){
-                    Utils.loadBitmap(userProfile.getMediaId(), Api.ImageFormat.THUMB,imageView,getActivity());
+                    Utils.loadBitmap(userProfile.getMediaId(), Api.ImageFormat.THUMB,imageView,imageView.getLayoutParams().width,imageView.getLayoutParams().width,getActivity());
                 }
             }
 

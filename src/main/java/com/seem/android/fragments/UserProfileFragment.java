@@ -185,7 +185,7 @@ public class UserProfileFragment extends Fragment {
                     followButton.setVisibility(View.INVISIBLE);
                 }
                 if(userProfile.getMediaId() != null){
-                    Utils.loadBitmap(userProfile.getMediaId(), Api.ImageFormat.THUMB,imageView,getActivity());
+                    Utils.loadBitmap(userProfile.getMediaId(), Api.ImageFormat.THUMB,imageView,imageView.getWidth(),imageView.getWidth(),getActivity());
                 }
 
                 if(userProfile.getIsFollowingMe() != null && userProfile.getIsFollowingMe()) {

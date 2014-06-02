@@ -270,7 +270,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
         if(item.getUserProfile() != null){
             name.setText(item.getUserProfile().getName());
             if(item.getUserProfile().getMediaId() != null) {
-                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImage,getContext());
+                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImage,userImage.getLayoutParams().width,userImage.getLayoutParams().width,getContext());
             }else{
                 userImage.setImageResource(R.drawable.user_profile_nophoto);
             }
@@ -292,7 +292,7 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             username.setOnClickListener(null);
         }
 
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,getContext());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getContext());
 
     }
 

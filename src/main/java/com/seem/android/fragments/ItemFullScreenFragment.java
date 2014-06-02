@@ -364,7 +364,7 @@ public class ItemFullScreenFragment extends Fragment {
                 }
 
                 //TODO first thumb, then big
-                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,getImageView(),getActivity());
+                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,getImageView(),GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_HEIGHT,getActivity());
             }
             getItemTask = null;
         }

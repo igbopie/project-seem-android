@@ -284,13 +284,13 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         }
         commentsNumberBig.setText(item.getReplyCount()+"");
 
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,imageLowRes,getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,imageLowRes,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
         Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image,getActivity(), new Callback() {
             @Override
             public void onSuccess() {
                 imageLowRes.setVisibility(View.INVISIBLE);
                 image.setVisibility(View.VISIBLE);
-                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,getActivity());
+                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
 
             @Override
@@ -347,7 +347,7 @@ public class ItemFragmentV3 extends Fragment implements View.OnClickListener{
         if(item.getUserProfile() != null){
             nameBig.setText(item.getUserProfile().getName());
             if(item.getUserProfile().getMediaId() != null) {
-                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,getActivity());
+                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
             usernameBig.setText(item.getUserProfile().getUsername());
             usernameSmall.setText(item.getUserProfile().getUsername());

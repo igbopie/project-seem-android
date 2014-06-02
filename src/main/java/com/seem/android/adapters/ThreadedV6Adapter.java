@@ -69,7 +69,7 @@ public class ThreadedV6Adapter extends ArrayAdapter<Item> {
         layout.height = parent.getLayoutParams().height;
         imageView.setLayoutParams(layout);
 
-        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.THUMB, imageView, getContext());
+        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.THUMB, imageView,layout.width ,layout.width, getContext());
         return convertView;
 
     }

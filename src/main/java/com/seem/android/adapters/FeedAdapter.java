@@ -85,7 +85,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
         mainImageView.setText(feed.getItemCaption());
         mainImageView.setLoading(false);
 
-        Utils.loadBitmap(feed.getItemMediaId(), Api.ImageFormat.THUMB,mainImageView.getImageView(),context);
+        Utils.loadBitmap(feed.getItemMediaId(), Api.ImageFormat.THUMB,mainImageView.getImageView(),mainImageView.getHeight(),mainImageView.getHeight(),context);
 
         //TODO specific stuff
         if(fa == Feed.FeedAction.CREATE_SEEM) {
@@ -101,7 +101,7 @@ public class FeedAdapter extends ArrayAdapter<Feed> {
             originalPost.setText(feed.getReplyToCaption());
             originalPost.setLoading(false);
 
-            Utils.loadBitmap(feed.getReplyToMediaId(), Api.ImageFormat.THUMB,originalPost.getImageView(),context);
+            Utils.loadBitmap(feed.getReplyToMediaId(), Api.ImageFormat.THUMB,originalPost.getImageView(),mainImageView.getHeight(),mainImageView.getHeight(),context);
 
         }
 

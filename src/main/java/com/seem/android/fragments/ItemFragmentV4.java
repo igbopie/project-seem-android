@@ -305,13 +305,13 @@ public class ItemFragmentV4 extends Fragment implements View.OnClickListener{
         }
         commentsNumberBig.setText(item.getReplyCount()+"");
 
-        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,imageLowRes,getActivity());
+        Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.THUMB,imageLowRes,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
         Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,image,getActivity(), new Callback() {
             @Override
             public void onSuccess() {
                 imageLowRes.setVisibility(View.INVISIBLE);
                 image.setVisibility(View.VISIBLE);
-                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,getActivity());
+                Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,fakeImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
 
             @Override
@@ -368,7 +368,7 @@ public class ItemFragmentV4 extends Fragment implements View.OnClickListener{
         if(item.getUserProfile() != null){
             nameBig.setText(item.getUserProfile().getName());
             if(item.getUserProfile().getMediaId() != null) {
-                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,getActivity());
+                Utils.loadBitmap(item.getUserProfile().getMediaId(), Api.ImageFormat.THUMB,userImageBig,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
             usernameBig.setText(item.getUserProfile().getUsername());
             usernameSmall.setText(item.getUserProfile().getUsername());
@@ -619,17 +619,17 @@ public class ItemFragmentV4 extends Fragment implements View.OnClickListener{
             }
 
             if(replies.size()>1){
-                Utils.loadBitmap(replies.get(0).getMediaId(), Api.ImageFormat.THUMB,reply1,getActivity());
+                Utils.loadBitmap(replies.get(0).getMediaId(), Api.ImageFormat.THUMB,reply1,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
             if(replies.size()>2){
-                Utils.loadBitmap(replies.get(1).getMediaId(), Api.ImageFormat.THUMB,reply2,getActivity());
+                Utils.loadBitmap(replies.get(1).getMediaId(), Api.ImageFormat.THUMB,reply2,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
             if(replies.size()>3){
-                Utils.loadBitmap(replies.get(2).getMediaId(), Api.ImageFormat.THUMB,reply3,getActivity());
+                Utils.loadBitmap(replies.get(2).getMediaId(), Api.ImageFormat.THUMB,reply3,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
 
             if(parentItem != null) {
-                Utils.loadBitmap(parentItem.getMediaId(), Api.ImageFormat.THUMB,parentImageView,getActivity());
+                Utils.loadBitmap(parentItem.getMediaId(), Api.ImageFormat.THUMB,parentImageView,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getActivity());
             }
 
         }

@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.seem.android.GlobalVars;
 import com.seem.android.R;
 
 import com.seem.android.model.Item;
@@ -68,7 +69,7 @@ public class ThreadedAdapter extends ArrayAdapter<Item> {
         TextView captionTextView = (TextView) v.findViewById(R.id.captionTextView);
         captionTextView.setText(c.getCaption());
 
-        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.THUMB,imageView,context);
+        Utils.loadBitmap(c.getMediaId(), Api.ImageFormat.THUMB,imageView, GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,context);
 
         return v;
 
