@@ -16,49 +16,105 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/seemTitleEditText"
-        android:singleLine="true"
-        android:imeOptions="actionNext"/>
+        android:singleLine="true"/>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:id="@+id/previewImageView"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.61" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Caption"
-        android:layout_weight="0.03" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/captionEditText"
-        android:layout_gravity="center_horizontal"
-        android:singleLine="true"
-        android:imeOptions="actionNext"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Topic"
+        android:text="Expiration:"
+        android:id="@+id/textView3"
         android:textSize="20dp"
-        android:id="@+id/textView2" />
+        android:layout_marginTop="20dp" />
 
-    <Spinner
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/topicSpinner"
-        android:imeOptions="actionDone"/>
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5m"
+            android:id="@+id/button5Min"
+            android:layout_gravity="center_horizontal"
+            android:onClick="set5Min"/>
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30m"
+            android:id="@+id/button30Min"
+            android:layout_gravity="center_horizontal"
+            android:onClick="set30Min"/>
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1H"
+            android:id="@+id/button1Hour"
+            android:layout_gravity="center_horizontal"
+            android:onClick="set1Hour" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6H"
+            android:id="@+id/button6Hour"
+            android:layout_gravity="center_horizontal"
+            android:onClick="set6Hour" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1D"
+            android:id="@+id/button1Day"
+            android:layout_gravity="center_horizontal"
+            android:onClick="set1Day" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1W"
+            android:id="@+id/button1Week"
+            android:layout_gravity="center_horizontal"
+            android:onClick="set1Week"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:12"
+            android:id="@+id/timeTextView"
+            android:textSize="30dp"
+            android:paddingRight="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01-01-2014"
+            android:id="@+id/dateTextView"
+            android:textSize="30dp" />
+
+
+
+     </LinearLayout>
+
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Seem it!"
-        android:id="@+id/seemItButton" />
+        android:text="Create and notify my followers"
+        android:id="@+id/seemItButton"
+        android:layout_marginTop="20dp" />
 
 </LinearLayout>

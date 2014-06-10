@@ -3,14 +3,11 @@ package com.seem.android.service;
 import com.seem.android.MyApplication;
 import com.seem.android.exceptions.EmailAlreadyExistsException;
 import com.seem.android.exceptions.UsernameAlreadyExistsException;
-import com.seem.android.model.Feed;
 import com.seem.android.model.Item;
 import com.seem.android.model.Media;
 import com.seem.android.model.Seem;
-import com.seem.android.model.Topic;
 import com.seem.android.model.UserProfile;
 import com.seem.android.util.Iso8601;
-import com.seem.android.util.Utils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -33,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,9 +46,6 @@ public class Api {
     public static final String S3_ENPOINT="http://seem-dev-test.s3-website-us-west-2.amazonaws.com/";
     public static final String ENDPOINT = "https://seem-test.herokuapp.com/";
     public static final String ENDPOINT_GET_SEEMS = "api/seem";
-    public static final String ENDPOINT_GET_ITEM = "api/seem/item/get";
-    public static final String ENDPOINT_GET_REPLY = "api/seem/item/reply";
-    public static final String ENDPOINT_GET_REPLIES = "api/seem/item/replies";
     public static final String ENDPOINT_GET_MEDIA_LARGE = "api/media/get/large/";
     public static final String ENDPOINT_GET_MEDIA_THUMB = "api/media/get/thumb/";
     public static final String ENDPOINT_CREATE_MEDIA = "api/media/create";
@@ -63,19 +58,12 @@ public class Api {
     public static final String ENDPOINT_UNFOLLOW = "api/unfollow";
     public static final String ENDPOINT_FEED = "api/feed";
     public static final String ENDPOINT_ADD_GCM_TOKEN = "api/user/addgcmtoken";
-    public static final String ENDPOINT_FAVOURITE = "api/seem/item/favourite";
-    public static final String ENDPOINT_UNFAVOURITE = "api/seem/item/unfavourite";
-    public static final String ENDPOINT_THUMB_UP = "api/seem/item/thumbup";
-    public static final String ENDPOINT_THUMB_DOWN = "api/seem/item/thumbdown";
-    public static final String ENDPOINT_THUMB_CLEAR = "api/seem/item/thumbclear";
 
-    public static final String ENDPOINT_TOPICS = "api/seem/topics";
-    public static final String ENDPOINT_SEEM_BY_TOPIC = "api/seem/by/topic";
-    public static final String ENDPOINT_SEEM_BY_HOTNESS = "api/seem/by/hotness";
-    public static final String ENDPOINT_SEEM_BY_VIRAL = "api/seem/by/viral";
-    public static final String ENDPOINT_SEEM_BY_CREATED = "api/seem/by/created";
-    public static final String ENDPOINT_SEEM_BY_UPDATED = "api/seem/by/updated";
-    public static final String ENDPOINT_SEEM_ITEM_BY_FAVOURITED = "api/seem/item/by/favourited";
+    public static final String ENDPOINT_SEEM_ADD = "api/seem/add";
+    public static final String ENDPOINT_SEEM_GET_ITEMS = "api/seem/items";
+    public static final String ENDPOINT_SEEM_BY_EXPIRE = "api/seem/by/expire";
+    public static final String ENDPOINT_SEEM_BY_EXPIRED = "api/seem/by/expired";
+
 
 
 
@@ -90,15 +78,13 @@ public class Api {
     public static final String JSON_TAG_RESPONSE = "response";
 
     //SEEM Model
-    public static final String JSON_TAG_SEEM_ITEM_ID = "itemId";
     public static final String JSON_TAG_SEEM_TITLE = "title";
     public static final String JSON_TAG_SEEM_ID = "_id";
     public static final String JSON_TAG_SEEM_ITEM_COUNT = "itemCount";
     public static final String JSON_TAG_SEEM_CREATED = "created";
     public static final String JSON_TAG_SEEM_UPDATED = "updated";
-    public static final String JSON_TAG_SEEM_ITEM_MEDIA_ID = "itemMediaId";
-    public static final String JSON_TAG_SEEM_ITEM_CAPTION = "itemCaption";
     public static final String JSON_TAG_SEEM_LASTEST_ITEMS = "latestItems";
+    public static final String JSON_TAG_SEEM_EXPIRE = "expire";
 
     //ITEM Model
 
@@ -106,21 +92,9 @@ public class Api {
     public static final String JSON_TAG_ITEM_CAPTION = "caption";
     public static final String JSON_TAG_ITEM_MEDIA_ID = "mediaId";
     public static final String JSON_TAG_ITEM_CREATED = "created";
-    public static final String JSON_TAG_ITEM_REPLY_COUNT = "replyCount";
     public static final String JSON_TAG_ITEM_SEEM_ID = "seemId";
-    public static final String JSON_TAG_ITEM_DEPTH = "depth";
-    public static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
-    public static final String JSON_TAG_ITEM_USERNAME = "username";
     public static final String JSON_TAG_ITEM_USER_ID = "userId";
     public static final String JSON_TAG_ITEM_USER = "user";
-    public static final String JSON_TAG_ITEM_FAVOURITE_COUNT = "favouriteCount";
-    public static final String JSON_TAG_ITEM_FAVOURITED = "favourited";
-    public static final String JSON_TAG_ITEM_THUMB_UP_COUNT = "thumbUpCount";
-    public static final String JSON_TAG_ITEM_THUMB_DOWN_COUNT = "thumbDownCount";
-    public static final String JSON_TAG_ITEM_THUMB_SCORE_COUNT = "thumbScoreCount";
-    public static final String JSON_TAG_ITEM_THUMBED_UP = "thumbedUp";
-    public static final String JSON_TAG_ITEM_THUMBED_DOWN = "thumbedDown";
-    public static final String JSON_TAG_ITEM_FAVOURITED_DATE = "favouritedDate";
 
 
     //USERPROFILE
@@ -139,104 +113,17 @@ public class Api {
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME= "isFollowingMe";
 
 
-    //FEED
-    public static final String JSON_TAG_FEED_ID = "_id";
-    public static final String JSON_TAG_FEED_CREATED = "created";
-    public static final String JSON_TAG_FEED_ITEM_ID = "itemId";
-    public static final String JSON_TAG_FEED_ITEM_MEDIA_ID = "itemMediaId";
-    public static final String JSON_TAG_FEED_ITEM_CAPTION = "itemCaption";
-    public static final String JSON_TAG_FEED_REPLY_TO_ID = "replyToId";
-    public static final String JSON_TAG_FEED_REPLY_TO_MEDIA_ID = "replyToMediaId";
-    public static final String JSON_TAG_FEED_REPLY_TO_CAPTION = "replyToCaption";
-    public static final String JSON_TAG_FEED_REPLY_TO_USERNAME = "replyToUsername";
-    public static final String JSON_TAG_FEED_REPLY_TO_USER_ID = "replyToUserId";
-    public static final String JSON_TAG_FEED_SEEM_ID = "seemId";
-    public static final String JSON_TAG_FEED_SEEM_TITLE = "seemTitle";
-    public static final String JSON_TAG_FEED_ACTION = "action";
-    public static final String JSON_TAG_FEED_USER_ID = "userId";
-    public static final String JSON_TAG_FEED_USERNAME = "username";
-
-    //TOPIC
-    public static final String JSON_TAG_TOPIC_ID = "_id";
-    public static final String JSON_TAG_TOPIC_CREATED = "created";
-    public static final String JSON_TAG_TOPIC_CODE = "code";
-    public static final String JSON_TAG_TOPIC_NAME = "name";
-
     public enum ImageFormat{THUMB,LARGE};
 
-    public static List<Item> getSeemItemsByFavourited(String username,int page){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("username",username);
-            params.put("page",page+"");
 
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_SEEM_ITEM_BY_FAVOURITED,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                httpResponse.getEntity().writeTo(os);
-                String output = os.toString( "UTF-8" );
-                //Utils.debug(Api.class,"Output:"+output);
-
-                JSONObject jsonObj = new JSONObject(output);
-
-                return fillItems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return null;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return null;
-        }
+    public static List<Seem> getSeemsByExpire(){
+        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_EXPIRE);
+    }
+    public static List<Seem> getSeemsByExpired(){
+        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_EXPIRED);
     }
 
-
-    public static List<Seem> getSeemsByTopic(String topicId){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("topicId",topicId);
-
-
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_SEEM_BY_TOPIC,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                httpResponse.getEntity().writeTo(os);
-                String output = os.toString( "UTF-8" );
-                //Utils.debug(Api.class,"Output:"+output);
-
-                JSONObject jsonObj = new JSONObject(output);
-
-                return fillSeems(jsonObj.getJSONArray(JSON_TAG_RESPONSE));
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return null;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return null;
-        }
-    }
-
-    public static List<Seem> getSeemsByHotness(){
-        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_HOTNESS);
-    }
-    public static List<Seem> getSeemsByViral(){
-        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_VIRAL);
-    }
-    public static List<Seem> getSeemsByCreated(){
-        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_CREATED);
-    }
-    public static List<Seem> getSeemsByUpdated(){
-        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_UPDATED);
-    }
 
     private static List<Seem> getSeemBySomething(String endpoint){
         try {
@@ -289,50 +176,7 @@ public class Api {
         }
     }
 
-    public static Item getItem(String id) {
-        return getItem(id,null);
-    }
-    public static Item getItem(String id,String token){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",id);
-            if(token != null){
-                params.put("token",token);
-            }
 
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_ITEM,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                httpResponse.getEntity().writeTo(os);
-                String output = os.toString( "UTF-8" );
-                //Utils.debug(Api.class,"Output:"+output);
-
-
-                JSONObject jsonObj = new JSONObject(output);
-                JSONObject itemJson = jsonObj.getJSONObject(JSON_TAG_RESPONSE);
-                Item item = fillItem(itemJson);
-                //Utils.debug(Api.class,"Item fetched: "+item);
-                //Utils.debug(Api.class,"Now fetching images...");
-
-                //fetch IMAGEs
-                //downloadLargeImage(item);
-                //downloadThumbImage(item);
-
-                //Utils.debug(Api.class,"Images fetched");
-                return item;
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return null;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return null;
-        }
-    }
 
     public static boolean addGcmToken(String gcmToken,String token){
         try {
@@ -398,110 +242,7 @@ public class Api {
         }
     }
 
-    public static boolean thumbUp(String itemId,String token){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",itemId);
-            params.put("token", token);
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_UP,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-                return true;
 
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return false;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return false ;
-        }
-    }
-
-    public static boolean thumbDown(String itemId,String token){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",itemId);
-            params.put("token", token);
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_DOWN,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-                return true;
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return false;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return false ;
-        }
-    }
-
-    public static boolean thumbClear(String itemId,String token){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",itemId);
-            params.put("token", token);
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_THUMB_CLEAR,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-                return true;
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return false;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return false ;
-        }
-    }
-
-    public static boolean favourite(String itemId,String token){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",itemId);
-            params.put("token", token);
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FAVOURITE,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-                return true;
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return false;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return false ;
-        }
-    }
-
-    public static boolean unfavourite(String itemId,String token){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",itemId);
-            params.put("token",token);
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_UNFAVOURITE,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-                return true;
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return false;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return false ;
-        }
-    }
 
     public static boolean updateUser(String username,String email,String name,String bio,String mediaId,String token){
         try {
@@ -626,50 +367,13 @@ public class Api {
         }
     }
 
-    public static Item reply(String caption,String mediaId,String itemId){
-        try {
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put("itemId", itemId);
-            params.put("mediaId", mediaId);
-            params.put("caption", caption);
-            params.put("token", MyApplication.getToken());
 
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLY,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
 
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                httpResponse.getEntity().writeTo(os);
-                String output = os.toString( "UTF-8" );
-                //Utils.debug(Api.class,"Output:"+output);
-
-                Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
-
-                return item;
-            } else if(responseCode == RESPONSE_CODE_CLIENT_LOGIN_TIMEOUT ) {
-                String token = login(MyApplication.getUsername(),MyApplication.getPassword());
-                if(token != null){
-                    MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
-                    return reply(caption,mediaId,itemId);
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return null;
-        }
-    }
-
-    public static Seem createSeem(String title,String caption,String topicId,String mediaId){
+    public static Seem createSeem(String title,Date expire){
         try {
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("title", title);
-            params.put("mediaId", mediaId);
-            params.put("caption", caption);
-            if(topicId != null){
-                params.put("topicId",topicId);
-            }
+            params.put("expire", Iso8601.fromDate(expire));
             params.put("token", MyApplication.getToken());
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE_SEEM,params);
@@ -689,7 +393,7 @@ public class Api {
                 String token = login(MyApplication.getUsername(),MyApplication.getPassword());
                 if(token != null){
                     MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
-                    return createSeem(title,caption,topicId,mediaId);
+                    return createSeem(title,expire);
                 }
             }
             return null;
@@ -698,17 +402,50 @@ public class Api {
             return null;
         }
     }
+    public static Item addToSeem(String caption,String mediaId,String seemId){
+        try {
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("seemId", seemId);
+            params.put("mediaId", mediaId);
+            params.put("caption", caption);
+            params.put("token", MyApplication.getToken());
 
-    public static List<Item> getReplies(String itemId,int page,String token){
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ ENDPOINT_SEEM_ADD,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                //Utils.debug(Api.class,"Output:"+output);
+
+                Item item = fillItem(new JSONObject(output).getJSONObject(JSON_TAG_RESPONSE));
+
+                return item;
+            } else if(responseCode == RESPONSE_CODE_CLIENT_LOGIN_TIMEOUT ) {
+                String token = login(MyApplication.getUsername(),MyApplication.getPassword());
+                if(token != null){
+                    MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
+                    return addToSeem(caption, mediaId, seemId);
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            //Utils.debug(Api.class,"API error:",e);
+            return null;
+        }
+    }
+    public static List<Item> getSeemItems(String seemId,int page,String token){
         try {
             HashMap<String,String>params = new HashMap<String, String>();
-            params.put("itemId",itemId);
+            params.put("seemId",seemId);
             params.put("page",page+"");
             if(token != null){
                 params.put("token",token+"");
             }
 
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_GET_REPLIES,params);
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ ENDPOINT_SEEM_GET_ITEMS,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
             if(responseCode == RESPONSE_CODE_OK){
                 //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
@@ -725,40 +462,6 @@ public class Api {
                 //Utils.debug(Api.class,"Items fetched: "+items);
 
                 return items;
-
-            } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
-                return null;
-            }
-        } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-            return null;
-        }
-    }
-
-    public static List<Feed> getFeeds(String token,int page){
-        try {
-            HashMap<String,String>params = new HashMap<String, String>();
-            params.put("token",token);
-            params.put("page",page+"");
-
-            HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_FEED,params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if(responseCode == RESPONSE_CODE_OK){
-                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
-
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                httpResponse.getEntity().writeTo(os);
-                String output = os.toString( "UTF-8" );
-                //Utils.debug(Api.class,"Output:"+output);
-
-
-                JSONObject jsonObj = new JSONObject(output);
-                JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
-                List<Feed> feeds = fillFeeds(itemJson);
-                //Utils.debug(Api.class,"Items fetched: "+feeds);
-
-                return feeds;
 
             } else {
                 //Utils.debug(Api.class,"API response code is: "+responseCode);
@@ -813,34 +516,6 @@ public class Api {
         return null;
     }
 
-    public static List<Topic> getTopics() {
-        try {
-            HashMap<String, String> params = new HashMap<String, String>();
-
-            HttpResponse httpResponse = makeRequest(ENDPOINT + ENDPOINT_TOPICS, params);
-            int responseCode = httpResponse.getStatusLine().getStatusCode();
-            if (responseCode == RESPONSE_CODE_OK) {
-
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                httpResponse.getEntity().writeTo(os);
-                String output = os.toString( "UTF-8" );
-                //Utils.debug(Api.class,"Output:"+output);
-
-
-                JSONObject jsonObj = new JSONObject(output);
-                JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
-                List<Topic> topics = fillTopics(itemJson);
-
-                return topics;
-            }else{
-                //Utils.debug(Api.class,"API return code: "+responseCode);
-            }
-        }  catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
-
-        }
-        return null;
-    }
 
     private static List<Seem> fillSeems(JSONArray seemsArray) throws JSONException, ParseException {
         List<Seem> seemList = new ArrayList<Seem>();
@@ -853,16 +528,15 @@ public class Api {
 
     private static Seem fillSeem(JSONObject seemJson) throws JSONException, ParseException {
         Seem seem = new Seem();
-        seem.setItemId(seemJson.getString(JSON_TAG_SEEM_ITEM_ID));
         seem.setId(seemJson.getString(JSON_TAG_SEEM_ID));
         seem.setTitle(seemJson.getString(JSON_TAG_SEEM_TITLE));
         seem.setCreated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_CREATED)).getTime());
         seem.setItemCount(seemJson.getInt(JSON_TAG_SEEM_ITEM_COUNT));
+        seem.setExpire(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_EXPIRE)).getTime());
+
 
         seem.setUpdated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_UPDATED)).getTime());
 
-        seem.setItemCaption(getStringJsonField(seemJson,JSON_TAG_SEEM_ITEM_CAPTION));
-        seem.setItemMediaId(getStringJsonField(seemJson,JSON_TAG_SEEM_ITEM_MEDIA_ID));
 
         if(seemJson.has(JSON_TAG_SEEM_LASTEST_ITEMS)){
             JSONArray array = seemJson.getJSONArray(JSON_TAG_SEEM_LASTEST_ITEMS);
@@ -871,54 +545,7 @@ public class Api {
 
         return seem;
     }
-    private static List<Topic> fillTopics(JSONArray feedsArray) throws JSONException, ParseException {
-        List<Topic> feedList = new ArrayList<Topic>();
-        for (int i = 0; i < feedsArray.length(); i++) {
-            JSONObject feedJson = feedsArray.getJSONObject(i);
-            feedList.add(fillTopic(feedJson));
-        }
-        return feedList;
-    }
-    private static List<Feed> fillFeeds(JSONArray feedsArray) throws JSONException, ParseException {
-        List<Feed> feedList = new ArrayList<Feed>();
-        for (int i = 0; i < feedsArray.length(); i++) {
-            JSONObject feedJson = feedsArray.getJSONObject(i);
-            feedList.add(fillFeed(feedJson));
-        }
-        return feedList;
-    }
 
-    private static Feed fillFeed(JSONObject feedJson) throws JSONException, ParseException {
-        Feed feed = new Feed();
-        feed.setId(getStringJsonField(feedJson, JSON_TAG_FEED_ID));
-        feed.setCreated(Iso8601.toCalendar(feedJson.getString(JSON_TAG_FEED_CREATED)).getTime());
-        feed.setItemId(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_ID));
-        feed.setItemMediaId(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_MEDIA_ID));
-        feed.setItemCaption(getStringJsonField(feedJson, JSON_TAG_FEED_ITEM_CAPTION));
-        feed.setReplyToId(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_ID));
-        feed.setReplyToMediaId(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_MEDIA_ID));
-        feed.setReplyToCaption(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_CAPTION));
-        feed.setReplyToUsername(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_USERNAME));
-        feed.setReplyToUserId(getStringJsonField(feedJson, JSON_TAG_FEED_REPLY_TO_USER_ID));
-        feed.setSeemId(getStringJsonField(feedJson, JSON_TAG_FEED_SEEM_ID));
-        feed.setSeemTitle(getStringJsonField(feedJson, JSON_TAG_FEED_SEEM_TITLE));
-        feed.setAction(Feed.FeedAction.getEnum(getStringJsonField(feedJson, JSON_TAG_FEED_ACTION)));
-        feed.setUserId(getStringJsonField(feedJson, JSON_TAG_FEED_USER_ID));
-        feed.setUsername(getStringJsonField(feedJson, JSON_TAG_FEED_USERNAME));
-        return feed;
-
-    }
-
-    private static Topic fillTopic(JSONObject feedJson) throws JSONException, ParseException {
-        Topic topic = new Topic();
-
-
-        topic.setId(getStringJsonField(feedJson, JSON_TAG_TOPIC_ID));
-        topic.setCode(getStringJsonField(feedJson, JSON_TAG_TOPIC_CODE));
-        topic.setName(getStringJsonField(feedJson, JSON_TAG_TOPIC_NAME));
-
-        return topic;
-    }
 
     private static String getStringJsonField(JSONObject jsonObject, String property) throws JSONException {
         if(jsonObject.has(property)){
@@ -977,53 +604,11 @@ public class Api {
         item.setCaption(itemJson.getString(JSON_TAG_ITEM_CAPTION));
         item.setMediaId(itemJson.getString(JSON_TAG_ITEM_MEDIA_ID));
         item.setCreated(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_CREATED)).getTime());
-        if(itemJson.has(JSON_TAG_ITEM_REPLY_COUNT)) {
-            item.setReplyCount(itemJson.getInt(JSON_TAG_ITEM_REPLY_COUNT));
-        }
-        item.setDepth(itemJson.getInt(JSON_TAG_ITEM_DEPTH));
         if(itemJson.has(JSON_TAG_ITEM_SEEM_ID)) {
             item.setSeemId(itemJson.getString(JSON_TAG_ITEM_SEEM_ID));
         }
-        if(itemJson.has(JSON_TAG_ITEM_REPLY_TO)) {
-            item.setReplyTo(itemJson.getString(JSON_TAG_ITEM_REPLY_TO));
-        }
         if(itemJson.has(JSON_TAG_ITEM_USER_ID)) {
             item.setUserId(itemJson.getString(JSON_TAG_ITEM_USER_ID));
-        }
-        if(itemJson.has(JSON_TAG_ITEM_USERNAME)) {
-            item.setUsername(itemJson.getString(JSON_TAG_ITEM_USERNAME));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_FAVOURITE_COUNT)) {
-            item.setFavouriteCount(itemJson.getInt(JSON_TAG_ITEM_FAVOURITE_COUNT));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_FAVOURITED)) {
-            item.setFavourited(itemJson.getBoolean(JSON_TAG_ITEM_FAVOURITED));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_THUMB_DOWN_COUNT)) {
-            item.setThumbDownCount(itemJson.getInt(JSON_TAG_ITEM_THUMB_DOWN_COUNT));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_THUMB_UP_COUNT)) {
-            item.setThumbUpCount(itemJson.getInt(JSON_TAG_ITEM_THUMB_UP_COUNT));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_THUMB_SCORE_COUNT)) {
-            item.setThumbScoreCount(itemJson.getInt(JSON_TAG_ITEM_THUMB_SCORE_COUNT));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_THUMBED_UP)) {
-            item.setThumbedUp(itemJson.getBoolean(JSON_TAG_ITEM_THUMBED_UP));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_THUMBED_DOWN)) {
-            item.setThumbedDown(itemJson.getBoolean(JSON_TAG_ITEM_THUMBED_DOWN));
-        }
-
-        if(itemJson.has(JSON_TAG_ITEM_FAVOURITED_DATE)) {
-            item.setFavouritedDate(Iso8601.toCalendar(itemJson.getString(JSON_TAG_ITEM_FAVOURITED_DATE)).getTime());
         }
 
         if(itemJson.has(JSON_TAG_ITEM_USER) && !(itemJson.getString(JSON_TAG_ITEM_USER).equals("null"))){
@@ -1070,7 +655,7 @@ public class Api {
         for(Map.Entry<String,String> entry:params.entrySet()){
             content.append(entry.getKey());
             content.append("=");
-            content.append(entry.getValue());
+            content.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
             content.append("&");
         }
         //remove last &

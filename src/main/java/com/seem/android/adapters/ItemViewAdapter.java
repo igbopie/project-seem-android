@@ -1,19 +1,12 @@
 package com.seem.android.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 
-import com.seem.android.GlobalVars;
-import com.seem.android.R;
 import com.seem.android.customviews.ItemView;
-import com.seem.android.customviews.SpinnerImageViewV5;
 import com.seem.android.model.Item;
-import com.seem.android.service.Api;
-import com.seem.android.util.Utils;
 
 import java.util.List;
 
@@ -25,7 +18,6 @@ public class ItemViewAdapter  extends BaseAdapter {
     private List<Item> itemList;
     private Context context;
     private ItemView.OnItemClickListener onItemClickListener;
-    private Boolean showFirst = true;
 
     public ItemViewAdapter(List<Item> itemList, Context ctx,ItemView.OnItemClickListener onItemClickListener) {
         super();
@@ -61,14 +53,7 @@ public class ItemViewAdapter  extends BaseAdapter {
                 view = (ItemView) convertView;
             }
             final Item item = (Item) getItem(position);
-            ItemView.Theme theme;
-            if(position == 0 && showFirst){
-                theme = ItemView.Theme.MAIN;
-            }else if(position == 0 && !showFirst){
-                theme = ItemView.Theme.MINIMAL_MAIN;
-            }else{
-                theme = ItemView.Theme.REPLY;
-            }
+            ItemView.Theme theme= ItemView.Theme.REPLY;
             view.setItem(item,theme);
 
 
@@ -78,11 +63,4 @@ public class ItemViewAdapter  extends BaseAdapter {
         return convertView;
     }
 
-    public Boolean getShowFirst() {
-        return showFirst;
-    }
-
-    public void setShowFirst(Boolean showFirst) {
-        this.showFirst = showFirst;
-    }
 }

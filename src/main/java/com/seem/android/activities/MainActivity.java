@@ -26,20 +26,11 @@ import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.fragments.EditUserFragment;
-import com.seem.android.fragments.FavListFragment;
-import com.seem.android.fragments.FeedListFragment;
 import com.seem.android.fragments.HomeFragment;
-import com.seem.android.fragments.ItemFragment;
-import com.seem.android.fragments.ItemFragmentV2;
-import com.seem.android.fragments.ItemFragmentV3;
-import com.seem.android.fragments.ItemFragmentV4;
-import com.seem.android.fragments.ItemFragmentV5;
-import com.seem.android.fragments.ItemFragmentV6;
 import com.seem.android.fragments.LoginFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
 import com.seem.android.fragments.UserProfileFragment;
-import com.seem.android.model.UserProfile;
 import com.seem.android.service.Api;
 import com.seem.android.uimodel.NavDrawerItem;
 import com.seem.android.uimodel.NavDrawerListAdapter;
@@ -57,14 +48,7 @@ public class MainActivity extends Activity implements
                                             LoginFragment.OnLoggedInInteractionListener,
                                             EditUserFragment.UserProfileInteractionListener,
                                             SignUpFragment.SignUpInteractionListener,
-                                            ItemFragmentV6.OnItemClickListener,
-                                            ItemFragmentV2.OnItemClickListener,
-                                            ItemFragmentV3.OnItemClickListener,
-                                            ItemFragmentV4.OnItemClickListener,
-                                            ItemFragmentV5.OnItemClickListener,
-                                            FeedListFragment.OnItemClickListener,
-                                            SeemListFragment.OnItemClickListener,
-                                            FavListFragment.OnItemClickListener,
+                                            SeemListFragment.OnSeemClickListener,
                                             UserProfileFragment.OnProfileListener
                                             {
 
@@ -79,8 +63,6 @@ public class MainActivity extends Activity implements
     //
     private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
     private NavDrawerItem drawerItemHome = new NavDrawerItem("Home", R.drawable.home);
-    private NavDrawerItem drawerItemFavs = new NavDrawerItem("Favs", R.drawable.star);
-    private NavDrawerItem drawerItemTimeline = new NavDrawerItem("Timeline", R.drawable.align_left);
     private NavDrawerItem drawerItemLogin = new NavDrawerItem("Login", R.drawable.sign_in);
     private NavDrawerItem drawerItemSignUp = new NavDrawerItem("Sign Up", R.drawable.plus_square);
     private NavDrawerItem drawerItemUserProfile = new NavDrawerItem("User Profile", R.drawable.user);
@@ -191,7 +173,7 @@ public class MainActivity extends Activity implements
 
             Utils.debug(getClass(), "" + scheme + " " + host + " " + params);
             if(host.equals("itemId")) {
-                ActivityFactory.startThreadedActivity(this, params.get(0));
+                //ActivityFactory.startThreadedActivity(this, params.get(0));
             }else{
                 Utils.debug(getClass(),"Unknown action");
             }
@@ -215,8 +197,6 @@ public class MainActivity extends Activity implements
 
         if(MyApplication.isLoggedIn()) {
             navDrawerItems.add(drawerItemHome);
-            navDrawerItems.add(drawerItemFavs);
-            navDrawerItems.add(drawerItemTimeline);
             navDrawerItems.add(drawerItemUserProfile);
         }else{
             navDrawerItems.add(drawerItemHome);
@@ -285,12 +265,8 @@ public class MainActivity extends Activity implements
                 fragment = SignUpFragment.newInstance();
             } else if (navDrawerItem == drawerItemUserProfile) {
                 fragment = UserProfileFragment.newInstance(MyApplication.getUsername());
-            } else if (navDrawerItem == drawerItemTimeline) {
-                fragment = new FeedListFragment();
-            } else if (navDrawerItem == drawerItemFavs) {
-                fragment =new FavListFragment();
             } else if(navDrawerItem.getItem() != null){
-                onClick(navDrawerItem.getItem().getSeemId(),navDrawerItem.getItem().getId());
+                //onClick(navDrawerItem.getItem().getSeemId(),navDrawerItem.getItem().getId());
             }
 
         } else {
@@ -390,40 +366,20 @@ public class MainActivity extends Activity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Utils.debug(this.getClass(),"On Activity Result "+requestCode+ " "+resultCode);
-        if (requestCode == GlobalVars.RETURN_CODE_THREADED_VIEW && resultCode == Activity.RESULT_OK) {
-            onClick(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
-        }
-
-        if (requestCode == GlobalVars.RETURN_CODE_ITEM_FULLSCREEN && resultCode == Activity.RESULT_OK && data.getStringExtra(GlobalVars.EXTRA_SEEM_ID) != null ) {
-            onClick(data.getStringExtra(GlobalVars.EXTRA_SEEM_ID),data.getStringExtra(GlobalVars.EXTRA_ITEM_ID));
-        }
 
         mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
     }
 
 
 
-    @Override
-    public void onFinish() {
-        this.displayView(0,drawerItemHome);
 
-        //getFragmentManager().popBackStack();
-    }
+
+
 
     @Override
-    public void onProfileClick(String username) {
-        Fragment f =UserProfileFragment.newInstance(username);
-        displayView(f);
+    public void onClick(String seemId) {
 
     }
-
-    @Override
-    public void onClick( String seemId,String itemId) {
-        android.app.Fragment fragment = ItemFragmentV6.newInstance(seemId, itemId,true);
-        displayView(fragment);
-    }
-
-
 
 
     private class SlideMenuClickListener implements ListView.OnItemClickListener {

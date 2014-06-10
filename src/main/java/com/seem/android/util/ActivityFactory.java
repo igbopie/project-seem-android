@@ -8,10 +8,8 @@ import android.provider.MediaStore;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.activities.CreateSeemFlowActivity;
-import com.seem.android.activities.ItemsFullScreenActivity;
 import com.seem.android.activities.MainActivity;
 import com.seem.android.activities.ReplyFlowActivity;
-import com.seem.android.activities.ThreadedViewActivity;
 import com.seem.android.fragments.UserProfileFragment;
 
 import java.util.Map;
@@ -42,20 +40,12 @@ public class ActivityFactory {
         context.startActivityForResult(intent, GlobalVars.RETURN_CODE_REPLY_TO_ITEM);
     }
 
-    public static void startCreateSeemActivity(Activity context,GlobalVars.PhotoSource photoSource){
+    public static void startCreateSeemActivity(Activity context){
         Intent intent = new Intent(context, CreateSeemFlowActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_PHOTO_SOURCE,photoSource.toString());
         context.startActivityForResult(intent, GlobalVars.RETURN_CODE_CREATE_SEEM);
     }
 
-    public static void startItemFullscreenActivity(Activity context, String seemId, String parentItem, String currentItem){
-        Intent intent = new Intent(context, ItemsFullScreenActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_SEEM_ID,seemId);
-        intent.putExtra(GlobalVars.EXTRA_CURRENT_ITEM_ID,currentItem);
-        intent.putExtra(GlobalVars.EXTRA_PARENT_ITEM_ID,parentItem);
-        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_ITEM_FULLSCREEN);
 
-    }
 
 
     public static void startCamera(Activity activity,Uri returnPhoto){
@@ -86,11 +76,6 @@ public class ActivityFactory {
     }
 
 
-    public static void startThreadedActivity(Activity activity,String itemId){
-        Intent intent = new Intent(activity, ThreadedViewActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
-        activity.startActivityForResult(intent, GlobalVars.RETURN_CODE_THREADED_VIEW);
-    }
     public static void startMainActivity(Activity activity) {
         Intent intent = new Intent(activity, MainActivity.class);
         activity.startActivity(intent);

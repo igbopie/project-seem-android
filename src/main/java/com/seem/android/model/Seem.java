@@ -10,12 +10,10 @@ import java.util.List;
 public class Seem {
     private String id;
     private String title;
-    private String itemId;
-    private String itemCaption;
-    private String itemMediaId;
     private Date created;
     private int itemCount;
     private Date updated;
+    private Date expire;
 
     private List<Item> lastestItems = new ArrayList<Item>();
 
@@ -35,13 +33,6 @@ public class Seem {
         this.title = title;
     }
 
-    public String getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
 
     public Date getCreated() {
         return created;
@@ -68,22 +59,6 @@ public class Seem {
         return updated;
     }
 
-    public String getItemCaption() {
-        return itemCaption;
-    }
-
-    public void setItemCaption(String itemCaption) {
-        this.itemCaption = itemCaption;
-    }
-
-    public String getItemMediaId() {
-        return itemMediaId;
-    }
-
-    public void setItemMediaId(String itemMediaId) {
-        this.itemMediaId = itemMediaId;
-    }
-
     public List<Item> getLastestItems() {
         return lastestItems;
     }
@@ -92,17 +67,23 @@ public class Seem {
         this.lastestItems = lastestItems;
     }
 
+    public Date getExpire() {
+        return expire;
+    }
+
+    public void setExpire(Date expire) {
+        this.expire = expire;
+    }
+
     @Override
     public String toString() {
         return "Seem{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
-                ", itemId='" + itemId + '\'' +
-                ", itemCaption='" + itemCaption + '\'' +
-                ", itemMediaId='" + itemMediaId + '\'' +
                 ", created=" + created +
                 ", itemCount=" + itemCount +
                 ", updated=" + updated +
+                ", expire=" + expire +
                 ", lastestItems=" + lastestItems +
                 '}';
     }

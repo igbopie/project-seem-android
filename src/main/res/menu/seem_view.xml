@@ -3,14 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.seem.android.activities.ItemActivity" >
 
-    <item android:id="@+id/action_up"
-        android:icon="@drawable/arrow_up"
-        android:title="Up"
-        app:showAsAction="always"
-        android:showAsAction="always"
-        android:visible="false"
-
-        />
 
 
     <item android:id="@+id/action_refresh"
@@ -22,9 +14,9 @@
 
         />
 
-    <item android:id="@+id/action_camera"
-        android:icon="@drawable/camera"
-        android:title="Camera"
+    <item android:id="@+id/action_add"
+        android:icon="@drawable/plus_square"
+        android:title="Add"
         app:showAsAction="always"
         android:showAsAction="always"
         android:visible="true"

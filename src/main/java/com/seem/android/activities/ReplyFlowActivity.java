@@ -18,7 +18,6 @@ import com.seem.android.service.Api;
 import com.seem.android.GlobalVars;
 import com.seem.android.R;
 import com.seem.android.model.Item;
-import com.seem.android.service.ItemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
@@ -143,8 +142,8 @@ public class ReplyFlowActivity extends Activity {
                 String mediaId = Api.createMedia(getContentResolver().openInputStream(items[0].getTempLocalFile()));
                 if(mediaId != null){
                     items[0].setMediaId(mediaId);
-                    items[0].setReplyTo(replyId);
-                    return ItemService.getInstance().reply(items[0]);
+                    //TODO
+                    //return ItemService.getInstance().reply(items[0]);
                 }else {
                     Utils.debug(this.getClass(),"Error uploading");
                 }

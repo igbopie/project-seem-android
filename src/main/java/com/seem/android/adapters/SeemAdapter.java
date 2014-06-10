@@ -1,25 +1,21 @@
 package com.seem.android.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.seem.android.R;
-import com.seem.android.customviews.SpinnerImageView;
+import com.seem.android.customviews.SquareImageView;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.model.Seem;
 import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by igbopie on 18/03/14.
@@ -69,25 +65,18 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         TextView itemCount= (TextView)v.findViewById(R.id.seemItemCount);
         itemCount.setText(""+c.getItemCount());
 
-        long epoch = c.getUpdated().getTime();
         TextView updatedText= (TextView)v.findViewById(R.id.updatedText);
-        updatedText.setText(DateUtils.getRelativeTimeSpanString(epoch,System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+        updatedText.setText(DateUtils.getRelativeTimeSpanString(c.getExpire().getTime(),System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
 
 
-        SpinnerImageView mainImageView = (SpinnerImageView) v.findViewById(R.id.mainImageView);
-        mainImageView.setText(c.getItemCaption());
+        SquareImageView mainImageView = (SquareImageView) v.findViewById(R.id.mainImageView);
 
 
-        Utils.loadBitmap(c.getItemMediaId(), Api.ImageFormat.THUMB, mainImageView.getImageView(),mainImageView.getLayoutParams().width,mainImageView.getLayoutParams().width, context);
-
-        mainImageView.setLoading(false);
-
-
-        SpinnerImageView miniView1 = (SpinnerImageView) v.findViewById(R.id.miniView1);
-        SpinnerImageView miniView2 = (SpinnerImageView) v.findViewById(R.id.miniView2);
-        SpinnerImageView miniView3 = (SpinnerImageView) v.findViewById(R.id.miniView3);
-        SpinnerImageView miniView4 = (SpinnerImageView) v.findViewById(R.id.miniView4);
-        SpinnerImageView miniView5 = (SpinnerImageView) v.findViewById(R.id.miniView5);
+        SquareImageView miniView1 = (SquareImageView) v.findViewById(R.id.miniView1);
+        SquareImageView miniView2 = (SquareImageView) v.findViewById(R.id.miniView2);
+        SquareImageView miniView3 = (SquareImageView) v.findViewById(R.id.miniView3);
+        SquareImageView miniView4 = (SquareImageView) v.findViewById(R.id.miniView4);
+        SquareImageView miniView5 = (SquareImageView) v.findViewById(R.id.miniView5);
 
         miniView5.setVisibility(View.INVISIBLE);
         miniView4.setVisibility(View.INVISIBLE);
@@ -97,25 +86,20 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
 
         switch (c.getLastestItems().size()){
             case 5:
-                miniView5.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), Api.ImageFormat.THUMB,miniView5.getImageView(),miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
-                miniView5.setVisibility(View.VISIBLE);
-            case 4:
-                miniView4.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), Api.ImageFormat.THUMB, miniView4.getImageView(),miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), Api.ImageFormat.THUMB,miniView4,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
                 miniView4.setVisibility(View.VISIBLE);
-            case 3:
-                miniView3.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), Api.ImageFormat.THUMB, miniView3.getImageView(),miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+            case 4:
+                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), Api.ImageFormat.THUMB, miniView3,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
                 miniView3.setVisibility(View.VISIBLE);
-            case 2:
-                miniView2.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), Api.ImageFormat.THUMB, miniView2.getImageView(),miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+            case 3:
+                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), Api.ImageFormat.THUMB, miniView2,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
                 miniView2.setVisibility(View.VISIBLE);
-            case 1:
-                miniView1.setLoading(false);
-                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), Api.ImageFormat.THUMB, miniView1.getImageView(),miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+            case 2:
+                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), Api.ImageFormat.THUMB, miniView1,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
                 miniView1.setVisibility(View.VISIBLE);
+            case 1:
+                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), Api.ImageFormat.THUMB, mainImageView,mainImageView.getLayoutParams().width,mainImageView.getLayoutParams().width, context);
+
             case 0:
                 break;
         }

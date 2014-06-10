@@ -2,7 +2,6 @@ package com.seem.android.fragments;
 
 import android.app.Activity;
 import android.app.ListFragment;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
@@ -23,7 +21,6 @@ import com.seem.android.R;
 import com.seem.android.adapters.SeemAdapter;
 import com.seem.android.model.Seem;
 import com.seem.android.service.Api;
-import com.seem.android.service.SeemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
@@ -37,7 +34,7 @@ import java.util.List;
 public class SeemListFragment extends ListFragment {
 
 
-    public  enum QueryType{CREATED,UPDATED,HOTNESS,VIRAL}
+    public  enum QueryType{EXPIRE,EXPIRED}
 
     public static SeemListFragment newInstance(QueryType type) {
         SeemListFragment f = new SeemListFragment();
@@ -47,21 +44,6 @@ public class SeemListFragment extends ListFragment {
         return f;
     }
 
-    public static SeemListFragment newInstance(String topicId) {
-        SeemListFragment f = new SeemListFragment();
-        Bundle args = new Bundle();
-        args.putString(GlobalVars.EXTRA_TOPIC_ID, topicId);
-        f.setArguments(args);
-        return f;
-    }
-    public String getTopicId(){
-        if(getArguments() != null) {
-            String topicId = getArguments().getString(GlobalVars.EXTRA_TOPIC_ID);
-            return topicId;
-        }else {
-            return null;
-        }
-    }
 
     public QueryType getQueryType(){
         if(getArguments() != null) {
@@ -113,7 +95,7 @@ public class SeemListFragment extends ListFragment {
         Seem seem = adapter.getItem(position);
         Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
         if(seem != null) {
-            onItemClickListener.onClick(seem.getId(), seem.getItemId());
+            onItemClickListener.onClick(seem.getId());
         }else{
             Utils.debug(getClass(),"Whot! seem is null");
         }
@@ -123,7 +105,7 @@ public class SeemListFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.seem_view, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_camera);
+        MenuItem menuItem = menu.findItem(R.id.action_add);
         if(!MyApplication.isLoggedIn()){
             menuItem.setVisible(false);
         }
@@ -136,27 +118,9 @@ public class SeemListFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_camera:
-                PopupMenu popup = new PopupMenu(this.getActivity(), getActivity().findViewById(R.id.action_camera));
-                MenuInflater inflater = popup.getMenuInflater();
-                inflater.inflate(R.menu.camera_popup_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.actionPopupCamera:
-                                Utils.debug(this.getClass(), "NEW SEEM!");
-                                ActivityFactory.startCreateSeemActivity(SeemListFragment.this.getActivity(), GlobalVars.PhotoSource.CAMERA);
-                                return true;
-                            case R.id.actionPopupGallery:
-                                Utils.debug(this.getClass(), "NEW SEEM!");
-                                ActivityFactory.startCreateSeemActivity(SeemListFragment.this.getActivity(), GlobalVars.PhotoSource.GALLERY);
-                                return true;
-                        }
-                        return false;
-                    }
-                });
-                popup.show();
+            case R.id.action_add:
+                Utils.debug(this.getClass(), "NEW SEEM!");
+                ActivityFactory.startCreateSeemActivity(SeemListFragment.this.getActivity());
                 return true;
 
             case R.id.action_refresh:
@@ -200,23 +164,14 @@ public class SeemListFragment extends ListFragment {
         @Override
         protected List<Seem> doInBackground(Void... voids) {
             List<Seem> seems = null;
-            if(getTopicId() != null) {
-
-                seems = Api.getSeemsByTopic(getTopicId());//API
-            }else if(getQueryType() != null){
+            if(getQueryType() != null){
                 switch (getQueryType()){
-                    case CREATED:
-                        seems = Api.getSeemsByCreated();
+                    case EXPIRE:
+                        seems = Api.getSeemsByExpire();
                         break;
-                    case UPDATED:
-                        seems = Api.getSeemsByUpdated();
-                        break;
-                    case VIRAL:
-                        seems = Api.getSeemsByViral();
-                        break;
-                    case HOTNESS:
+                    case EXPIRED:
                     default:
-                        seems = Api.getSeemsByHotness();
+                        seems = Api.getSeemsByExpired();
                         break;
                 }
             }
@@ -236,12 +191,12 @@ public class SeemListFragment extends ListFragment {
     }
 
 
-    private OnItemClickListener onItemClickListener;
+    private OnSeemClickListener onItemClickListener;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            onItemClickListener = (OnItemClickListener) activity;
+            onItemClickListener = (OnSeemClickListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement UserProfileInteractionListener");
@@ -251,7 +206,7 @@ public class SeemListFragment extends ListFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Utils.debug(getClass(),"OnDetach");
+        Utils.debug(getClass(), "OnDetach");
         onItemClickListener = null;
     }
 
@@ -267,8 +222,8 @@ public class SeemListFragment extends ListFragment {
         Utils.debug(getClass(),"onStop");
     }
 
-    public interface OnItemClickListener {
-        public void onClick(String seemId,String itemId);
+    public interface OnSeemClickListener {
+        public void onClick(String seemId);
     }
 
     @Override

@@ -1,59 +1,48 @@
 package com.seem.android.activities;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.app.TimePickerDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.text.format.DateFormat;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
-import com.seem.android.model.Topic;
 import com.seem.android.service.Api;
-import com.seem.android.GlobalVars;
 import com.seem.android.R;
 import com.seem.android.model.Seem;
-import com.seem.android.service.SeemService;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by igbopie on 21/03/14.
  */
-public class CreateSeemFlowActivity extends Activity {
+public class CreateSeemFlowActivity extends Activity implements DatePickerDialog.OnDateSetListener,
+        TimePickerDialog.OnTimeSetListener {
 
 
     String title;
-    String caption;
-    ImageView imageView;
-    EditText editText;
     EditText titleText;
     Button submit;
-    Uri localTempFile;
-    Boolean cameraStarted = false;
-    private Spinner topicSpinner;
-    List<String> topicNameList;
-    ArrayAdapter<String> dataAdapter;
+    TextView timeTextView;
+    TextView dateTextView;
 
-    GlobalVars.PhotoSource source;
-    private List<Topic> topics = new ArrayList<Topic>();
-    private Topic topicSelected;
+    SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+
+    Calendar calendar = Calendar.getInstance();
 
 
     @Override
@@ -61,114 +50,43 @@ public class CreateSeemFlowActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_seem_flow);
 
-        imageView = (ImageView) findViewById(R.id.previewImageView);
-        editText = (EditText) findViewById(R.id.captionEditText);
         submit = (Button) findViewById(R.id.seemItButton);
         titleText = (EditText) findViewById(R.id.seemTitleEditText);
-        topicSpinner = (Spinner) findViewById(R.id.topicSpinner);
 
-        topicNameList = new ArrayList<String>();
-        dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, topicNameList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        topicSpinner.setAdapter(dataAdapter);
-        topicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                if(position == 0){
-                    topicSelected = null;
-                } else {
-                   topicSelected = topics.get(position-1);
-                }
-            }
+        timeTextView = (TextView) findViewById(R.id.timeTextView);
+        dateTextView = (TextView) findViewById(R.id.dateTextView);
 
+        this.set1Day(null);
+
+        timeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                topicSelected = null;
+            public void onClick(View view) {
+                DialogFragment newFragment = new TimePickerFragment(CreateSeemFlowActivity.this);
+                newFragment.show(getFragmentManager(), "datePicker");
             }
         });
 
-
-        editText.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+        dateTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId,
-                                          KeyEvent event) {
-                Utils.debug(getClass(),"onEditorAction: "+actionId);
-                if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-                    topicSpinner.performClick();
-                    return true;
-                }
-                return false;
+            public void onClick(View view) {
+
+                DialogFragment newFragment = new DatePickerFragment(CreateSeemFlowActivity.this);
+                newFragment.show(getFragmentManager(), "datePicker");
             }
         });
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                caption = editText.getText().toString();
                 title = titleText.getText().toString();
-                new UploadMedia().execute();
+                new CreateSeem().execute();
             }
         });
-        //---
-
-        source = GlobalVars.PhotoSource.valueOf(getIntent().getStringExtra(GlobalVars.EXTRA_PHOTO_SOURCE));
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERASTARTED)) {
-            Utils.debug(this.getClass(),"Camera Value recovered");
-            cameraStarted = savedInstanceState.getBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED);
-            if(savedInstanceState.containsKey(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE)) {
-                localTempFile = Uri.parse(savedInstanceState.getString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE));
-            }
-        }
-
-        if(!cameraStarted) {
-            cameraStarted = true;
-            if(source.equals(GlobalVars.PhotoSource.CAMERA)) {
-                localTempFile = Utils.getNewFileUri();
-                ActivityFactory.startCamera(this, localTempFile);
-            }else{
-                ActivityFactory.startGallery(this);
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Utils.debug(this.getClass(),"Create Seem Flow Activity OnActivityResult");
-        if (requestCode == GlobalVars.RETURN_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            //Do nothing
-        } else if(requestCode == GlobalVars.RETURN_CODE_GALLERY && resultCode == Activity.RESULT_OK){
-            localTempFile =data.getData();
-        } else {
-            Utils.debug(this.getClass(),"Create Seem Flow Activity - Pic Cancelled");
-            ActivityFactory.finishActivity(this,Activity.RESULT_CANCELED);
-        }
-
-        if(resultCode == Activity.RESULT_OK){
-            Utils.loadStream(data.getData(),imageView,this);
-            new FetchTopics().execute();
-        }
 
     }
 
 
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Utils.debug(this.getClass(),"Create Seem Flow - onSaveInstanceState");
-        outState.putBoolean(GlobalVars.SAVED_BUNDLE_CAMERASTARTED,cameraStarted);
-        if(localTempFile != null) {
-            outState.putString(GlobalVars.SAVED_BUNDLE_CAMERA_OUT_FILE, localTempFile.getPath());
-        }
-    }
-
-    private class UploadMedia extends AsyncTask<Void,Void,Seem> {
+    private class CreateSeem extends AsyncTask<Void,Void,Seem> {
         private final ProgressDialog dialog = new ProgressDialog(CreateSeemFlowActivity.this);
 
         @Override
@@ -182,18 +100,9 @@ public class CreateSeemFlowActivity extends Activity {
         protected Seem doInBackground(Void... items) {
 
             try {
-                String mediaId = Api.createMedia(getContentResolver().openInputStream(localTempFile));
-                if(mediaId != null){
-                    String topicId = null;
-                    if(topicSelected != null){
-                        topicId = topicSelected.getId();
-                    }
-                    return SeemService.getInstance().save(title, caption,topicId, mediaId);
-                }else {
-                    Utils.debug(this.getClass(),"Error uploading");
-                }
+                return Api.createSeem(title,calendar.getTime());
             }catch (Exception e) {
-                Utils.debug(this.getClass(),"Pete al crear la imagen",e);
+                Utils.debug(this.getClass(),"Pete al crear el seem",e);
             }
             return null;
         }
@@ -208,39 +117,111 @@ public class CreateSeemFlowActivity extends Activity {
     }
 
 
-    public class FetchTopics extends AsyncTask<Void,Void,Void>{
-        private final ProgressDialog dialog = new ProgressDialog(CreateSeemFlowActivity.this);
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog.setMessage("Please wait...");
-            dialog.show();
+
+    private void setDate(Calendar date){
+        this.calendar = date;
+        timeTextView.setText(""+timeFormat.format(date.getTime()));
+        dateTextView.setText(""+dateFormat.format(date.getTime()));
+    }
+
+    private Calendar getDate(){
+        return this.calendar;
+    }
+
+    public void onDateSet(DatePicker view, int year, int month, int day) {
+        // Do something with the date chosen by the user
+        Calendar calendar = getDate();
+        calendar.set(year, month, day);
+        setDate(calendar);
+
+    }
+
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        // Do something with the time chosen by the user
+        Calendar calendar = getDate();
+        calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
+        calendar.set(Calendar.MINUTE,minute);
+        setDate(calendar);
+    }
+
+
+    public void set5Min(View view){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE,5);
+        setDate(calendar);
+    }
+
+    public void set30Min(View view){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE,30);
+        setDate(calendar);
+    }
+
+    public void set1Hour(View view){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR,1);
+        setDate(calendar);
+    }
+
+    public void set6Hour(View view){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR,6);
+        setDate(calendar);
+    }
+
+    public void set1Day(View view){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR,1);
+        setDate(calendar);
+    }
+
+    public void set1Week(View view){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.WEEK_OF_YEAR,1);
+        setDate(calendar);
+    }
+
+
+    public static class TimePickerFragment extends DialogFragment{
+        TimePickerDialog.OnTimeSetListener onTimeSetListener;
+
+        public TimePickerFragment(TimePickerDialog.OnTimeSetListener onTimeSetListener) {
+            this.onTimeSetListener = onTimeSetListener;
         }
-        @Override
-        protected Void doInBackground(Void... voids) {
-            topics = Api.getTopics();
 
-            Utils.debug(getClass(),"Topics: "+topics);
-            return null;
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), onTimeSetListener, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+
+    }
+
+    public static class DatePickerFragment extends DialogFragment {
+
+        DatePickerDialog.OnDateSetListener onDateSetListener;
+
+        public DatePickerFragment(DatePickerDialog.OnDateSetListener onDateSetListener) {
+            this.onDateSetListener = onDateSetListener;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            dialog.dismiss();
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
 
-            topicNameList.clear();
-            topicNameList.add("None");
-            for(Topic topic:topics){
-                topicNameList.add(topic.getName());
-            }
-            dataAdapter.notifyDataSetChanged();
-
-            titleText.performClick();
-
-            InputMethodManager imm = (InputMethodManager)getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(titleText, 0);
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
         }
     }
 

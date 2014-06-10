@@ -21,10 +21,13 @@ public final class Iso8601 {
     /** Transform Calendar to ISO 8601 string. */
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
-        String formatted = sdf.format(date);
-        return formatted.substring(0, 22) + ":" + formatted.substring(22);
+        return fromDate(date);
     }
-
+    public static String fromDate(final Date date) {
+        String formatted = sdf.format(date);
+        //String result =  formatted.substring(0, 22) + ":" + formatted.substring(23);
+        return formatted;
+    }
     /** Get current date and time formatted as ISO 8601 string. */
     public static String now() {
         return fromCalendar(GregorianCalendar.getInstance());

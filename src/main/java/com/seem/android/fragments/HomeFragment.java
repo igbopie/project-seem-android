@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.seem.android.R;
-import com.seem.android.model.Topic;
 import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
 
@@ -27,19 +26,17 @@ import java.util.Map;
  */
 public class HomeFragment extends Fragment {
 
-    private int nStaticQueries = 4;
+    private int nStaticQueries = 2;
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     private TabsPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
     private PagerSlidingTabStrip tabs;
-    private List<Topic> topics = new ArrayList<Topic>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new FetchTopics().execute();
     }
 
     @Override
@@ -91,16 +88,10 @@ public class HomeFragment extends Fragment {
                 return fragment;
             }
             if(i == 0){
-                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.UPDATED);
+                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.EXPIRE);
                 //fragment = new FeedListFragment();
             } else if (i==1){
-                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.CREATED);
-            } else if (i==2){
-                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.HOTNESS);
-            } else if (i==3){
-                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.VIRAL);
-            } else {
-                fragment = SeemListFragment.newInstance(topics.get(i-nStaticQueries).getId());
+                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.EXPIRED);
             }
 
             mPageReferenceMap.put(i, fragment);
@@ -110,22 +101,18 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return nStaticQueries + topics.size();
+            return nStaticQueries;
         }
 
 
         @Override
         public CharSequence getPageTitle(int position) {
             if(position == 0){
-                return "Updated";
+                return "About to expire";
             }else if (position == 1){
-                return "Created";
-            }else if (position == 2){
-                return "Hot";
-            }else if (position == 3){
-                return "Viral";
-            }else {
-                return topics.get(position-nStaticQueries).getName();
+                return "Expired";
+            } else {
+                return "Wait... what!";
             }
 
         }
@@ -168,24 +155,6 @@ public class HomeFragment extends Fragment {
         Utils.debug(getClass(), "OnDetach");
     }
 
-
-    public class FetchTopics extends AsyncTask<Void,Void,Void>{
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            topics = Api.getTopics();
-
-            Utils.debug(getClass(),"Topics: "+topics);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            mPagerAdapter.notifyDataSetChanged();
-            tabs.notifyDataSetChanged();
-        }
-    }
 
 }
 
