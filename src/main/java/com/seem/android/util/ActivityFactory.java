@@ -9,7 +9,7 @@ import android.provider.MediaStore;
 import com.seem.android.GlobalVars;
 import com.seem.android.activities.CreateSeemFlowActivity;
 import com.seem.android.activities.MainActivity;
-import com.seem.android.activities.ReplyFlowActivity;
+import com.seem.android.activities.SeemAddItemFlowActivity;
 import com.seem.android.fragments.UserProfileFragment;
 
 import java.util.Map;
@@ -25,17 +25,10 @@ public class ActivityFactory {
         intent.putExtra(GlobalVars.EXTRA_USERNAME, username);
         context.startActivity(intent);
     }
-    public static void startReplyItemActivity(Fragment context,String itemId,GlobalVars.PhotoSource photoSource) {
-        Intent intent = new Intent(context.getActivity(), ReplyFlowActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
 
-        intent.putExtra(GlobalVars.EXTRA_PHOTO_SOURCE,photoSource.toString());
-        context.startActivityForResult(intent, GlobalVars.RETURN_CODE_TAKE_PHOTO);
-    }
-    public static void startReplyItemActivity(Activity context,String itemId,GlobalVars.PhotoSource photoSource) {
-        Intent intent = new Intent(context, ReplyFlowActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_ITEM_ID, itemId);
-
+    public static void startSeemAddItemActivity(Activity context, String seemId, GlobalVars.PhotoSource photoSource) {
+        Intent intent = new Intent(context, SeemAddItemFlowActivity.class);
+        intent.putExtra(GlobalVars.EXTRA_SEEM_ID, seemId);
         intent.putExtra(GlobalVars.EXTRA_PHOTO_SOURCE,photoSource.toString());
         context.startActivityForResult(intent, GlobalVars.RETURN_CODE_REPLY_TO_ITEM);
     }

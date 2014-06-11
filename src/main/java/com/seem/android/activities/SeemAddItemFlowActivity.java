@@ -26,13 +26,13 @@ import java.util.Calendar;
 /**
  * Created by igbopie on 21/03/14.
  */
-public class ReplyFlowActivity extends Activity {
+public class SeemAddItemFlowActivity extends Activity {
 
     Item itemInProgress;
     ImageView imageView;
     EditText editText;
     Button submit;
-    String replyId;
+    String seemId;
     boolean cameraStarted;
 
 
@@ -46,7 +46,7 @@ public class ReplyFlowActivity extends Activity {
 
         Utils.debug(this.getClass(),"ReplyFlow OnCreate");
         setContentView(R.layout.activity_reply_flow);
-        replyId = getIntent().getStringExtra(GlobalVars.EXTRA_ITEM_ID);
+        seemId = getIntent().getStringExtra(GlobalVars.EXTRA_SEEM_ID);
 
         imageView = (ImageView) findViewById(R.id.previewImageView);
         editText = (EditText) findViewById(R.id.captionEditText);
@@ -126,7 +126,7 @@ public class ReplyFlowActivity extends Activity {
     }
 
     private class UploadMedia extends AsyncTask<Item,Void,Item> {
-        private final ProgressDialog dialog = new ProgressDialog(ReplyFlowActivity.this);
+        private final ProgressDialog dialog = new ProgressDialog(SeemAddItemFlowActivity.this);
 
         @Override
         protected void onPreExecute() {
@@ -142,8 +142,7 @@ public class ReplyFlowActivity extends Activity {
                 String mediaId = Api.createMedia(getContentResolver().openInputStream(items[0].getTempLocalFile()));
                 if(mediaId != null){
                     items[0].setMediaId(mediaId);
-                    //TODO
-                    //return ItemService.getInstance().reply(items[0]);
+                    return Api.addToSeem(items[0].getCaption(),items[0].getMediaId(),seemId);
                 }else {
                     Utils.debug(this.getClass(),"Error uploading");
                 }
@@ -157,7 +156,7 @@ public class ReplyFlowActivity extends Activity {
         protected void onPostExecute(Item item) {
             super.onPostExecute(item);
             dialog.dismiss();
-            ActivityFactory.finishActivity(ReplyFlowActivity.this,Activity.RESULT_OK);
+            ActivityFactory.finishActivity(SeemAddItemFlowActivity.this,Activity.RESULT_OK);
         }
     }
 

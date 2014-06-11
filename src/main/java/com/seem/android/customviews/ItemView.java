@@ -180,9 +180,6 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
 
         public void onProfileClick(String username);
 
-        public void onReplyFromCamera(String itemId);
-
-        public void onReplyFromGallery(String itemId);
     }
 
 
@@ -200,12 +197,6 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.actionPopupCamera:
-                onItemClickListener.onReplyFromCamera(item.getId());
-                return true;
-            case R.id.actionPopupGallery:
-                onItemClickListener.onReplyFromGallery(item.getId());
-                return true;
             case R.id.actionCopyLink:
                 String link = "http://seem-test.herokuapp.com/item/"+item.getId();
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);

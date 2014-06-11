@@ -61,7 +61,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.seem.android.activities.ReplyFlowActivity"
+            android:name=".activities.SeemAddItemFlowActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>

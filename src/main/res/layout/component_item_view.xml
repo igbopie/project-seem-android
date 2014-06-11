@@ -7,14 +7,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <View
-        android:id="@+id/threadedView"
-        android:layout_height="60dp"
-        android:layout_width="match_parent"/>
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/threadedView"
         android:id="@+id/mainContent">
         <ImageView
             android:layout_width="360dp"
@@ -69,82 +64,15 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:textSize="18sp"/>
-            <ImageView
-                android:layout_width="@dimen/fullscreen_topbar_icon"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:id="@+id/thumbUpIcon"
-                android:src="@drawable/thumbs_o_up_black"
-                android:layout_below="@+id/caption"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:text="300"
-                android:id="@+id/thumbsUpScore"
-                android:layout_alignTop="@+id/thumbUpIcon"
-                android:layout_toRightOf="@+id/thumbUpIcon"
-                android:layout_below="@+id/caption"
-                android:gravity="center"
-                android:textColor="#000" />
-
-            <ImageView
-                android:layout_width="@dimen/fullscreen_topbar_icon"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:id="@+id/thumbDownIcon"
-                android:src="@drawable/thumbs_o_down_black"
-                android:layout_below="@+id/caption"
-                android:layout_toRightOf="@+id/thumbsUpScore"
-                android:layout_marginLeft="10dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:text="300"
-                android:id="@+id/thumbsDownScore"
-                android:layout_alignTop="@+id/thumbDownIcon"
-                android:layout_toRightOf="@+id/thumbDownIcon"
-                android:layout_below="@+id/caption"
-                android:gravity="center"
-                android:textColor="#000" />
-
-            <ImageView
-                android:layout_width="@dimen/fullscreen_topbar_icon"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:id="@+id/favIcon"
-                android:src="@drawable/star_o_black"
-                android:layout_below="@+id/caption"
-                android:layout_toRightOf="@+id/thumbsDownScore"
-                android:layout_marginLeft="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:text="300"
-                android:id="@+id/favsScore"
-                android:layout_alignTop="@+id/favIcon"
-                android:layout_toRightOf="@+id/favIcon"
-                android:layout_below="@+id/caption"
-                android:gravity="center"
-                android:textColor="#000" />
-
-            <ImageView
-                android:layout_width="@dimen/fullscreen_topbar_icon"
-                android:layout_height="@dimen/fullscreen_topbar_icon"
-                android:id="@+id/replyIcon"
-                android:src="@drawable/reply_black"
-                android:layout_below="@+id/caption"
-                android:layout_toLeftOf="@+id/moreOptionsIcon" />
 
             <ImageView
                 android:layout_width="@dimen/fullscreen_topbar_icon"
                 android:layout_height="@dimen/fullscreen_topbar_icon"
                 android:id="@+id/moreOptionsIcon"
                 android:src="@drawable/more_options_black"
-                android:layout_below="@+id/caption"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentBottom="true" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -156,79 +84,10 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:id="@+id/commentsIcon"
-                android:src="@drawable/comments_black"
 
-                android:layout_alignBottom="@+id/commentsNumber"
-                android:layout_toLeftOf="@+id/commentsNumber" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="25dp"
-                android:text="10"
-                android:id="@+id/commentsNumber"
-
-                android:gravity="center"
-                android:textColor="#000"
-                android:layout_below="@+id/date"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
 
         </RelativeLayout>
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/bigCommentsSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/mainContent"
-        android:background="@color/SeemDarkBlue"
-        >
-        <View
-            android:id="@+id/fakeBorder"
-            android:layout_height="10dp"
-            android:layout_width="fill_parent"
-            android:background="#ddd"></View>
-        <RelativeLayout
-            android:layout_below="@id/fakeBorder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-        >
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/comments"
-                android:layout_alignParentTop="true"
-                android:id="@+id/imageView" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="10"
-                android:id="@+id/commentsNumberBig"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:textColor="#fff"
-                android:layout_alignParentTop="true"
-                android:textStyle="bold"
-                android:layout_toRightOf="@+id/imageView" />
-            <TextView
-                android:paddingLeft="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="replies"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:textColor="#fff"
-                android:layout_alignParentTop="true"
-                android:textStyle="bold"
-                android:layout_toRightOf="@+id/commentsNumberBig" />
-        </RelativeLayout>
-
-    </RelativeLayout>
 </RelativeLayout>
 </merge>

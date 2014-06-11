@@ -28,6 +28,7 @@ import com.seem.android.R;
 import com.seem.android.fragments.EditUserFragment;
 import com.seem.android.fragments.HomeFragment;
 import com.seem.android.fragments.LoginFragment;
+import com.seem.android.fragments.SeemItemsListFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
 import com.seem.android.fragments.UserProfileFragment;
@@ -265,8 +266,6 @@ public class MainActivity extends Activity implements
                 fragment = SignUpFragment.newInstance();
             } else if (navDrawerItem == drawerItemUserProfile) {
                 fragment = UserProfileFragment.newInstance(MyApplication.getUsername());
-            } else if(navDrawerItem.getItem() != null){
-                //onClick(navDrawerItem.getItem().getSeemId(),navDrawerItem.getItem().getId());
             }
 
         } else {
@@ -378,7 +377,8 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onClick(String seemId) {
-
+        Fragment newFragment = SeemItemsListFragment.newInstance(seemId);
+        displayView(newFragment);
     }
 
 

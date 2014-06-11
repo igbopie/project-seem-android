@@ -110,11 +110,11 @@ public class EditUserFragment extends Fragment {
                             case R.id.actionPopupCamera:
                                 localTempFile = Utils.getNewFileUri();
                                 ActivityFactory.startCamera(EditUserFragment.this, localTempFile);
-                                //ActivityFactory.startReplyItemActivity(UserProfileFragment.this, item.getId(), GlobalVars.PhotoSource.CAMERA);
+                                //ActivityFactory.startSeemAddItemActivity(UserProfileFragment.this, item.getId(), GlobalVars.PhotoSource.CAMERA);
                                 return true;
                             case R.id.actionPopupGallery:
                                 ActivityFactory.startGallery(EditUserFragment.this);
-                                //ActivityFactory.startReplyItemActivity(UserProfileFragment.this,item.getId(), GlobalVars.PhotoSource.GALLERY);
+                                //ActivityFactory.startSeemAddItemActivity(UserProfileFragment.this,item.getId(), GlobalVars.PhotoSource.GALLERY);
                                 return true;
                         }
                         return false;
