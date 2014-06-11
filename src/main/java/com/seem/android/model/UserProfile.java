@@ -1,9 +1,11 @@
 package com.seem.android.model;
 
+import java.io.Serializable;
+
 /**
  * Created by igbopie on 09/04/14.
  */
-public class UserProfile {
+public class UserProfile implements Serializable {
     private String id;
     private String username;
     private String mediaId;

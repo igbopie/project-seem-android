@@ -1,5 +1,6 @@
 package com.seem.android.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Created by igbopie on 13/03/14.
  */
-public class Seem {
+public class Seem implements Serializable{
     private String id;
     private String title;
     private Date created;

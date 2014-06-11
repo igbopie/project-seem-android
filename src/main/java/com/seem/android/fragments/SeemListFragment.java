@@ -27,6 +27,8 @@ import com.seem.android.util.Utils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import android.support.v4.widget.SwipeRefreshLayout;
+
 
 /**
  * Created by igbopie on 03/04/14.
@@ -55,7 +57,7 @@ public class SeemListFragment extends ListFragment {
     }
 
     private SeemAdapter adapter;
-    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,17 +76,33 @@ public class SeemListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        progressBar = (ProgressBar)view.findViewById(R.id.progressBar);
+        // Now find the PullToRefreshLayout to setup
+
+
+        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new GetSeemsTask().execute();
+            }
+        });
+        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+
+        adapter = new SeemAdapter(new ArrayList<Seem>(),this.getActivity());
+        setListAdapter(adapter);
+
+        swipeLayout.setRefreshing(true);
+        new GetSeemsTask().execute();
+
+
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
-        new GetSeemsTask(false).execute();
-        adapter = new SeemAdapter(new ArrayList<Seem>(),this.getActivity());
-        setListAdapter(adapter);
-
-
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -95,7 +113,7 @@ public class SeemListFragment extends ListFragment {
         Seem seem = adapter.getItem(position);
         Utils.debug(this.getClass(),"Item Clicked! seem "+seem);
         if(seem != null) {
-            onItemClickListener.onClick(seem.getId());
+            onItemClickListener.onClick(seem);
         }else{
             Utils.debug(getClass(),"Whot! seem is null");
         }
@@ -123,11 +141,6 @@ public class SeemListFragment extends ListFragment {
                 ActivityFactory.startCreateSeemActivity(SeemListFragment.this.getActivity());
                 return true;
 
-            case R.id.action_refresh:
-                //newGame();
-                Utils.debug(this.getClass(),"Refresh Seems!");
-                new GetSeemsTask(true).execute();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -139,26 +152,20 @@ public class SeemListFragment extends ListFragment {
 
         if (requestCode == GlobalVars.RETURN_CODE_CREATE_SEEM && resultCode == Activity.RESULT_OK) {
             Utils.debug(this.getClass(),"Seem created!");
-            new GetSeemsTask(false).execute();
+            new GetSeemsTask().execute();
         }
     }
 
 
 
     private class GetSeemsTask extends AsyncTask<Void,Void,List<Seem>> {
-        private boolean refresh = true;
-        //private final ProgressDialog dialog = new ProgressDialog(SeemListFragment.this.getActivity());
 
-        private GetSeemsTask(boolean refresh) {
-            this.refresh = refresh;
+        private GetSeemsTask() {
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-            //dialog.setMessage("Downloading seems...");
-            //dialog.show();
         }
 
         @Override
@@ -184,9 +191,7 @@ public class SeemListFragment extends ListFragment {
             super.onPostExecute(result);
             adapter.setItemList(result);
             adapter.notifyDataSetChanged();
-
-            progressBar.setVisibility(View.INVISIBLE);
-            //dialog.dismiss();
+            swipeLayout.setRefreshing(false);
         }
     }
 
@@ -223,7 +228,7 @@ public class SeemListFragment extends ListFragment {
     }
 
     public interface OnSeemClickListener {
-        public void onClick(String seemId);
+        public void onClick(Seem seem);
     }
 
     @Override

@@ -135,7 +135,7 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Utils.debug(getClass(),"onResume");
-        mViewPager.setCurrentItem(mViewPager.getCurrentItem());
+
     }
     @Override
     public void onPause() {

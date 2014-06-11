@@ -32,6 +32,7 @@ import com.seem.android.fragments.SeemItemsListFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
 import com.seem.android.fragments.UserProfileFragment;
+import com.seem.android.model.Seem;
 import com.seem.android.service.Api;
 import com.seem.android.uimodel.NavDrawerItem;
 import com.seem.android.uimodel.NavDrawerListAdapter;
@@ -189,6 +190,23 @@ public class MainActivity extends Activity implements
             mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
         }
 
+        getFragmentManager().addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    public void onBackStackChanged() {
+                        // Update your UI here.
+                        Utils.debug(getClass(),"BackStackChanged");
+                        /*
+                        int backStackEntryCount = getFragmentManager().;
+                        if(backStackEntryCount > 1){
+                            lastDrawerStatus = false;
+                            mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
+                        }else{
+                            lastDrawerStatus = true;
+                            mDrawerToggle.setDrawerIndicatorEnabled(lastDrawerStatus);
+                        }*/
+                    }
+                });
+
     }
 
     private void buildDrawerMenu(){
@@ -277,12 +295,14 @@ public class MainActivity extends Activity implements
         if (fragment != null) {
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.frame_container, fragment);
-            //no addtoback
-            if( fragment instanceof UserProfileFragment) {
-                // Add to backstack
-                transaction.addToBackStack(null);
+            if(position == -1) {
+                transaction.setCustomAnimations(R.anim.fragment_slide_left_enter,
+                        R.anim.fragment_slide_left_exit,
+                        R.anim.fragment_slide_right_enter,
+                        R.anim.fragment_slide_right_exit);
             }
+            transaction.replace(R.id.frame_container, fragment);
+            transaction.addToBackStack(null);
             transaction.commit();
 
             // update selected item and title, then close the drawer
@@ -373,11 +393,9 @@ public class MainActivity extends Activity implements
 
 
 
-
-
     @Override
-    public void onClick(String seemId) {
-        Fragment newFragment = SeemItemsListFragment.newInstance(seemId);
+    public void onClick(Seem seem) {
+        Fragment newFragment = SeemItemsListFragment.newInstance(seem);
         displayView(newFragment);
     }
 

@@ -2,12 +2,13 @@ package com.seem.android.model;
 
 import android.net.Uri;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by igbopie on 18/03/14.
  */
-public class Item {
+public class Item implements Serializable{
 
     private String id;
     private String caption;

@@ -5,17 +5,9 @@
 
 
 
-    <item android:id="@+id/action_refresh"
-        android:icon="@drawable/refresh"
-        android:title="Refresh"
-        app:showAsAction="always"
-        android:showAsAction="always"
-        android:visible="true"
-
-        />
 
     <item android:id="@+id/action_add"
-        android:icon="@drawable/plus_square"
+        android:icon="@drawable/plus"
         android:title="Add"
         app:showAsAction="always"
         android:showAsAction="always"
