@@ -2,7 +2,6 @@ package com.seem.android.fragments;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -13,12 +12,9 @@ import android.view.ViewGroup;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.seem.android.R;
-import com.seem.android.service.Api;
 import com.seem.android.util.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +22,7 @@ import java.util.Map;
  */
 public class HomeFragment extends Fragment {
 
-    private int nStaticQueries = 2;
+    private int nStaticQueries = SeemListFragment.QueryType.values().length;
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     private TabsPagerAdapter mPagerAdapter;
@@ -87,13 +83,7 @@ public class HomeFragment extends Fragment {
             if(fragment != null){
                 return fragment;
             }
-            if(i == 0){
-                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.EXPIRE);
-                //fragment = new FeedListFragment();
-            } else if (i==1){
-                fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.EXPIRED);
-            }
-
+            fragment = SeemListFragment.newInstance(SeemListFragment.QueryType.values()[i]);
             mPageReferenceMap.put(i, fragment);
 
             return fragment;
@@ -108,9 +98,11 @@ public class HomeFragment extends Fragment {
         @Override
         public CharSequence getPageTitle(int position) {
             if(position == 0){
-                return "About to expire";
+                return "Recents";
             }else if (position == 1){
-                return "Expired";
+                return "About to start";
+            }else if (position == 2){
+                return "About to end";
             } else {
                 return "Wait... what!";
             }

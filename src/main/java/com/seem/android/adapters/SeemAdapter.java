@@ -26,10 +26,11 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
     private Context context;
     private SeemListFragment.QueryType queryType;
 
-    public SeemAdapter(List<Seem> itemList, Context ctx) {
+    public SeemAdapter(List<Seem> itemList,SeemListFragment.QueryType queryType, Context ctx) {
         super(ctx, R.layout.component_seem_list, itemList);
         this.itemList = itemList;
         this.context = ctx;
+        this.queryType = queryType;
     }
 
     public int getCount() {
@@ -66,10 +67,16 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
         itemCount.setText(""+c.getItemCount());
 
         TextView updatedText= (TextView)v.findViewById(R.id.updatedText);
-        updatedText.setText(DateUtils.getRelativeTimeSpanString(c.getExpire().getTime(),System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+        updatedText.setText(DateUtils.getRelativeTimeSpanString(c.getUpdated().getTime(),System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
 
+        if(queryType.equals(SeemListFragment.QueryType.ABOUT_TO_START) && c.getStartDate() != null){
+            updatedText.setText(DateUtils.getRelativeTimeSpanString(c.getStartDate().getTime(),System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+        }else if(queryType.equals(SeemListFragment.QueryType.ABOUT_TO_END) && c.getEndDate() != null){
+            updatedText.setText(DateUtils.getRelativeTimeSpanString(c.getEndDate().getTime(),System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+        }
 
         SquareImageView mainImageView = (SquareImageView) v.findViewById(R.id.mainImageView);
+        Utils.loadBitmap(c.getCoverPhotoMediaId(), Api.ImageFormat.THUMB, mainImageView,mainImageView.getLayoutParams().width,mainImageView.getLayoutParams().width, context);
 
 
         SquareImageView miniView1 = (SquareImageView) v.findViewById(R.id.miniView1);
@@ -86,20 +93,20 @@ public class SeemAdapter extends ArrayAdapter<Seem> {
 
         switch (c.getLastestItems().size()){
             case 5:
-                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), Api.ImageFormat.THUMB,miniView4,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
-                miniView4.setVisibility(View.VISIBLE);
+                Utils.loadBitmap(c.getLastestItems().get(4).getMediaId(), Api.ImageFormat.THUMB,miniView5,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+                miniView5.setVisibility(View.VISIBLE);
             case 4:
-                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), Api.ImageFormat.THUMB, miniView3,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
-                miniView3.setVisibility(View.VISIBLE);
+                Utils.loadBitmap(c.getLastestItems().get(3).getMediaId(), Api.ImageFormat.THUMB, miniView4,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+                miniView4.setVisibility(View.VISIBLE);
             case 3:
-                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), Api.ImageFormat.THUMB, miniView2,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
-                miniView2.setVisibility(View.VISIBLE);
+                Utils.loadBitmap(c.getLastestItems().get(2).getMediaId(), Api.ImageFormat.THUMB, miniView3,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+                miniView3.setVisibility(View.VISIBLE);
             case 2:
-                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), Api.ImageFormat.THUMB, miniView1,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
-                miniView1.setVisibility(View.VISIBLE);
+                Utils.loadBitmap(c.getLastestItems().get(1).getMediaId(), Api.ImageFormat.THUMB, miniView2,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+                miniView2.setVisibility(View.VISIBLE);
             case 1:
-                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), Api.ImageFormat.THUMB, mainImageView,mainImageView.getLayoutParams().width,mainImageView.getLayoutParams().width, context);
-
+                Utils.loadBitmap(c.getLastestItems().get(0).getMediaId(), Api.ImageFormat.THUMB, miniView1,miniView5.getLayoutParams().width,miniView5.getLayoutParams().width, context);
+                miniView1.setVisibility(View.VISIBLE);
             case 0:
                 break;
         }

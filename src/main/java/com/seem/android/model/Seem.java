@@ -14,7 +14,10 @@ public class Seem implements Serializable{
     private Date created;
     private int itemCount;
     private Date updated;
-    private Date expire;
+    private Date startDate;
+    private Date endDate;
+    private String coverPhotoMediaId;
+    private String publishPermissions;
 
     private List<Item> lastestItems = new ArrayList<Item>();
 
@@ -68,12 +71,36 @@ public class Seem implements Serializable{
         this.lastestItems = lastestItems;
     }
 
-    public Date getExpire() {
-        return expire;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setExpire(Date expire) {
-        this.expire = expire;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getCoverPhotoMediaId() {
+        return coverPhotoMediaId;
+    }
+
+    public void setCoverPhotoMediaId(String coverPhotoMediaId) {
+        this.coverPhotoMediaId = coverPhotoMediaId;
+    }
+
+    public String getPublishPermissions() {
+        return publishPermissions;
+    }
+
+    public void setPublishPermissions(String publishPermissions) {
+        this.publishPermissions = publishPermissions;
     }
 
     @Override
@@ -84,7 +111,10 @@ public class Seem implements Serializable{
                 ", created=" + created +
                 ", itemCount=" + itemCount +
                 ", updated=" + updated +
-                ", expire=" + expire +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", coverPhotoMediaId='" + coverPhotoMediaId + '\'' +
+                ", publishPermissions='" + publishPermissions + '\'' +
                 ", lastestItems=" + lastestItems +
                 '}';
     }

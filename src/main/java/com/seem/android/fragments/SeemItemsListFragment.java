@@ -136,7 +136,10 @@ public class SeemItemsListFragment extends Fragment {
         menu.clear();
         inflater.inflate(R.menu.seem_view, menu);
         MenuItem menuItem = menu.findItem(R.id.action_add);
-        boolean expired =  Calendar.getInstance().getTime().after(seem.getExpire());
+        boolean expired = false;
+        if(seem.getEndDate() != null){
+            Calendar.getInstance().getTime().after(seem.getEndDate());
+        }
         Utils.debug(getClass(),"Expired:"+expired);
         if(!MyApplication.isLoggedIn() || expired){
             menuItem.setVisible(false);

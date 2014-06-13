@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
 
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
@@ -36,7 +34,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 public class SeemListFragment extends ListFragment {
 
 
-    public  enum QueryType{EXPIRE,EXPIRED}
+    public  enum QueryType{UPDATED,ABOUT_TO_START,ABOUT_TO_END}
 
     public static SeemListFragment newInstance(QueryType type) {
         SeemListFragment f = new SeemListFragment();
@@ -92,7 +90,7 @@ public class SeemListFragment extends ListFragment {
                 android.R.color.holo_red_light);
 
 
-        adapter = new SeemAdapter(new ArrayList<Seem>(),this.getActivity());
+        adapter = new SeemAdapter(new ArrayList<Seem>(),getQueryType(),this.getActivity());
         setListAdapter(adapter);
 
         swipeLayout.setRefreshing(true);
@@ -173,12 +171,17 @@ public class SeemListFragment extends ListFragment {
             List<Seem> seems = null;
             if(getQueryType() != null){
                 switch (getQueryType()){
-                    case EXPIRE:
-                        seems = Api.getSeemsByExpire();
+                    case UPDATED:
+                        seems = Api.getSeemsByUpdated();
                         break;
-                    case EXPIRED:
+                    case ABOUT_TO_START:
+                        seems = Api.getSeemsByAboutToStart();
+                        break;
+                    case ABOUT_TO_END:
+                        seems = Api.getSeemsByAboutToEnd();
+                        break;
                     default:
-                        seems = Api.getSeemsByExpired();
+                        seems = Api.getSeemsByEnded();
                         break;
                 }
             }

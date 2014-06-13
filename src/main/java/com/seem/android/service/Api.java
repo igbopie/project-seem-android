@@ -61,8 +61,10 @@ public class Api {
 
     public static final String ENDPOINT_SEEM_ADD = "api/seem/add";
     public static final String ENDPOINT_SEEM_GET_ITEMS = "api/seem/items";
-    public static final String ENDPOINT_SEEM_BY_EXPIRE = "api/seem/by/expire";
-    public static final String ENDPOINT_SEEM_BY_EXPIRED = "api/seem/by/expired";
+    public static final String ENDPOINT_SEEM_BY_UPDATED = "api/seem/by/updated";
+    public static final String ENDPOINT_SEEM_BY_ABOUT_TO_START = "api/seem/by/abouttostart";
+    public static final String ENDPOINT_SEEM_BY_ABOUT_TO_END = "api/seem/by/abouttoend";
+    public static final String ENDPOINT_SEEM_BY_ENDED = "api/seem/by/ended";
 
 
 
@@ -84,7 +86,10 @@ public class Api {
     public static final String JSON_TAG_SEEM_CREATED = "created";
     public static final String JSON_TAG_SEEM_UPDATED = "updated";
     public static final String JSON_TAG_SEEM_LASTEST_ITEMS = "latestItems";
-    public static final String JSON_TAG_SEEM_EXPIRE = "expire";
+    public static final String JSON_TAG_SEEM_END_DATE = "endDate";
+    public static final String JSON_TAG_SEEM_START_DATE = "startDate";
+    public static final String JSON_TAG_SEEM_COVER_PHOTO_MEDIA_ID = "coverPhotoMediaId";
+    public static final String JSON_TAG_SEEM_PUBLISH_PERMISSIONS= "publishPermissions";
 
     //ITEM Model
 
@@ -116,12 +121,18 @@ public class Api {
     public enum ImageFormat{THUMB,LARGE};
 
 
-
-    public static List<Seem> getSeemsByExpire(){
-        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_EXPIRE);
+    public static List<Seem> getSeemsByUpdated(){
+        return getSeemBySomething(ENDPOINT+ ENDPOINT_SEEM_BY_UPDATED);
     }
-    public static List<Seem> getSeemsByExpired(){
-        return getSeemBySomething(ENDPOINT+ENDPOINT_SEEM_BY_EXPIRED);
+    public static List<Seem> getSeemsByAboutToStart(){
+        return getSeemBySomething(ENDPOINT+ ENDPOINT_SEEM_BY_ABOUT_TO_START);
+    }
+
+    public static List<Seem> getSeemsByAboutToEnd(){
+        return getSeemBySomething(ENDPOINT+ ENDPOINT_SEEM_BY_ABOUT_TO_END);
+    }
+    public static List<Seem> getSeemsByEnded(){
+        return getSeemBySomething(ENDPOINT+ ENDPOINT_SEEM_BY_ENDED);
     }
 
 
@@ -532,11 +543,20 @@ public class Api {
         seem.setTitle(seemJson.getString(JSON_TAG_SEEM_TITLE));
         seem.setCreated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_CREATED)).getTime());
         seem.setItemCount(seemJson.getInt(JSON_TAG_SEEM_ITEM_COUNT));
-        seem.setExpire(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_EXPIRE)).getTime());
-
+        if(seemJson.has(JSON_TAG_SEEM_END_DATE)) {
+            seem.setEndDate(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_END_DATE)).getTime());
+        }
+        if(seemJson.has(JSON_TAG_SEEM_START_DATE)) {
+            seem.setStartDate(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_START_DATE)).getTime());
+        }
+        if(seemJson.has(JSON_TAG_SEEM_COVER_PHOTO_MEDIA_ID)){
+           seem.setCoverPhotoMediaId(seemJson.getString(JSON_TAG_SEEM_COVER_PHOTO_MEDIA_ID));
+        }
+        if(seemJson.has(JSON_TAG_SEEM_PUBLISH_PERMISSIONS)){
+            seem.setPublishPermissions(seemJson.getString(JSON_TAG_SEEM_PUBLISH_PERMISSIONS));
+        }
 
         seem.setUpdated(Iso8601.toCalendar(seemJson.getString(JSON_TAG_SEEM_UPDATED)).getTime());
-
 
         if(seemJson.has(JSON_TAG_SEEM_LASTEST_ITEMS)){
             JSONArray array = seemJson.getJSONArray(JSON_TAG_SEEM_LASTEST_ITEMS);
