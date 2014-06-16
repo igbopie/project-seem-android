@@ -65,14 +65,22 @@
                 android:paddingBottom="10dp"
                 android:textSize="18sp"/>
 
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="@dimen/fullscreen_topbar_icon"
+                android:id="@+id/replyIcon"
+                android:src="@drawable/reply_black"
+                android:layout_below="@+id/caption"
+                android:layout_alignLeft="@+id/caption"
+                android:layout_alignStart="@+id/caption" />
 
             <ImageView
                 android:layout_width="@dimen/fullscreen_topbar_icon"
                 android:layout_height="@dimen/fullscreen_topbar_icon"
                 android:id="@+id/moreOptionsIcon"
                 android:src="@drawable/more_options_black"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true" />
+                android:layout_alignTop="@+id/replyIcon"
+                android:layout_toRightOf="@+id/replyIcon" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -84,6 +92,23 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/fullscreen_topbar_icon"
+                android:text="See conversation"
+                android:id="@+id/seeConversationText"
+                android:layout_alignBottom="@+id/moreOptionsIcon"
+                android:layout_alignRight="@+id/date"
+                android:layout_alignEnd="@+id/date"
+                android:gravity="center" />
+
+            <ImageView
+                android:layout_width="@dimen/fullscreen_topbar_icon"
+                android:layout_height="@dimen/fullscreen_topbar_icon"
+                android:id="@+id/seeConversationIcon"
+                android:src="@drawable/comments_black"
+                android:layout_alignBottom="@+id/seeConversationText"
+                android:layout_toLeftOf="@+id/seeConversationText" />
 
 
         </RelativeLayout>

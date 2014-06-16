@@ -7,6 +7,8 @@ import android.widget.BaseAdapter;
 
 import com.seem.android.customviews.ItemView;
 import com.seem.android.model.Item;
+import com.seem.android.model.UserProfile;
+import com.seem.android.util.ActionLauncherListener;
 
 import java.util.List;
 
@@ -17,13 +19,12 @@ public class ItemViewAdapter  extends BaseAdapter {
 
     private List<Item> itemList;
     private Context context;
-    private ItemView.OnItemClickListener onItemClickListener;
+    private ActionLauncherListener actionLauncherListener;
 
-    public ItemViewAdapter(List<Item> itemList, Context ctx,ItemView.OnItemClickListener onItemClickListener) {
+    public ItemViewAdapter(List<Item> itemList, Context ctx) {
         super();
         this.itemList = itemList;
-        this.context = ctx;
-        this.onItemClickListener = onItemClickListener;
+        this.context = ctx;;
     }
 
     @Override
@@ -47,7 +48,17 @@ public class ItemViewAdapter  extends BaseAdapter {
             ItemView view;
             if (convertView == null) {
                 view = new ItemView(context, null);
-                view.setOnItemClickListener(onItemClickListener);
+                view.setActionLauncherListener(new ActionLauncherListener() {
+                    @Override
+                    public void launchViewProfile(UserProfile userProfile) {
+                        actionLauncherListener.launchViewProfile(userProfile);
+                    }
+
+                    @Override
+                    public void launchSeeConversation(Item item) {
+                        actionLauncherListener.launchSeeConversation(item);
+                    }
+                });
             } else {
                 //Reusing views...
                 view = (ItemView) convertView;
@@ -63,4 +74,11 @@ public class ItemViewAdapter  extends BaseAdapter {
         return convertView;
     }
 
+    public ActionLauncherListener getActionLauncherListener() {
+        return actionLauncherListener;
+    }
+
+    public void setActionLauncherListener(ActionLauncherListener actionLauncherListener) {
+        this.actionLauncherListener = actionLauncherListener;
+    }
 }

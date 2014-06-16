@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!--
@@ -8,5 +9,6 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
     <item name="fragment_seemitemslist" type="layout">@layout/fragment_seemitemslist_list</item>
+    <item name="fragment_conversationviewfragment" type="layout">@layout/fragment_conversationviewfragment_list</item>
 
 </resources>

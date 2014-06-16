@@ -25,6 +25,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.seem.android.GlobalVars;
 import com.seem.android.MyApplication;
 import com.seem.android.R;
+import com.seem.android.fragments.ConversationViewFragmentFragment;
 import com.seem.android.fragments.EditUserFragment;
 import com.seem.android.fragments.HomeFragment;
 import com.seem.android.fragments.LoginFragment;
@@ -32,10 +33,13 @@ import com.seem.android.fragments.SeemItemsListFragment;
 import com.seem.android.fragments.SeemListFragment;
 import com.seem.android.fragments.SignUpFragment;
 import com.seem.android.fragments.UserProfileFragment;
+import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
+import com.seem.android.model.UserProfile;
 import com.seem.android.service.Api;
 import com.seem.android.uimodel.NavDrawerItem;
 import com.seem.android.uimodel.NavDrawerListAdapter;
+import com.seem.android.util.ActionLauncherListener;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
@@ -51,8 +55,8 @@ public class MainActivity extends Activity implements
                                             EditUserFragment.UserProfileInteractionListener,
                                             SignUpFragment.SignUpInteractionListener,
                                             SeemListFragment.OnSeemClickListener,
-                                            UserProfileFragment.OnProfileListener
-                                            {
+                                            UserProfileFragment.OnProfileListener,
+                                            ActionLauncherListener{
 
     private boolean lastDrawerStatus = true;
 
@@ -397,6 +401,18 @@ public class MainActivity extends Activity implements
     public void onClick(Seem seem) {
         Fragment newFragment = SeemItemsListFragment.newInstance(seem);
         displayView(newFragment);
+    }
+
+    @Override
+    public void launchViewProfile(UserProfile userProfile) {
+        Fragment fragment = UserProfileFragment.newInstance(userProfile.getUsername());
+        displayView(fragment);
+    }
+
+    @Override
+    public void launchSeeConversation(Item item) {
+        Fragment fragment = ConversationViewFragmentFragment.newInstance(item);
+        displayView(fragment);
     }
 
 

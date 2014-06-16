@@ -1,5 +1,6 @@
 package com.seem.android.fragments;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -24,7 +25,9 @@ import com.seem.android.adapters.ItemViewAdapter;
 import com.seem.android.customviews.ItemView;
 import com.seem.android.model.Item;
 import com.seem.android.model.Seem;
+import com.seem.android.model.UserProfile;
 import com.seem.android.service.Api;
+import com.seem.android.util.ActionLauncherListener;
 import com.seem.android.util.ActivityFactory;
 import com.seem.android.util.Utils;
 
@@ -42,11 +45,10 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link }
  * interface.
  */
-public class SeemItemsListFragment extends Fragment {
+public class SeemItemsListFragment extends Fragment implements ActionLauncherListener{
 
     private static final String SEEM = "seem";
     private Seem seem;
-
 
     /**
      * The fragment's ListView/GridView.
@@ -59,6 +61,7 @@ public class SeemItemsListFragment extends Fragment {
      */
     private ItemViewAdapter mAdapter;
     private List<Item> items = new ArrayList<Item>();
+    private ActionLauncherListener actionLauncherListener;
 
     public static SeemItemsListFragment newInstance(Seem seem) {
         SeemItemsListFragment fragment = new SeemItemsListFragment();
@@ -83,20 +86,6 @@ public class SeemItemsListFragment extends Fragment {
             seem = (Seem) getArguments().getSerializable(SEEM);
 
         }
-
-        // TODO: Change Adapter to display your content
-        mAdapter = new ItemViewAdapter(items,getActivity(),new ItemView.OnItemClickListener() {
-            @Override
-            public void onClick(Item item, ItemView itemView) {
-
-            }
-
-            @Override
-            public void onProfileClick(String username) {
-
-            }
-
-        });
     }
 
     @Override
@@ -105,6 +94,8 @@ public class SeemItemsListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_seemitemslist, container, false);
 
         // Set the adapter
+        mAdapter = new ItemViewAdapter(items,getActivity());
+        mAdapter.setActionLauncherListener(this);
         mListView = (AbsListView) view.findViewById(android.R.id.list);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
@@ -191,6 +182,16 @@ public class SeemItemsListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void launchViewProfile(UserProfile userProfile) {
+        actionLauncherListener.launchViewProfile(userProfile);
+    }
+
+    @Override
+    public void launchSeeConversation(Item item) {
+        actionLauncherListener.launchSeeConversation(item);
+    }
+
     public class GetItems extends AsyncTask<Void,Void,Void>{
         @Override
         protected Void doInBackground(Void... voids) {
@@ -211,4 +212,18 @@ public class SeemItemsListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(activity instanceof ActionLauncherListener){
+            actionLauncherListener = (ActionLauncherListener) activity;
+        }
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        actionLauncherListener = null;
+    }
 }

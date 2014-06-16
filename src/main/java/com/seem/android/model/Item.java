@@ -16,6 +16,7 @@ public class Item implements Serializable{
     private Date created;
     private String seemId;
     private String userId;
+    private String replyTo;
 
     private UserProfile userProfile;
 
@@ -64,6 +65,30 @@ public class Item implements Serializable{
     }
 
 
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id='" + id + '\'' +
+                ", caption='" + caption + '\'' +
+                ", mediaId='" + mediaId + '\'' +
+                ", created=" + created +
+                ", seemId='" + seemId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", replyTo='" + replyTo + '\'' +
+                ", userProfile=" + userProfile +
+                ", tempLocalFile=" + tempLocalFile +
+                '}';
+    }
+
+    public String getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(String replyTo) {
+        if(!replyTo.equalsIgnoreCase("null")) {
+            this.replyTo = replyTo;
+        }
+    }
 
     public String getUserId() {
         return userId;
@@ -102,17 +127,4 @@ public class Item implements Serializable{
         }
     }
 
-    @Override
-    public String toString() {
-        return "Item{" +
-                "id='" + id + '\'' +
-                ", caption='" + caption + '\'' +
-                ", mediaId='" + mediaId + '\'' +
-                ", created=" + created +
-                ", seemId='" + seemId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", userProfile=" + userProfile +
-                ", tempLocalFile=" + tempLocalFile +
-                '}';
-    }
 }

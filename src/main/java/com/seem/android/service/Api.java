@@ -62,6 +62,8 @@ public class Api {
 
     public static final String ENDPOINT_SEEM_ADD = "api/seem/add";
     public static final String ENDPOINT_SEEM_GET_ITEMS = "api/seem/items";
+    public static final String ENDPOINT_SEEM_ITEM_GET = "api/seem/item/get";
+    public static final String ENDPOINT_SEEM_ITEM_CONVERSATION = "api/seem/item/conversation";
     public static final String ENDPOINT_SEEM_BY_UPDATED = "api/seem/by/updated";
     public static final String ENDPOINT_SEEM_BY_ABOUT_TO_START = "api/seem/by/abouttostart";
     public static final String ENDPOINT_SEEM_BY_ABOUT_TO_END = "api/seem/by/abouttoend";
@@ -101,6 +103,7 @@ public class Api {
     public static final String JSON_TAG_ITEM_SEEM_ID = "seemId";
     public static final String JSON_TAG_ITEM_USER_ID = "userId";
     public static final String JSON_TAG_ITEM_USER = "user";
+    private static final String JSON_TAG_ITEM_REPLY_TO = "replyTo";
 
 
     //USERPROFILE
@@ -117,6 +120,8 @@ public class Api {
     public static final String JSON_TAG_USER_PROFILE_EMAIL= "email";
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWED_BY_ME= "isFollowedByMe";
     public static final String JSON_TAG_USER_PROFILE_IS_FOLLOWING_ME= "isFollowingMe";
+
+
 
 
     public enum ImageFormat{THUMB,LARGE};
@@ -541,6 +546,77 @@ public class Api {
         return null;
     }
 
+    public static Item getItem(String itemId,String token) {
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            if(token != null){
+                params.put("token",token+"");
+            }
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ ENDPOINT_SEEM_ITEM_GET,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+
+                JSONObject jsonObj = new JSONObject(output);
+                JSONObject itemJson = jsonObj.getJSONObject(JSON_TAG_RESPONSE);
+                Item item = fillItem(itemJson);
+                //Utils.debug(Api.class,"Items fetched: "+items);
+
+                return item;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class, "API error:", e);
+            return null;
+        }
+    }
+
+    public static List<Item> getItemConversationView(String itemId,String token) {
+        try {
+            HashMap<String,String>params = new HashMap<String, String>();
+            params.put("itemId",itemId);
+            if(token != null){
+                params.put("token",token+"");
+            }
+
+            HttpResponse httpResponse = makeRequest(ENDPOINT+ ENDPOINT_SEEM_ITEM_CONVERSATION,params);
+            int responseCode = httpResponse.getStatusLine().getStatusCode();
+            if(responseCode == RESPONSE_CODE_OK){
+                //Utils.debug(Api.class,"Va bien! Status Line:" + httpResponse.getStatusLine().getStatusCode());
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(os);
+                String output = os.toString( "UTF-8" );
+                Utils.debug(Api.class,"Output:"+output);
+
+
+                JSONObject jsonObj = new JSONObject(output);
+                JSONArray itemJson = jsonObj.getJSONArray(JSON_TAG_RESPONSE);
+                List<Item> item = fillItems(itemJson);
+                //Utils.debug(Api.class,"Items fetched: "+items);
+
+                return item;
+
+            } else {
+                Utils.debug(Api.class,"API response code is: "+responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            Utils.debug(Api.class, "API error:", e);
+            return null;
+        }
+    }
 
     private static List<Seem> fillSeems(JSONArray seemsArray) throws JSONException, ParseException {
         List<Seem> seemList = new ArrayList<Seem>();
@@ -647,6 +723,9 @@ public class Api {
 
         if(itemJson.has(JSON_TAG_ITEM_USER) && !(itemJson.getString(JSON_TAG_ITEM_USER).equals("null"))){
             item.setUserProfile(fillUserProfile(itemJson.getJSONObject(JSON_TAG_ITEM_USER)));
+        }
+        if(itemJson.has(JSON_TAG_ITEM_REPLY_TO)){
+            item.setReplyTo(itemJson.getString(JSON_TAG_ITEM_REPLY_TO));
         }
 
         return item;

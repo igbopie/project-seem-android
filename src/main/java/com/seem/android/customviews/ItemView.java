@@ -1,10 +1,8 @@
 package com.seem.android.customviews;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -17,10 +15,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.seem.android.GlobalVars;
-import com.seem.android.MyApplication;
 import com.seem.android.R;
 import com.seem.android.model.Item;
 import com.seem.android.service.Api;
+import com.seem.android.util.ActionLauncherListener;
 import com.seem.android.util.Utils;
 
 import java.util.ArrayList;
@@ -42,8 +40,10 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
     TextView username;
     TextView date;
     ImageView moreOptionsIcon;
+    TextView seeConversationText;
+    ImageView seeConversationIcon;
 
-    OnItemClickListener onItemClickListener;
+    ActionLauncherListener actionLauncherListener;
 
     View mainContent;
 
@@ -87,15 +87,13 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
                 popup.show();
             }
         });
-        /*threadedView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(onItemClickListener != null) {
-                    Item clicked = parents.get(i);
-                    onItemClickListener.onClick(clicked.getSeemId(), clicked.getId());
-                }
-            }
-        });*/
+
+
+        seeConversationText = (TextView) findViewById(R.id.seeConversationText);
+        seeConversationIcon = (ImageView) findViewById(R.id.seeConversationIcon);
+
+        seeConversationText.setOnClickListener(this);
+        seeConversationIcon.setOnClickListener(this);
 
 
     }
@@ -148,8 +146,8 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             View.OnClickListener  profileAction = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(onItemClickListener!= null) {
-                        onItemClickListener.onProfileClick(item.getUserProfile().getUsername());
+                    if(actionLauncherListener != null) {
+                        actionLauncherListener.launchViewProfile(item.getUserProfile());
                     }
                 }
             };
@@ -162,24 +160,25 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
             username.setOnClickListener(null);
         }
 
+        if(item.getReplyTo() != null){
+            seeConversationIcon.setVisibility(VISIBLE);
+            seeConversationText.setVisibility(VISIBLE);
+        } else {
+            seeConversationIcon.setVisibility(INVISIBLE);
+            seeConversationText.setVisibility(INVISIBLE);
+        }
+
         Utils.loadBitmap(item.getMediaId(), Api.ImageFormat.LARGE,itemMainImage,GlobalVars.SCREEN_WIDTH,GlobalVars.SCREEN_WIDTH,getContext());
 
     }
 
 
-    public OnItemClickListener getOnItemClickListener() {
-        return onItemClickListener;
+    public ActionLauncherListener getActionLauncherListener() {
+        return actionLauncherListener;
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
-
-    public interface OnItemClickListener {
-        public void onClick(Item item,ItemView itemView);
-
-        public void onProfileClick(String username);
-
+    public void setActionLauncherListener(ActionLauncherListener actionLauncherListener) {
+        this.actionLauncherListener = actionLauncherListener;
     }
 
 
@@ -191,7 +190,10 @@ public class ItemView extends RelativeLayout implements View.OnClickListener, Po
 
     @Override
     public void onClick(View view) {
-
+        if((view.getId() == R.id.seeConversationIcon || view.getId() == R.id.seeConversationText) &&
+                actionLauncherListener != null){
+            actionLauncherListener.launchSeeConversation(item);
+        }
     }
 
     @Override
