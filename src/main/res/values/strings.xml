@@ -17,4 +17,9 @@
     <string name="title_activity_user_profile">UserProfile</string>
     <string name="title_activity_main_activity_tab">MainActivityTab</string>
 
+    <string-array name="publish_permissions_array">
+        <item>EVERYONE</item>
+        <item>ONLY_ME</item>
+    </string-array>
+
 </resources>

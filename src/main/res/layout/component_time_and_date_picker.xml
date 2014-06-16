@@ -17,16 +17,17 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5m"
-        android:id="@+id/button5Min"
+        android:text="Unset"
+        android:id="@+id/buttonUnset"
         android:layout_gravity="center_horizontal"/>
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="30m"
-        android:id="@+id/button30Min"
+        android:text="5m"
+        android:id="@+id/button5Min"
         android:layout_gravity="center_horizontal"/>
+
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"

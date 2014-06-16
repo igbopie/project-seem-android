@@ -1,59 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    >
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Seem Title"
-        android:id="@+id/textView"
-        android:textSize="20dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seem Title"
+            android:id="@+id/textView"
+            android:textSize="20dp" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seemTitleEditText"
+            android:singleLine="true"/>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/seemTitleEditText"
-        android:singleLine="true"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cover Photo:"
+            android:id="@+id/coverPhotoTextView"
+            android:textSize="20dp"
+            android:layout_marginTop="20dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Date:"
-        android:id="@+id/startDateTextView"
-        android:textSize="20dp"
-        android:layout_marginTop="20dp" />
-
-
-    <com.seem.android.customviews.TimeAndDatePicker
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </com.seem.android.customviews.TimeAndDatePicker>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="End Date:"
-        android:id="@+id/textView3"
-        android:textSize="20dp"
-        android:layout_marginTop="20dp" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/boton"
+            android:id="@+id/coverPhotoImageView"
+            android:scaleType="centerCrop"/>
 
 
-    <com.seem.android.customviews.TimeAndDatePicker
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Publish permissions:"
+            android:id="@+id/PublishPermissionsTextView"
+            android:textSize="20dp"
+            android:layout_marginTop="20dp" />
 
-    </com.seem.android.customviews.TimeAndDatePicker>
+        <Spinner
+            android:id="@+id/publishPermissionsSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start Date:"
+            android:id="@+id/startDateTextView"
+            android:textSize="20dp"
+            android:layout_marginTop="20dp" />
 
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create and notify my followers"
-        android:id="@+id/seemItButton"
-        android:layout_marginTop="20dp" />
+        <com.seem.android.customviews.TimeAndDatePicker
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/startDateTimeAndDatePicker">
 
-</LinearLayout>
+        </com.seem.android.customviews.TimeAndDatePicker>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End Date:"
+            android:id="@+id/textView3"
+            android:textSize="20dp"
+            android:layout_marginTop="20dp" />
+
+
+        <com.seem.android.customviews.TimeAndDatePicker
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/endDateTimeAndDatePicker">
+
+        </com.seem.android.customviews.TimeAndDatePicker>
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create seem"
+            android:id="@+id/seemItButton"
+            android:layout_marginTop="20dp" />
+
+    </LinearLayout>
+</ScrollView>

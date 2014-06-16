@@ -8,6 +8,7 @@ import com.seem.android.model.Media;
 import com.seem.android.model.Seem;
 import com.seem.android.model.UserProfile;
 import com.seem.android.util.Iso8601;
+import com.seem.android.util.Utils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -380,12 +381,25 @@ public class Api {
 
 
 
-    public static Seem createSeem(String title,Date expire){
+    public static Seem createSeem(String title,Date startDate,Date endDate,String coverPhotoMediaId,String publishPermissions){
         try {
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("title", title);
-            params.put("expire", Iso8601.fromDate(expire));
             params.put("token", MyApplication.getToken());
+
+            if(startDate != null){
+                params.put("startDate", Iso8601.fromDate(startDate));
+            }
+            if(endDate != null){
+                params.put("endDate", Iso8601.fromDate(endDate));
+            }
+            if(coverPhotoMediaId != null){
+                params.put("coverPhotoMediaId", coverPhotoMediaId);
+            }
+            if(publishPermissions != null){
+                params.put("publishPermissions", publishPermissions);
+            }
+
 
             HttpResponse httpResponse = makeRequest(ENDPOINT+ENDPOINT_CREATE_SEEM,params);
             int responseCode = httpResponse.getStatusLine().getStatusCode();
@@ -404,7 +418,7 @@ public class Api {
                 String token = login(MyApplication.getUsername(),MyApplication.getPassword());
                 if(token != null){
                     MyApplication.login(MyApplication.getUsername(),MyApplication.getPassword(),token);
-                    return createSeem(title,expire);
+                    return createSeem(title,startDate,endDate,coverPhotoMediaId,publishPermissions);
                 }
             }
             return null;
@@ -475,11 +489,11 @@ public class Api {
                 return items;
 
             } else {
-                //Utils.debug(Api.class,"API response code is: "+responseCode);
+                Utils.debug(Api.class,"API response code is: "+responseCode);
                 return null;
             }
         } catch (Exception e) {
-            //Utils.debug(Api.class,"API error:",e);
+            Utils.debug(Api.class, "API error:", e);
             return null;
         }
     }
